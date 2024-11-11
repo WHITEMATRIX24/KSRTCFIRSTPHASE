@@ -1,0 +1,11 @@
+.realtimedatadiv {
+  /* margin-left: 300px;
+    margin-top: 20px; */
+}
+@media screen and (max-width: 500px) {
+  .realtimedatadiv {
+    margin: 10px;
+    padding: 0;
+    width: 200px;
+  }
+}

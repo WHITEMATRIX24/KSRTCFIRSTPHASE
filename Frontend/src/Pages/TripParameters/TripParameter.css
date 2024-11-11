@@ -1,0 +1,36 @@
+/* HR alignment style */
+.TripParameters.align-hr {
+    border-top: 2px solid #ccc;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .TripParameters .trip-cost-card {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 20px;
+  }
+  
+  .TripParameters.total-cost {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .TripParameters.trip-cost-card .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+  }
+  
+ .TripParameters .trip-cost-card .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  
+  .TripParameters.card-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  

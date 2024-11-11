@@ -1,0 +1,29 @@
+.TripOverview{
+
+    *{
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+    }
+
+    .circle{
+        border-radius: 50%;
+        border: 1px grey solid;
+        aspect-ratio: 1/1;
+        background-color: white;
+        color: grey;
+    }
+
+    .circlePick{
+        border: 1px green solid;
+    }
+
+    .form-control{
+        padding: 0.5rem 0.8rem;
+    }
+
+    .pointer{
+        cursor: pointer;
+    }
+
+}

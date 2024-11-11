@@ -1,0 +1,16 @@
+.vehicle-horizontal-line {
+    margin: 0px;
+    padding: 0px;
+}
+
+/* table */
+.vehicle-table thead th {
+    padding: 10px;
+    text-align: left;
+}
+
+.vehicle-table tbody td {
+    padding: 10px;
+    padding-bottom: 0px;
+    text-align: left;
+}

@@ -1,0 +1,63 @@
+.main-container{
+    background-color: #E7EDF4;
+}
+.vehicle-card{
+    justify-content: center;
+    align-items: center;
+}
+.vehicle-info{
+    justify-content: center;
+    align-items: center;
+}
+.vehicle-info-vin{
+    font-weight: bold;
+    font-size: 11px;
+}
+.vehicle-info-lp{
+    font-weight: bold;
+    font-size: 11px;
+}
+.fuel-usage{
+    border: solid 1px;
+    border-color: rgba(0, 0, 0, 0.192);
+}
+.fuel-text{
+    font-size: 10px;
+}
+.avgSpeed-main {
+    border: solid 1px;
+    border-color: rgba(0, 0, 0, 0.192);
+    box-sizing: border-box;
+}
+.avg-speed-text{
+    font-size: 11px;
+}
+.vehicle-condi-title{
+    font-size: 1rem;
+}
+.key-title{
+    font-size: 1rem;
+}
+.v-details-head{
+    display: flex;
+    justify-content: space-between;
+}
+.trip-button{
+    background-color: #3366FF14 !important;
+}
+.vd-edit-btn:hover{
+    color: white;
+    background-color: #3366FF14 !important;
+}
+.trip-start-date{
+    font-size: 12px;
+}
+.trip-end-date{
+    font-size: 12px;
+}
+.trip-duration{
+    font-size: 12px;
+}
+.trip-distance{
+    font-size: 12px;
+}

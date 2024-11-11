@@ -1,0 +1,19 @@
+.Navbar-main-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FBFDFF;
+}
+.navlinks-a{
+    text-decoration: underline;
+}
+.nav-event-button{
+    background: var(--color-grey-93, #E7EDF4) !important;
+    margin: 10px;
+}
+.nav-vehicle-button{
+    margin: 10px;
+}
+.nav-event-icon{
+    background: var(--color-grey-93, #E7EDF4) !important;
+}
