@@ -14,20 +14,14 @@ import { getAllTripApi, updateTripApi, getAllVehicles } from '../../services/all
 
 export default function OnGoingTrips() {
 
-  // Initial trip data
-  /* const tripData = [
-    { id: '#786473', vehicle: 'RT 2237', status:'live', driver: 'John Doe', startDate: '2020-01-01T17:00', endDate: '2020-01-02T18:30', duration: '1d 1h 30 min' },
-    { id: '#786474', vehicle: 'RT 2238',status:'live', driver: 'Jane Doe', startDate: '2020-02-01T12:00', endDate: '2020-02-02T14:30', duration: '1d 2h 30 min' },
-    { id: '#786475', vehicle: 'RT 2239',status:'scheduled', driver: 'John Smith', startDate: '2020-03-01T08:00', endDate: '2020-03-02T10:00', duration: '1d 2h' },
-    // Add more data as needed
-  ]; */
+
+  //state to store trip data
 
   const [tripData, setNewTripData] = useState([])
   const [vehicles, setVehicles] = useState([])
   const [modifiedTrips, setModifiedTrips] = useState([])
 
 
-  //state to store trip data
   //state to store trip colleftion and fuel cost
   const [tripCost, setTripCost] = useState({
     "collection": 0,
@@ -37,7 +31,6 @@ export default function OnGoingTrips() {
   //state to validate whether data entered is number
   const [tripCostValidation, setTripCostValidation] = useState({
     "collectionValid": false,
-    "costValid": false
   })
 
 
@@ -94,6 +87,9 @@ export default function OnGoingTrips() {
       collection_amount: "",
       fuelCost: ''
     })
+    setInputPairs([])
+    setFuel([])
+    setFuelCost(0)
   };
   /* Function to open modal */
 
@@ -117,82 +113,51 @@ export default function OnGoingTrips() {
       fuelCost: tripEditing.fuelCost,
       _id: tripEditing._id
     })
-    console.log(editTrip);
+    //console.log(editTrip);
 
   };
-  const [showFuelCost, setShowFuelCost] = useState(false);
 
-  const handleCloseFuleCost = () => {
-    setShowFuelCost(false)
-    seteditTrip({
-      _id,
-      vehicle_id: "",
-      driver_id: "",
-      conductor_id: "",
-      start_date: "",
-      end_date: "",
-      departure_location: "",
-      arrival_location: "",
-      start_time: "",
-      end_time: "",
-      status: "",
-      revenue_generated: "",
-      collection_amount: "",
-      fuelCost: ''
-    })
-  };
-
-
-
-  const addFuelCostModal = (tripEditing) => {
-    setShowFuelCost(true)
-    seteditTrip({
-      _id: tripEditing._id,
-      vehicle_id: tripEditing.vehicle_id,
-      driver_id: tripEditing.driver_id,
-      conductor_id: tripEditing.conductor_id,
-      start_date: tripEditing.start_date,
-      end_date: tripEditing.end_date,
-      departure_location: tripEditing.departure_location,
-      arrival_location: tripEditing.arrival_location,
-      start_time: tripEditing.start_time,
-      end_time: tripEditing.end_time,
-      status: tripEditing.status,
-      revenue_generated: tripEditing.revenue_generated,
-      collection_amount: tripEditing.collection_amount,
-      fuelCost: tripEditing.fuelCost
-
-    })
-  };
 
 
   //function to validate collection amount
   const valiadateCollection = (amount) => {
-
-    if (!!amount.match(/^[0-9]*$/)) {
-      setTripCost({ ...tripCost, collection: amount })
-      seteditTrip({ ...editTrip, collection_amount: amount })
-      setTripCostValidation({ ...tripCostValidation, collectionValid: false })
-
-    }
-    else {
-      setTripCostValidation({ ...tripCostValidation, collectionValid: true })
-    }
+    setTripCost({ ...tripCost, collection: amount })
+    seteditTrip({ ...editTrip, collection_amount: amount })
+    setTripCostValidation({ ...tripCostValidation, collectionValid: false })
 
   }
-  //function to validate Trip cost amount
-  const valiadateTripCost = (amount) => {
 
-    if (!!amount.match(/^[0-9]*$/)) {
-      setTripCost({ ...tripCost, Cost: amount })
-      seteditTrip({ ...editTrip, fuelCost: amount })
-      setTripCostValidation({ ...tripCostValidation, costValid: false })
-    }
-    else {
-      setTripCostValidation({ ...tripCostValidation, costValid: true })
-    }
+  // State to track the list of input pairs (two separate inputs)
+  const [inputPairs, setInputPairs] = useState([]);
+  const [fuel, setFuel] = useState([])
 
-  }
+
+  const [fuelCost, setFuelCost] = useState(0)
+
+  const handleButtonClick = () => {
+    // Add a new pair of input fields, each with its own state for the values
+    setInputPairs([...inputPairs, { liter: '', rate: '', total: '' }]);
+  };
+
+  const handleInputChange = (index, field, event) => {
+    // Update the value of either input1 or input2 for a specific input pair
+    const newInputPairs = [...inputPairs];
+    let newFuel = fuel
+    let fuelCharge = 0
+    newInputPairs[index][field] = event.target.value;
+    newInputPairs[index]['total'] = newInputPairs[index]['liter'] * newInputPairs[index]['rate']
+    fuel[index] = newInputPairs[index]['total']
+    setInputPairs(newInputPairs);
+    setFuel(newFuel)
+    fuelCharge = newFuel.reduce((a, b) => a + b)
+
+    setFuelCost(fuelCharge)
+    setTripCost({ ...tripCost, Cost: fuelCost })
+    seteditTrip({ ...editTrip, fuelCost: fuelCharge })
+
+  };
+
+
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [password, setPassword] = useState("")
@@ -201,14 +166,16 @@ export default function OnGoingTrips() {
     setShowConfirmation(false)
     setPassword("")
   };
-  /* Function to open delete modal */
   const handleOpeneConfirmation = () => {
     setShowConfirmation(true)
+    setShow(false)
+
   };
   const ConfirmSave = () => {
 
     if (password === "1234") {
       UpdateTripDetails()
+
       handleCloseConfirmation()
     }
     else {
@@ -222,11 +189,10 @@ export default function OnGoingTrips() {
     console.log(result.status);
 
     if (result.status == 200) {
-
-
       setNewTripData(result.data);
     }
     else {
+      console.log(result);
 
     }
 
@@ -245,14 +211,10 @@ export default function OnGoingTrips() {
   }
 
   const UpdateTripDetails = async () => {
-    const statusValue = "completed"
     seteditTrip({ ...editTrip, collection_amount: tripCost.collection })
     seteditTrip({ ...editTrip, fuelCost: tripCost.Cost })
     seteditTrip({ ...editTrip, status: "completed" })
-    console.log(editTrip.status);
-    console.log(editTrip.collection_amount);
-
-
+    //api to update trip details
     const result = await updateTripApi(editTrip, editTrip._id)
     if (result.status == 200) {
       handleClose();
@@ -262,25 +224,9 @@ export default function OnGoingTrips() {
     }
   }
 
-  /* const makeTripLive=async()=>{
-    const tripData = tripData.filter(event => new Date(event.date) > currentDate);
-
-  } */
-
-  /*  const deleteATrip = async()=>{
-     const result = await deleteTripApi(deleteTrip)
-     if(result.status == 200){
-         handleCloseDeleteModal();
-     }
-     else{
-         alert(result.error)
-     }
- 
-   } */
   useEffect(() => {
     getAllTrips();
     getAllBuses()
-    //makeTripLive()
   }, [])
   useEffect(() => {
     if (tripData.length > 0 && vehicles.length > 0) {
@@ -425,14 +371,48 @@ export default function OnGoingTrips() {
                 onChange={(e) => { valiadateCollection(e.target.value) }}
               />
               {tripCostValidation.collectionValid && <p className='text-danger'>Please enter valid amount</p>}
-              <TextField
-                required
-                id="outlined-required" name="tripCost"
-                label="Fuel Cost "
-                className='w-100 mb-3'
-                onChange={(e) => { valiadateTripCost(e.target.value) }}
-              />
-              {tripCostValidation.collectionValid && <p className='text-danger'>Please enter valid amount</p>}
+              <>
+                <button className='btn btn-outline-warning m-3' onClick={handleButtonClick}>Add Fuel Cost</button>
+                {/* Render each input pair */}
+                {inputPairs.map((pair, index) => (
+                  <div key={index} className='d-flex' style={{ marginBottom: '10px' }}>
+                    <TextField
+                      required
+                      id="outlined-required" name="liter"
+                      label="Fuel in Liter "
+                      className='w-25     me-3'
+                      value={pair.input1}
+                      onChange={(e) => handleInputChange(index, 'liter', e)}
+                      placeholder={`Liters`} />
+
+                    <TextField
+                      required
+                      id="outlined-required" name="liter"
+                      label="Fuel Rate "
+                      className='w-25     me-3'
+                      value={pair.input2}
+                      onChange={(e) => handleInputChange(index, 'rate', e)}
+                      placeholder={`₹ 0`} />
+
+                    <TextField
+                      readOnly
+                      label="Total "
+
+                      id="outlined-required" name="Total"
+                      className='w-25     me-3'
+                      value={pair.total}
+                      placeholder={`₹ 0`} />
+
+                  </div>
+                ))}
+                <h6 className='text-danger'>Total Fuel Cost</h6>
+                <input
+                  className='form-control w-100 text-danger fs-3'
+
+                  type="text"
+                  value={`₹ ${fuelCost}`}
+                  placeholder='₹ 0'
+                />    </>
             </Form>
           </Modal.Body>
           <Modal.Footer>

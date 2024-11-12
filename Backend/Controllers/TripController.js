@@ -141,3 +141,18 @@ export const editTripDetailsNew = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+// <<<<<<<:::::::Getting All completed Trip Details From DB::::::::>>>>>>>>>
+export const getAllCompletedTripDetails = async (req, res) => {
+    try {
+        const allCompletedTripDetails = await Trip.find({ status: 'completed' });
+        if (allCompletedTripDetails) {
+            res.status(200).json(allCompletedTripDetails);
+        } else {
+            res.status(406).json("Can't Find Any Data::::::");
+        }
+    } catch (err) {
+        console.log("Error at catch in tripController/getAllTripDetails::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}

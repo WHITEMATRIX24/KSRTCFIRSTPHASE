@@ -15,24 +15,31 @@ const Conductors = () => {
     const [ConductorData, setConductorData] = useState([]);
     const [editleave, setEditLeave] = useState({ on_leave: "" });
     const [show, setShow] = useState(false);
+    const [currentId, setCurrentId] = useState(null);
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+
+    const handleShow = (conductor) => {
+        setCurrentId(conductor.conductor_id);
+        setEditLeave({ on_leave: conductor.on_leave || "" }); // Initialize with current status
+        setShow(true);
+    };
+
 
     const navigate = useNavigate();
 
-    const handleLeaveStatus = async (conductor_id, on_leave) => {
+    const handleLeaveStatus = async (on_leave) => {
         const reqBody = { on_leave };
-        // console.log("Driver ID:", driver_id);
-        // console.log("Request Body:", reqBody);
+        console.log("reqBody", reqBody);
+
 
         try {
-            const editStatus = await editLeaveStatusConductor(conductor_id, reqBody);
+            const editStatus = await editLeaveStatusConductor(currentId, reqBody); // Use currentId directly
 
             if (editStatus.status === 200) {
                 setEditLeave(editStatus.data);
-                handleAllConductorData();
-                handleClose() // Refresh the driver data
+                await handleAllConductorData(); // Refresh the conductor data
+                handleClose();
             } else {
                 console.log("Error at EditLeaveStatus:::::", editStatus);
             }
@@ -40,6 +47,7 @@ const Conductors = () => {
             console.log("Error during the request:", err);
         }
     };
+
 
     const handleAllConductorData = async () => {
         try {
@@ -200,7 +208,7 @@ const Conductors = () => {
                                                 <input type="checkbox" />
                                             </td>
                                             <td>
-                                                {/* <img src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8" alt="" height={'50px'} width={'50px'} /> */}
+                                                <img src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8" alt="" height={'50px'} width={'50px'} />
                                             </td>
                                             <td>
                                                 <strong>{conductor.first_name} {conductor.last_name}</strong>
@@ -213,7 +221,7 @@ const Conductors = () => {
                                             </td>
 
                                             <td>
-                                                <div className='bg-light p-2 rounded' style={{ border: '1px solid black', borderRadius: '8px', display: 'inline-block' }}>
+                                                <div className=' p-2 rounded' style={{ border: '1px solid black', borderRadius: '8px', display: 'inline-block' }}>
                                                     {conductor.on_leave === 'Available' ?
                                                         (
                                                             <FontAwesomeIcon icon={faCircleCheck} style={{ color: '#189be3' }} />
@@ -231,7 +239,7 @@ const Conductors = () => {
                                             </td>
 
                                             <td>
-                                                <div className='bg-light p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
+                                                <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
                                                     ₹ INR 25,000
                                                 </div>
                                             </td>
@@ -241,8 +249,8 @@ const Conductors = () => {
                                             </td>
 
                                             <td>
-                                                <button className='btn-primary rounded p-1 px-3' style={{ border: 'none', backgroundColor: '#0d8a72', color: 'white' }}
-                                                    onClick={handleShow} >Edit</button>
+                                                <button className='btn-primary rounded p-1 px-3' style={{ backgroundColor: '#0d8a72', color: 'white', border: 'none' }}
+                                                    onClick={() => handleShow({ conductor_id: conductor._id })} >Edit</button>
                                             </td>
 
                                             {/* ::::::::::::Modal Section:::::::: */}
@@ -268,7 +276,7 @@ const Conductors = () => {
                                                         Close
                                                     </Button>
                                                     <Button variant="primary"
-                                                        onClick={() => handleLeaveStatus(conductor._id, editleave.on_leave)}
+                                                        onClick={() => handleLeaveStatus(editleave.on_leave)}
                                                     >
                                                         Save Changes
                                                     </Button>

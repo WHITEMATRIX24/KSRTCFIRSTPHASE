@@ -2,7 +2,7 @@
 import express from 'express';
 import multerConfig from '../MiddleWares/MulterMiddleware.js';  // Add .js extension
 import { addNewVehicle, editVehicleDetails, getAllVehicles, getAllOutofServicesDetails, getAllAvilableServicesDetails, getAllOnRouteDetails, getAllVehiclesNumber } from '../Controllers/VehicleController.js';  // Add .js extension
-import { addNewTrip, editTripDetails, editTripDetailsNew, getAllTripDetails } from '../Controllers/TripController.js';  // Add .js extension
+import { addNewTrip, editTripDetails, editTripDetailsNew, getAllTripDetails, getAllCompletedTripDetails } from '../Controllers/TripController.js';  // Add .js extension
 import { getAllLedgerData, newLedgerData } from '../Controllers/LedgerController.js';  // Add .js extension
 import { addNewDriver, editDriverDetails, editLeaveStatus, getAllDriverDetails } from '../Controllers/DriverController.js';  // Add .js extension
 import { addNewConductor, editConductorDetails, editLeaveStatusConductor, getAllConductorDetails } from '../Controllers/ConductorController.js';  // Add .js extension
@@ -64,6 +64,8 @@ router.get('/getAllTripDetails', getAllTripDetails);
 router.put('/editTripDetails/:_id', editTripDetails);
 // New Edit Trip Details
 router.put('/editTripDetailsnew/:trip_id/:vehicle_id/:driver_id/:conductor_id', editTripDetailsNew);
+router.get('/getAllCompletedTripDetails', getAllCompletedTripDetails);
+
 
 
 

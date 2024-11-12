@@ -40,6 +40,11 @@ export const addTripApi = async (vehicleId, driverId, conductorId, data) => {
 export const updateTripApiNew = async (trip_id, vehicle_id, driver_id, conductor_id, data) => {
     return commonAPI("PUT", `${SERVERURL}/editTripDetailsnew/${trip_id}/${vehicle_id}/${driver_id}/${conductor_id}`, data, "")
 }
+// all completed trip details
+export const getAllCompletedTripApi = async () => {
+    return await commonAPI('GET', `${SERVERURL}/getAllCompletedTripDetails`, "", "")
+}
+
 
 // get all drivers
 export const getDriversListApi = async () => {
@@ -80,7 +85,8 @@ export const getAllDrivers = async () => {
 }
 
 //  Edit driver Leave Status
-export const editLeaveStatus = async (driver_id, reqbody) => {
+//  Edit driver Leave Status
+export const editLeaveStatusDriver = async (driver_id, reqbody) => {
     return await commonAPI("PUT", `${SERVERURL}/editLeaveStatus/${driver_id}`, reqbody, '');
 }
 export const addNewConductor = async (reqbody) => {

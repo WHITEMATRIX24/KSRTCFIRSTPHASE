@@ -19,22 +19,24 @@ ChartJS.register(
   Legend
 );
 
-function ChartBar() {
+function ChartBar({ collection, fuelconsumtion, revenew }) {
+  console.log(collection, fuelconsumtion);
+
   return (
     <div className='m-5' style={{ width: '450px', height: '300px' }}>
       <Bar
         width={350}
         height={300}
         data={{
-          labels: ['Expense', 'Collection', 'Remunaration'],
+          labels: ['Expense', 'Collection', 'Revenue'],
           datasets: [
             {
               label: 'Total Revenue',
-              data: [12, 19, 3],
+              data: [fuelconsumtion, collection, revenew],
               backgroundColor: [
-                '#0d8a72', // out of service
-                ' #37bc7f', //grenn - availble
-                ' #ffb94d', //o route
+                '#0d8a72',
+                ' #37bc7f',
+                ' #ffb94d',
                 // 'rgba(75, 192, 192, 0.2)',
                 // 'rgba(153, 102, 255, 0.2)',
                 // 'rgba(255, 159, 64, 0.2)',
