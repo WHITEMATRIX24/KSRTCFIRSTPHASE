@@ -1,72 +1,34 @@
 import mongoose from 'mongoose';
 
 const driverSchema = new mongoose.Schema({
-    first_name: {
+    EmployeeName: {
         type: String,
         required: true
     },
-    last_name: {
-        type: String,
-        required: true
+    PEN:{
+        type:String,
+        required:true,
+        unique:true
     },
-    dob: {
-        type: Date,
-        required: true
+    Designation:{
+        type:String,
+        required:true
     },
-    image: {
-        type: String,
-        default: null
-    },
-    gender: {
-        type: String,
-        enum: ["Male", "Female"]
-    },
-    role: {
-        type: String,
-        enum: ["Conductor", "Driver"],
-        default: "Driver",
-        // required: true
+    UNIT:{
+        type:String,
+        required:true
     },
     is_permanent: {
         type: String,
-        enum: ["Temporary", "Permanent"]
-    },
-    salary: {
-        type: Number,
-        // required: true
-    },
-    salary_frequency: {
-        type: String,
-        enum: ["daily", "monthly"],
-        default: "daily"
-        // required: true
+        enum: ["Badli", "Permanent"]
     },
     on_leave: {
         type: String,
         enum: ["Leave", "Available"],
         default: "Available"
     },
-    license_number: {
-        type: String,
-        unique: true
-    },
-    contact_info: {
-        phone: {
-            type: String,
-            unique: true
-        }
-    },
-    emergency_contact: {
+    phone: {
         type: Number,
-        required: true
-    },
-    assigned_vehicles: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Vehicles'
-    }],
-    blood_group: {
-        type: String,
-        enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]
     },
     created_at: {
         type: Date

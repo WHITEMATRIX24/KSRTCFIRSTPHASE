@@ -1,49 +1,29 @@
 import mongoose from 'mongoose';
 
 const vehicleSchema = new mongoose.Schema({
-    number: {
+    REGNO: {
         type: String,
         required: true,
         unique: true
     },
-    // add enum
-    model: {
+    BUSNO:{
         type: String,
-        enum: ["Ashok Leyland", "Bharath Benzs"],
+        required: true,
+        unique: true
+    },
+    CLASS: {
+        type: String,
         required: true
+    },
+    ALLOTTEDDEPOT:{
+        type: String,
+        required:true 
     },
     status: {
         type: String,
-        enum: ["enroute", "available", "maintenance", "out_of_services"],
+        enum: [" in_service", "en_route", "doc"],
         required: true
     },
-    transport_type: {
-        type: String,
-        enum: ["deluxe", "super", "superfast"],
-        required: true
-    },
-    odometer: {
-        type: String,
-        default: null,
-    },
-    driver: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Drivers'
-    },
-    // extra added condition and fuelconsumption
-    // condition:{
-    //     type: String,
-    //     enum: ["Good","Bad"],
-    //     required: true
-    // },
-    fuelconsumption: {
-        type: String,
-        default: null,
-
-    },
-
-
-
     maintenance_history: [
         {
             maintenance_date: {
@@ -61,7 +41,8 @@ const vehicleSchema = new mongoose.Schema({
         }
     ],
     created_at: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     updated_at: {
         type: Date,
