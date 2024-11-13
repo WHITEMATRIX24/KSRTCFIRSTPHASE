@@ -362,7 +362,7 @@ const Vehicles = () => {
                                                                 onClick={() =>
                                                                     handleChangeVehicleStatus(
                                                                         vehicle,
-                                                                        "out_of_service"
+                                                                        "out_of_services"
                                                                     )
                                                                 }
                                                             >
