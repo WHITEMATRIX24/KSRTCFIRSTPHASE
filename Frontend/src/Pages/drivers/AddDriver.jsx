@@ -29,9 +29,9 @@ const AddDriver = () => {
         if (newDriver.status == 201) {
           console.log(newDriver.data);
           setDriverData(newDriver.data);
-          alert("New Conductor Added SuccessFully:::::");
+          alert("New Driver Added SuccessFully:::::");
         } else if (newDriver.status == 406) {
-          alert(" Conductor Already Existing:::::")
+          alert(" Driver Already Existing:::::")
 
         }
         else {
