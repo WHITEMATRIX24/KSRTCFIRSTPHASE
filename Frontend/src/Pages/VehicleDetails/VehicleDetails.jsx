@@ -8,7 +8,7 @@ import VehicleNav from './VehicleNav.jsx';
 
 import vehicleImg from '../../assets/vehicleImg.jpg';
 
-import BatteryImg from '../../assets/BatteryImg.png';
+import BatteryImg from '../../assets/batteryImg.png';
 import engineImg from '../../assets/engineImg.png';
 import gasImg from '../../assets/gasImg.png';
 import oilCheck from '../../assets/oilImg.png';
