@@ -338,10 +338,10 @@ export default function OnGoingTrips() {
                         <button className='btn btn-outline-success' onClick={()=>addFuelCostModal(trip)} >Add Fuel Cost</button>
                       </td> */}
                           {/* <td>
-                        <Button variant="link" className="p-0">
-                          <FontAwesomeIcon className='text-danger' onClick={()=>showDeleteModal(trip.id)} icon={faTrash} />
-                        </Button>
-                      </td> */}
+                            <Button variant="link" className="p-0">
+                              <FontAwesomeIcon className='text-danger' onClick={() => showDeleteModal(trip.id)} icon={faTrash} />
+                            </Button>
+                          </td> */}
                         </tr>
                       ))}
                     </tbody>

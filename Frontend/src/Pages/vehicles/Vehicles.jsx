@@ -196,10 +196,10 @@ const Vehicles = () => {
 
                         <div className="d-flex justify-content-between align-items-center mt-3">
                             {/* Left - gear and trash icons */}
-                            <div className="d-flex gap-5 ms-5">
+                            {/* <div className="d-flex gap-5 ms-5">
                                 <FontAwesomeIcon icon={faGear} />
                                 <FontAwesomeIcon icon={faTrashCan} />
-                            </div>
+                            </div> */}
 
                             {/* Right - Items on page, dropdown, pagination */}
                             <div className="d-flex gap-4 align-items-center me-5">
@@ -363,13 +363,13 @@ const Vehicles = () => {
                                                     </div>
                                                 </td>
 
-                                                <td>
+                                                {/* <td>
                                                     <div style={{ position: "relative", width: "50px" }}>
-                                                        <FontAwesomeIcon
+                                                         <FontAwesomeIcon
                                                             icon={faEllipsisVertical}
                                                             onClick={() => toggleEditOptions(vehicle.id)}
                                                             style={{ cursor: "pointer" }}
-                                                        />
+                                                        /> 
                                                         {showEditOptions[vehicle.id] && (
                                                             <div
                                                                 className="edit-options-dropdown"
@@ -394,7 +394,7 @@ const Vehicles = () => {
                                                             </div>
                                                         )}
                                                     </div>{" "}
-                                                </td>
+                                                </td> */}
                                             </tr>
                                         ))}
                                 </tbody>

@@ -166,10 +166,10 @@ const Conductors = () => {
                         <hr className='vehicle-horizontal-line' />
                         <div className="d-flex justify-content-between align-items-center mt-3">
                             {/* Left - gear and trash icons */}
-                            <div className="d-flex gap-5 ms-5">
+                            {/* <div className="d-flex gap-5 ms-5">
                                 <FontAwesomeIcon icon={faGear} />
                                 <FontAwesomeIcon icon={faTrashCan} />
-                            </div>
+                            </div> */}
 
                             {/* Right - Items on page, dropdown, pagination */}
                             <div className="d-flex gap-4 align-items-center me-5">

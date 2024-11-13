@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Navbar from 'react-bootstrap/Navbar';
 import './Sidebar.css'
 import Divider from '@mui/material/Divider';
+import { Link } from 'react-router-dom';
 
 function NavSidebar() {
   const [isOpen, setIsOpen] = useState(true);
@@ -43,13 +44,13 @@ function NavSidebar() {
         <Divider />
         {activeMenu === 'dashboard' && (
           <ul className="submenu">
-            <li><a href="#" id='vehiclesoverview' className='my-1' onClick={() => toggelColor('vehiclesoverview')}>Vehicles Overview</a></li>
-            <Divider />
+            {/* <li><a href="#" id='vehiclesoverview' className='my-1' onClick={() => toggelColor('vehiclesoverview')}>Vehicles Overview</a></li>
+            <Divider /> */}
 
             <li><a href="/" className='my-1' id='realTimeData' onClick={() => toggelColor('realTimeData')}>Real Time Data</a></li>
             <Divider />
-            <li><a href="#" className='my-1' id='Events' onClick={() => toggelColor('Events')}>Events</a></li>
-            <Divider />
+            {/* <li><a href="#" className='my-1' id='Events' onClick={() => toggelColor('Events')}>Events</a></li>
+            <Divider /> */}
           </ul>
         )}
       </li>
@@ -81,7 +82,7 @@ function NavSidebar() {
         <Divider />
         {activeMenu === 'trips' && (
           <ul className="submenu">
-            <li><a href="/trip-overview" className='my-2' id='vehiclesoverview' onClick={() => toggelColor('vehiclesoverview')}>Overview</a></li> <Divider />
+            <li><Link to="/trip-overview" className='my-2' id='vehiclesoverview' onClick={() => toggelColor('vehiclesoverview')}>Overview</Link></li>
             <li><a href="/scheduled-trips" className='my-2' id='Upcoming' onClick={() => toggelColor('Upcoming')}>Upcoming</a></li> <Divider />
             <li><a href="/add-trip" className='my-2' id='Scheduled' onClick={() => toggelColor('Scheduled')}>Schedule</a></li> <Divider />
             <li><a href="/ongoing-trips" className='my-2' id='Ongoing' onClick={() => toggelColor('Ongoing')}>OnGoing</a></li> <Divider />
