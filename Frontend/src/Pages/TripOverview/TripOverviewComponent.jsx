@@ -16,7 +16,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { getAllTripApi, getVehiclesNumberDetails } from "../../services/allApi";
+import { getAllTripApi, getVehiclesNumberDetails } from "../../services/allAPI";
 
 function TripOverviewComponent() {
   let dateToday = new Date();
