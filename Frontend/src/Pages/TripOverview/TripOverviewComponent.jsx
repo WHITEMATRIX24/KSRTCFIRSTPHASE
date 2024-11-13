@@ -144,10 +144,12 @@ function TripOverviewComponent() {
   };
 
   const filterVehiclesNumber = (vehicleId) => {
-    const vehicleDetails = vehicleDetailsData.find(
-      (val) => val._id == vehicleId
+    const vehicleDetails = vehicleDetailsData?.find(
+      (val) => val._id === vehicleId
     );
-    return vehicleDetails.number;
+    if (vehicleDetails) {
+      return vehicleDetails.number;
+    }
   };
 
   return (
@@ -190,7 +192,7 @@ function TripOverviewComponent() {
             />
           </div>
 
-          {filteredTrips.map((item, index) =>
+          {filteredTrips?.map((item, index) =>
             index == chosenTrip ? (
               <div
                 key={index}
@@ -202,7 +204,7 @@ function TripOverviewComponent() {
                     <div className="circlePick circle p-1 me-2">
                       <FontAwesomeIcon icon={faCarSide} />
                     </div>
-                    <h4>{filterVehiclesNumber(item.vehicle_id)}</h4>
+                    <h4>{filterVehiclesNumber(item?.vehicle_id)}</h4>
                   </div>
                   <div
                     className={`d-flex flex-column align-items-end ${tripStatusColor(
@@ -216,8 +218,9 @@ function TripOverviewComponent() {
                   </div>
                 </div>
                 <div
-                  className={`ms-5 mt-3 ${item?.status == 4 ? tripStatusArrival(item?.status) : ""
-                    }`}
+                  className={`ms-5 mt-3 ${
+                    item?.status == 4 ? tripStatusArrival(item?.status) : ""
+                  }`}
                 >
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faLocationDot} className="me-2" />
@@ -225,8 +228,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.departure_location.city}
                       </span>
-                      <span>{`${item?.start_date.split("T")[0]} , ${item?.start_time
-                        }`}</span>
+                      <span>{`${item?.start_date.split("T")[0]} , ${
+                        item?.start_time
+                      }`}</span>
                     </div>
                   </div>
                 </div>
@@ -237,8 +241,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.arrival_location.city}
                       </span>
-                      <span>{`${item?.end_date.split("T")[0]} , ${item?.end_time
-                        }`}</span>
+                      <span>{`${item?.end_date.split("T")[0]} , ${
+                        item?.end_time
+                      }`}</span>
                     </div>
                   </div>
                 </div>
@@ -268,8 +273,9 @@ function TripOverviewComponent() {
                   </div>
                 </div>
                 <div
-                  className={`ms-5 mt-3 ${item?.status == 4 ? tripStatusArrival(item?.status) : ""
-                    }`}
+                  className={`ms-5 mt-3 ${
+                    item?.status == 4 ? tripStatusArrival(item?.status) : ""
+                  }`}
                 >
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faLocationDot} className="me-2" />
@@ -277,8 +283,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.departure_location.city}
                       </span>
-                      <span>{`${item?.start_date.split("T")[0]} , ${item?.start_time
-                        }`}</span>
+                      <span>{`${item?.start_date.split("T")[0]} , ${
+                        item?.start_time
+                      }`}</span>
                     </div>
                   </div>
                 </div>
@@ -289,8 +296,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.arrival_location.city}
                       </span>
-                      <span>{`${item?.end_date.split("T")[0]} , ${item?.end_time
-                        }`}</span>
+                      <span>{`${item?.end_date.split("T")[0]} , ${
+                        item?.end_time
+                      }`}</span>
                     </div>
                   </div>
                 </div>
