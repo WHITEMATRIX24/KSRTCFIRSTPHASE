@@ -65,12 +65,9 @@ export const editTripDetails = async (req, res) => {
 
     try {
         const vehicle = await Trip.findById(_id);
-
-
         if (!vehicle) {
             return res.status(404).json({ error: "One or more related entities not found" });
         }
-
         const updatedTrip = await Trip.findByIdAndUpdate(_id, {
             start_date, end_date, start_time, end_time,
             departure_location: {
@@ -98,11 +95,7 @@ export const editTripDetails = async (req, res) => {
     }
 };
 
-
-
-
 // editing trip by tripid , driverid, vehicleid, contuctorid
-
 export const editTripDetailsNew = async (req, res) => {
     const { start_date, end_date, start_time, end_time, departure_location, arrival_location, status } = req.body;
     const { vehicle_id, driver_id, conductor_id, trip_id } = req.params;

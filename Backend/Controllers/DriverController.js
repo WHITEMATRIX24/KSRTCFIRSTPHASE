@@ -3,21 +3,15 @@ import Driver from '../Models/DiverSchema.js';
 // <<<<<<::::::::Adding New Driver Details::::::::>>>
 
 export const addNewDriver = async (req, res) => {
-    const { first_name, last_name, dob, gender, role, is_permanent, salary,
-        salary_frequency, license_number, contact_info: { phone }, emergency_contact } = req.body;
+    const { EmployeeName, PEN, Designation, UNIT, is_permanent, phone } = req.body;
     // const image = req.file ? req.file.filename : null;
     try {
-        const existingDriver = await Driver.findOne({ license_number });
+        const existingDriver = await Driver.findOne({ PEN });
         if (existingDriver) {
             res.status(406).json("Driver is Already Existing:::::");
         } else {
             const newDriver = new Driver({
-                first_name, last_name, dob, gender, role, is_permanent,
-                salary, salary_frequency, license_number, emergency_contact,
-                contact_info: {
-                    phone: phone,
-                },
-                emergency_contact
+                EmployeeName, PEN, Designation, UNIT, is_permanent, phone
             });
             await newDriver.save();
             res.status(201).json(newDriver);
@@ -45,17 +39,11 @@ export const getAllDriverDetails = async (req, res) => {
 
 // <<<<<:::::::::Editing Driver Details By driver_id:::::::::>>>>>>>>>
 export const editDriverDetails = async (req, res) => {
-    const { first_name, last_name, dob, gender, role, is_permanent, salary, salary_frequency,
-        on_leave, license_number, phone, blood_group, emergency_contact } = req.body;
+    const { EmployeeName, PEN, Designation, UNIT, is_permanent, phone, on_leave } = req.body;
     const { driver_id } = req.params;
     try {
         const updatedDriver = await Driver.findByIdAndUpdate(driver_id, {
-            first_name, last_name, dob, gender, role, is_permanent,
-            salary, salary_frequency, on_leave, license_number,
-            contact_info: {
-                phone: phone
-            },
-            blood_group, emergency_contact
+            EmployeeName, PEN, Designation, UNIT, is_permanent, phone, on_leave
         }, { new: true });
 
         if (updatedDriver) {
@@ -69,9 +57,7 @@ export const editDriverDetails = async (req, res) => {
     }
 }
 
-
-// Edit Leave Status
-
+//<<<<<::::::: Edit Leave Status ::::::>>>>>
 export const editLeaveStatus = async (req, res) => {
     const { on_leave } = req.body;
     const { driver_id } = req.params;
@@ -108,3 +94,21 @@ export const editLeaveStatus = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+//<<<<<<......Delete Driver By driver_Id........>>>>
+export const deleteDriverById = async (req, res) => {
+    const { driver_id } = req.params;
+    try {
+        const result = await Driver.findByIdAndDelete(driver_id);
+        if (result) {
+            res.status(200).json(result);
+            console.log("Delete Successfully::::");
+
+        } else {
+            res.status(404).json("Error at Deleting driver Status(406)::::::");
+        }
+    } catch (err) {
+        console.log("Error at catch in DriverController/deletDriverById::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}

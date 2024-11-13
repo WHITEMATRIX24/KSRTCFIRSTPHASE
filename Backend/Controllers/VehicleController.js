@@ -1,20 +1,18 @@
 import Vehicles from "../Models/VechicleSchema.js";
 
 // <<<<<<::::::::Adding New Vehicle Details::::::::>>>
-// <<<<<<::::::::Adding New Vehicle Details::::::::>>>
 export const addNewVehicle = async (req, res) => {
     // console.log("in controller");
-
-    const { transport_type, number, model, status, fuelconsumption, odometer } = req.body;
+    const { REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status } = req.body;
     console.log(req.body);
 
     try {
-        const existingVehicle = await Vehicles.findOne({ number });
+        const existingVehicle = await Vehicles.findOne({ BUSNO });
         if (existingVehicle) {
             res.status(406).json("Vehicle is Already Existing:::::");
         } else {
             const newVehicle = new Vehicles({
-                transport_type, number, model, status, fuelconsumption, odometer
+                REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status
             });
             await newVehicle.save();
             res.status(201).json(newVehicle);
@@ -22,10 +20,8 @@ export const addNewVehicle = async (req, res) => {
     } catch (err) {
         console.log("Error at catch in vehicleController/addNewVehicle::::::", err);
         res.status(500).json({ error: "Internal server error" });
-
     }
 };
-
 
 // <<<<<<<:::::::Getting All Vehicle Details From DB::::::::>>>>>>>>>
 export const getAllVehicles = async (req, res) => {
@@ -45,10 +41,10 @@ export const getAllVehicles = async (req, res) => {
 // <<<<<:::::::::Editing Vehicle Details By vehicle_id:::::::::>>>>>>>> 
 export const editVehicleDetails = async (req, res) => {
     const { vehicle_id } = req.params;
-    const { number, model, status, transport_type, odometer } = req.body;
+    const { REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status } = req.body;
     try {
         const updatedVehicle = await Vehicles.findByIdAndUpdate(vehicle_id, {
-            number, model, status, transport_type, odometer
+            REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status
         }, { new: true });
 
         if (updatedVehicle) {
@@ -65,7 +61,7 @@ export const editVehicleDetails = async (req, res) => {
 // <<<::::::::get all Vechicle number :::::::>>>>>>
 export const getAllVehiclesNumber = async (req, res) => {
     try {
-        const allVehicleDetails = await Vehicles.find({}, { _id: 1, number: 1 });
+        const allVehicleDetails = await Vehicles.find({}, { _id: 1, BUSNO: 1 });
         if (allVehicleDetails) {
             res.status(200).json(allVehicleDetails);
         } else {
@@ -83,7 +79,7 @@ export const getAllVehiclesNumber = async (req, res) => {
 // <<<<<:::::::::Getting All out of service Vehicle Details from Db :::::::::>>>>>>>>
 export const getAllOutofServicesDetails = async (req, res) => {
     try {
-        const AllOSDetails = await Vehicles.find({ status: "out_of_services" });
+        const AllOSDetails = await Vehicles.find({ status: "doc" });
         if (AllOSDetails) {
             res.status(200).json(AllOSDetails);
         } else {
@@ -98,10 +94,10 @@ export const getAllOutofServicesDetails = async (req, res) => {
     }
 };
 
-// <<<<<:::::::::Getting All Avilable service Vehicle Details from Db :::::::::>>>>>>>>
+// <<<<<:::::::::Getting All in_service  Vehicle Details from Db :::::::::>>>>>>>>
 export const getAllAvilableServicesDetails = async (req, res) => {
     try {
-        const AllAvilableDetails = await Vehicles.find({ status: "available" });
+        const AllAvilableDetails = await Vehicles.find({ status: "in_service" });
         if (AllAvilableDetails) {
             res.status(200).json(AllAvilableDetails);
         } else {
@@ -119,18 +115,32 @@ export const getAllAvilableServicesDetails = async (req, res) => {
 // <<<<<:::::::::Getting All on route Vehicle Details from Db :::::::::>>>>>>>>
 export const getAllOnRouteDetails = async (req, res) => {
     try {
-        const AllOnRouteDetails = await Vehicles.find({ status: "enroute" });
+        const AllOnRouteDetails = await Vehicles.find({ status: "en_route" });
         if (AllOnRouteDetails) {
             res.status(200).json(AllOnRouteDetails);
         } else {
             res.status(406).json("Can't find any vehicle Details:::: ");
         }
     } catch (err) {
-        console.log(
-            "Error at catch in vehicleController/getAllVehicles::::::",
-            err
-        );
+        console.log("Error at catch in vehicleController/getAllOnRouteDetails::::::", err);
         res.status(500).json({ error: "Internal server error" });
     }
 };
+
+// <<<<<:::::Delete Vehicle By ID::::::>>>>>
+export const deleteVehicleById = async (req, res) => {
+    const { vehicle_id } = req.params;
+    try {
+        const vehicleById = await Vehicles.findByIdAndDelete(vehicle_id);
+        if (vehicleById) {
+            res.status(200).json(vehicleById);
+            console.log("Delete Successfully::::");
+        } else {
+            res.status(406).json("No vehicles found By this Id::::::");
+        }
+    } catch (err) {
+        console.log("Error at catch in vehicleController/addNewVehicle::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
 
