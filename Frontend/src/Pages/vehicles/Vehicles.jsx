@@ -17,7 +17,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import NavSidebar from "../../components/common/Sidebar/NavSidebar";
-import { getAllVehicles, updateVehicleStatus } from "../../services/allApi";
+import { getAllVehicles, updateVehicleStatus } from "../../services/allAPI";
 
 const Vehicles = () => {
     const [vehiclesData, setVehiclesData] = useState([]);
