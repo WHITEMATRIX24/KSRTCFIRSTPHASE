@@ -285,7 +285,7 @@ const Vehicles = () => {
 
                                                 <td>
                                                     <div
-                                                        className=" p-2 rounded"
+                                                        className="p-2 rounded"
                                                         style={{
                                                             border: "1px solid black",
                                                             borderRadius: "8px",
@@ -293,26 +293,35 @@ const Vehicles = () => {
                                                         }}
                                                     >
                                                         {vehicle.status === "available" && (
-                                                            <FontAwesomeIcon
-                                                                icon={faCircleCheck}
-                                                                style={{ color: "#189be3" }}
-                                                            />
+                                                            <>
+                                                                <FontAwesomeIcon
+                                                                    icon={faCircleCheck}
+                                                                    style={{ color: "#189be3" }}
+                                                                />
+                                                                <span className="ms-2">Available</span>
+                                                            </>
                                                         )}
                                                         {vehicle.status === "enroute" && (
-                                                            <FontAwesomeIcon
-                                                                icon={faLocationArrow}
-                                                                style={{ color: "#0d8a72" }}
-                                                            />
+                                                            <>
+                                                                <FontAwesomeIcon
+                                                                    icon={faLocationArrow}
+                                                                    style={{ color: "#0d8a72" }}
+                                                                />
+                                                                <span className="ms-2">Enroute</span>
+                                                            </>
                                                         )}
                                                         {vehicle.status === "out_of_services" && (
-                                                            <FontAwesomeIcon
-                                                                icon={faBan}
-                                                                style={{ color: "#db5c4d" }}
-                                                            />
+                                                            <>
+                                                                <FontAwesomeIcon
+                                                                    icon={faBan}
+                                                                    style={{ color: "#db5c4d" }}
+                                                                />
+                                                                <span className="ms-2">Out of Services</span>
+                                                            </>
                                                         )}
-                                                        <span className="ms-2">{vehicle.status}</span>
                                                     </div>
                                                 </td>
+
 
                                                 <td>
                                                     <div className="btn-group">
