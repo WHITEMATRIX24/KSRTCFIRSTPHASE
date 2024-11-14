@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBus, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -7,53 +7,154 @@ import { addvehicleAPI } from '../../services/allAPI';
 
 const AddVehicle = () => {
   const [vehicleData, setVehicleData] = useState({
-    transport_type: '',
-    number: '',
-    model: '',
-    driver: '',
-    status: '',
-    fuelconsumption: '',
-    odometer: '',
-
+    REGNO: '',
+    BUSNO: '',
+    ALLOTTEDDEPOT: '',
+    CLASS: '',
+    status: 'in_service',
+    maintenance_history: [],
   });
+
+  const [search, setSearch] = useState({
+    vehicleClass: '',
+    depot: ''
+  });
+  const [dropdownsOpen, setDropdownsOpen] = useState({
+    vehicleClass: false,
+    depot: false
+  });
+  const [selected, setSelected] = useState({
+    vehicleClass: '',
+    depot: ''
+  });
+
+  const vehicleClasses = [
+    { name: 'AC PREMIUM SF', id: '1' },
+    { name: 'BB AC SEATER', id: '2' },
+    { name: 'CLASS', id: '3' },
+    { name: 'ELECTRIC', id: '4' },
+    { name: 'EL DD', id: '5' },
+    { name: 'FP', id: '6' },
+    { name: 'JN AC', id: '7' },
+    { name: 'JN NAC', id: '8' },
+    { name: 'ORD', id: '9' },
+    { name: 'S/DLX', id: '10' },
+    { name: 'S/EXP', id: '11' },
+    { name: 'SEATER CUM SLEEPER AC', id: '12' },
+    { name: 'SEATER CUM SLEEPER NON AC', id: '13' },
+    { name: 'SEMI SLEEPER', id: '14' },
+    { name: 'SFP', id: '15' },
+    { name: 'SP', id: '16' },
+    { name: 'SSFP', id: '17' },
+    { name: 'SWIFT AC SEATER', id: '18' },
+    { name: 'SWIFT DLX', id: '19' },
+    { name: 'SWIFT SLEEPER', id: '20' }
+  ];
+
+  const depots = [
+    'ADR', 'ALP', 'ALY', 'ANK', 'ARD', 'ARK', 'ATL', 'CDM', 'CGR', 'CHT', 'CHY',
+    'CLD', 'CTL', 'CTR', 'EDT', 'EKM', 'EMY', 'ETP', 'GVR', 'HPD', 'IJK', 'KDR',
+    'KGD', 'KHD', 'KKD', 'KKM', 'KLM', 'KLP', 'KMG', 'KMR', 'KMY', 'KNI', 'KNP',
+    'KNR', 'KPM', 'KPT', 'KTD', 'KTM', 'KTP', 'KTR', 'KYM', 'MKD', 'MLA', 'MLP',
+    'MLT', 'MND', 'MNR', 'MPY', 'MVK', 'MVP', 'NBR', 'NDD', 'NDM', 'NPR', 'NTA',
+    'PBR', 'PDK', 'PDM', 'PLA', 'PLD', 'PLK', 'PLR', 'PMN', 'PNI', 'PNK', 'PNR',
+    'PPD', 'PPM', 'PRK', 'PSL', 'PTA', 'PVM', 'PVR', 'RNI', 'SBY', 'TDP', 'TDY',
+    'TLY', 'TMY', 'TPM', 'TSR', 'TVL', 'TVM CL', 'TVM CTY', 'TVRA', 'VDA', 'VDY',
+    'VJD', 'VKB', 'VKM', 'VLD', 'VRD', 'VTR', 'VZM'
+  ];
+
+
+  const handleSearchChange = (type, value) => {
+    setSearch(prevSearch => ({ ...prevSearch, [type]: value }));
+  };
+
+  const handleDropdownToggle = (type) => {
+    setDropdownsOpen(prevState => ({ ...prevState, [type]: !prevState[type] }));
+  };
+
+  const handleBlur = (type) => {
+    setTimeout(() => setDropdownsOpen(prevState => ({ ...prevState, [type]: false })), 200);
+  };
+
+  const handleSelectionChange = (type, value) => {
+    setSelected(prevSelected => ({ ...prevSelected, [type]: value }));
+    setSearch(prevSearch => ({ ...prevSearch, [type]: value }));
+    setDropdownsOpen(prevState => ({ ...prevState, [type]: false }));
+
+    if (type === 'vehicleClass') {
+      setVehicleData(prevData => ({
+        ...prevData,
+        CLASS: value
+      }));
+    } else if (type === 'depot') {
+      setVehicleData(prevData => ({
+        ...prevData,
+        ALLOTTEDDEPOT: value
+      }));
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setVehicleData({
-      ...vehicleData,
-      [name]: value,
-    });
+    setVehicleData(prevData => ({ ...prevData, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(vehicleData);
-    // You would add API logic here to save the vehicle data
-    const { transport_type, number, model, status, fuelconsumption, odometer } = vehicleData
-    if (!transport_type || !number || !model || !status) {
-      alert("please fill the field")
-    } else {
-      try {
-        const result = await addvehicleAPI(vehicleData)
-        console.log(result);
-        if (result.status === 406) {
-          alert("Vehicle is already exist")
-        }
-        if (result.status === 201) {
-          alert("successfully added")
-          setVehicleData({ number: "", model: "", status: "", transport_type: "", odometer: "", fuelconsumption: "" })
+    e.preventDefault(); // Prevent form submission to handle it manually
+    console.log("Submitting vehicle data:", vehicleData);
 
+    try {
+      // API call to add vehicle
+      const result = await addvehicleAPI(vehicleData);
+      console.log("API Response:", result); // Log entire response for debugging
+
+      // Handle different response statuses from the server
+      if (result.status === 406) {
+        alert('Vehicle already exists');
+      } else if (result.status === 201) {
+        // Reset form state after successful submission
+        alert('Vehicle successfully added');
+        setVehicleData({
+          CLASS: '',
+          BUSNO: '',
+          REGNO: '',
+          ALLOTTEDDEPOT: '',
+          status: 'in_service', // Default to 'in_service' if not provided
+          maintenance_history: [],
+        });
+        setSelected({ vehicleClass: '', depot: '' }); // Reset other related states
+      } else {
+        alert('Unexpected response from server');
+      }
+    } catch (error) {
+      // Handle detailed error scenarios
+      if (error.response) {
+        const httpStatus = error.response.status;
+        const responseMessage = error.response.data?.message || "Unexpected error occurred";
+        console.error("Server response error:", error.response);
+
+        // Display appropriate error messages based on HTTP status code
+        if (httpStatus === 500) {
+          alert("Internal Server Error: Please try again later.");
+        } else if (httpStatus === 404) {
+          alert("Not Found: The requested resource could not be located.");
         } else {
-          alert(result.data.message)
+          alert(`Server error: ${responseMessage}`);
         }
-
-      } catch (error) {
-        console.log(error);
-
+      } else {
+        // Handle network errors or if error.response doesn't exist
+        console.error("Network error:", error);
+        alert('Network error: Please check your connection and try again.');
       }
     }
-
   };
+
+  const filteredVehicleClasses = vehicleClasses.filter(vehicleClass =>
+    vehicleClass.name.toLowerCase().includes(search.vehicleClass.toLowerCase())
+  );
+  const filteredDepots = depots.filter(depot =>
+    depot.toLowerCase().includes(search.depot.toLowerCase())
+  );
 
   return (
     <div>
@@ -62,7 +163,6 @@ const AddVehicle = () => {
         <Container fluid>
           <Row>
             <Col xs={2}></Col>
-
             <Col xs={9}>
               <Card className="shadow-sm border-0">
                 <Card.Body>
@@ -70,136 +170,107 @@ const AddVehicle = () => {
                     <FontAwesomeIcon icon={faBus} className="me-2 text-primary" />
                     Vehicle Details
                   </Card.Title>
-
                   <hr className="mb-4" />
                   <h5 className="text-start">1. VEHICLE INFORMATION</h5>
 
                   <Form onSubmit={handleSubmit}>
-                    <Form.Group>
-                      <Row className="mt-3">
-                        <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>VEHICLE TYPE</Form.Label>
-                          <Form.Check
-                            type="radio"
-                            label="Super Deluxe"
-                            name="transport_type"
-                            value="deluxe"
-                            onChange={handleChange}
-                          />
-                          <Form.Check
-                            type="radio"
-                            label="Fast Passenger"
-                            name="transport_type"
-                            value="super"
-                            onChange={handleChange}
-                          />
-                          <Form.Check
-                            type="radio"
-                            label="Super Fast"
-                            name="transport_type"
-                            value="superfast"
-                            onChange={handleChange}
-                          />
-                        </Col>
-                        <Col></Col>
-                      </Row>
-
-                      <Row className="mt-3">
-                        <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>VEHICLE NO</Form.Label>
+                    <Row className="mt-3">
+                      <Col md={6}>
+                        <Form.Group controlId="vehicleClass">
+                          <Form.Label>Vehicle Class</Form.Label>
                           <Form.Control
-                            value={vehicleData.number}
-                            type="text"
-                            name="number"
-                            onChange={handleChange}
+                            value={search.vehicleClass}
+                            onChange={(e) => handleSearchChange('vehicleClass', e.target.value)}
+                            onFocus={() => handleDropdownToggle('vehicleClass')}
+                            onBlur={() => handleBlur('vehicleClass')}
+                            placeholder="Search or select a vehicle class"
                           />
-                        </Col>
-                      </Row>
+                          {dropdownsOpen.vehicleClass && (
+                            <div style={{ border: '1px solid #ddd', marginTop: '5px', padding: '10px' }}>
+                              {filteredVehicleClasses.length > 0 ? (
+                                filteredVehicleClasses.map((vehicleClass, index) => (
+                                  <Form.Check
+                                    type="radio"
+                                    label={vehicleClass.name}
+                                    value={vehicleClass.name}
+                                    checked={selected.vehicleClass === vehicleClass.name}
+                                    onChange={() => handleSelectionChange('vehicleClass', vehicleClass.name)}
+                                    key={index}
+                                  />
+                                ))
+                              ) : (
+                                <div>No matching vehicle classes found</div>
+                              )}
+                            </div>
+                          )}
+                        </Form.Group>
+                      </Col>
+                      <Col md={6}>
+                        <Form.Label>Registration No</Form.Label>
+                        <Form.Control
+                          value={vehicleData.REGNO}
+                          type="text"
+                          name="REGNO"
+                          onChange={handleChange}
+                        />
+                      </Col>
+                    </Row>
 
-                      <Row className="mt-3">
-                        <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>VEHICLE MODEL</Form.Label>
-                          <Form.Control value={vehicleData.model} as="select" name="model" onChange={handleChange}>
-                            <option value="" disabled>select model</option>
-                            <option value="Ashok Leyland">Asok Leyland</option>
-                            <option value="Bharath Benzs">Bharath Benzs</option>
-
-                          </Form.Control>
-                        </Col>
-                        <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>VEHICLE STATUS</Form.Label>
-                          <Form.Control value={vehicleData.status} as="select" name="status" onChange={handleChange} >
-                            <option value="" disabled>Select status</option>
-                            <option value="available">Available</option>
-                            <option value="enroute">Enroute</option>
-
-                            <option value="out_of_services">Out of Services</option>
-                          </Form.Control>
-                        </Col>
-                        {/* <Col md={6}>
-
-                        
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>ASSIGN DRIVER</Form.Label>
-                          <Form.Control value={vehicleData.driver} as="select" name="driver" onChange={handleChange}>
-                            <option value="" disabled> Select Driver</option>
-                            <option>driver 1</option>
-                            <option>driver 2</option>
-                            
-                          </Form.Control>
-                        </Col> */}
-                      </Row>
-
-                      <Row className="mt-3">
-
-                        {/* *******************vehicle condition******************* */}
-
-                        {/* <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>VEHICLE CONDITION</Form.Label>
-                          <Form.Control value={vehicleData.condition} as="select" name="condition" onChange={handleChange}>
-                            <option value="" disabled> Select condition</option>
-                            <option value="Good">Good</option>
-                            <option value="Bad">Bad</option>
-
-                          </Form.Control>
-                        </Col> */}
-
-                      </Row>
-
-                      <Row className="mt-3">
-                        <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>FUEL CONSUMPTION</Form.Label>
+                    <Row className="mt-3">
+                      <Col md={6}>
+                        <Form.Label>Bus No</Form.Label>
+                        <Form.Control
+                          value={vehicleData.BUSNO}
+                          type="text"
+                          name="BUSNO"
+                          onChange={handleChange}
+                        />
+                      </Col>
+                      <Col md={6}>
+                        <Form.Group controlId="depot">
+                          <Form.Label>Depot</Form.Label>
                           <Form.Control
-                            value={vehicleData.fuelconsumption}
-                            type="text"
-                            name="fuelconsumption"
-                            onChange={handleChange}
+                            value={search.depot}
+                            onChange={(e) => handleSearchChange('depot', e.target.value)}
+                            onFocus={() => handleDropdownToggle('depot')}
+                            onBlur={() => handleBlur('depot')}
+                            placeholder="Search or select a depot"
                           />
-                        </Col>
-                        <Col md={6}>
-                          <Form.Label style={{ color: "#333", fontWeight: "500" }}>ODOMETER READING</Form.Label>
-                          <Form.Control
-                            value={vehicleData.odometer}
-                            type="text"
-                            name="odometer"
-                            onChange={handleChange}
-                          />
-                        </Col>
-                      </Row>
+                          {dropdownsOpen.depot && (
+                            <div style={{ border: '1px solid #ddd', marginTop: '5px', padding: '10px' }}>
+                              {filteredDepots.length > 0 ? (
+                                filteredDepots.map((depot, index) => (
+                                  <Form.Check
+                                    type="radio"
+                                    label={depot}
+                                    value={depot}
+                                    checked={selected.depot === depot}
+                                    onChange={() => handleSelectionChange('depot', depot)}
+                                    key={index}
+                                  />
+                                ))
+                              ) : (
+                                <div>No matching depots found</div>
+                              )}
+                            </div>
+                          )}
+                        </Form.Group>
+                      </Col>
 
-                      <Row className="mt-4">
-                        <Col className="d-flex justify-content-end">
-                          <Button variant="outline-secondary" size="sm" className="me-2">
-                            <FontAwesomeIcon icon={faTimes} className="me-1" /> Cancel
-                          </Button>
-                          <Button type="submit" variant="success" size="sm">Add</Button>
-                        </Col>
-                      </Row>
-                    </Form.Group>
+                    </Row>
+
+                    <Row className="mt-4">
+                      <Col className="d-flex justify-content-end">
+                        <Button variant="outline-secondary" size="sm" className="me-2">
+                          <FontAwesomeIcon icon={faTimes} className="me-1" /> Cancel
+                        </Button>
+                        <Button type="submit" variant="success" size="sm">Add</Button>
+                      </Col>
+                    </Row>
                   </Form>
                 </Card.Body>
               </Card>
             </Col>
-
             <Col xs={1}></Col>
           </Row>
         </Container>

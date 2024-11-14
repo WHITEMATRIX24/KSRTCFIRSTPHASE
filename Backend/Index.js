@@ -18,7 +18,7 @@ server.use(router);
 server.use("/Uploads", express.static("./Uploads"));
 
 // Define port
-const PORT = process.env.PORT;
+const PORT = 3000 || process.env.PORT;
 
 // Start the server
 server.listen(PORT, () => {

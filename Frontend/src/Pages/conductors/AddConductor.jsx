@@ -1,43 +1,59 @@
-import React, { useState } from 'react'
-import { Button, Col, Form, Row } from 'react-bootstrap'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBus, faCreditCard, faXmark } from '@fortawesome/free-solid-svg-icons'
-import Header from '../../components/common/Header'
-import NavSidebar from '../../components/common/Sidebar/NavSidebar'
-import { addNewConductor } from '../../services/allAPI'
+import React, { useState } from 'react';
+import { Button, Col, Form, Row } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBus, faXmark } from '@fortawesome/free-solid-svg-icons';
+import Header from '../../components/common/Header';
+import NavSidebar from '../../components/common/Sidebar/NavSidebar';
+import { addNewConductor } from '../../services/allAPI';
 
 const AddConductor = () => {
   const [conductorData, setConductorData] = useState({
-    first_name: "", last_name: "", gender: "", dob: "",
-    is_permanent:"",contact_info: { phone: ""},
+    EmployeeName: "",
+    PEN: "",
+    Designation: "",
+    UNIT: "",
+    is_permanent: "",
+    contact_info: { phone: "" },
+    on_leave: "Available", // default value
   });
 
-  
   const handleAddnewConductor = async () => {
     if (!conductorData) {
       console.error("conductorData is undefined");
       return;
     }
-    const { first_name, last_name, gender, dob,is_permanent, contact_info:{phone}} = conductorData;
-    console.log("Data:",conductorData);
-
-    if (!first_name || !last_name || !gender || !dob || !phone ||!is_permanent) {
-      alert("Please fill the Empty fields");
+  
+    const { EmployeeName, PEN, Designation, UNIT, is_permanent, contact_info: { phone }, on_leave } = conductorData;
+  
+    console.log("Data:", conductorData);
+  
+    if (!EmployeeName || !PEN || !Designation || !UNIT || !phone || !is_permanent) {
+      alert("Please fill the empty fields");
     } else {
       const newConductor = await addNewConductor(conductorData);
-      console.log("newConductoe:",newConductor.data);
-      
-      if (newConductor.status==201) {
-        setConductorData(newConductor.data);
-        alert("New Conductor Added SuccessFully:::::");
-      } else if(newConductor.status==406){
-        alert("Conductor Already Existing:::::");
-      }else{
-        console.log("Error in Adding new Conductor::::");
+      console.log("newConductor:", newConductor.data);
+  
+      if (newConductor.status === 201) {
+        alert("New Conductor Added Successfully");
+        // Reset conductorData after successful addition
+        setConductorData({
+          EmployeeName: "",
+          PEN: "",
+          Designation: "",
+          UNIT: "",
+          is_permanent: "",
+          contact_info: { phone: "" },
+          on_leave: "Available",
+        });
+      } else if (newConductor.status === 406) {
+        alert("Conductor Already Exists");
+      } else {
+        console.log("Error in Adding new Conductor");
       }
     }
+  };
+  
 
-  }
   return (
     <>
       <Row>
@@ -46,114 +62,121 @@ const AddConductor = () => {
           <NavSidebar />
         </Col>
         <Col md={9}>
-          <div >
+          <div>
             <Row>
               <Col md={2}></Col>
-              <Col md={12} >
+              <Col md={12}>
                 <h6 className='fw-bold'>Add Conductors</h6>
                 <hr className='vehicle-horizontal-line' />
                 <div className='m-3 p-2' style={{ backgroundColor: 'white' }}>
-                  <h6><FontAwesomeIcon icon={faBus} />Conductor Details</h6>
+                  <h6><FontAwesomeIcon icon={faBus} /> Conductor Details</h6>
                   <hr className='vehicle-horizontal-line' />
                   <Form>
                     {/* --------------------- section 1 ---------------------*/}
                     <Form.Group className="my-4">
-                      <h6 className='fw-bold'>1.Personal Informations</h6>
+                      <h6 className='fw-bold'>1. Personal Information</h6>
                       <Row className="mt-2">
                         <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>First Name </Form.Label>
-                          <Form.Control type="text" name="firstName" placeholder='Enter First Name'
-                            onChange={e => setConductorData({ ...conductorData, first_name: e.target.value })} />
+                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Name</Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder='Enter Name'
+                            onChange={e => setConductorData({ ...conductorData, EmployeeName: e.target.value })}
+                          />
                         </Col>
                         <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}> Last Name</Form.Label>
-                          <Form.Control type="text" name="lastName" placeholder='Enter Last Name'
-                            onChange={e => setConductorData({ ...conductorData, last_name: e.target.value })} />
-                        </Col>
-                      </Row>
-                      <Row className="mt-2">
-                        <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Gender</Form.Label>
-                          <Form.Control as="select"
-                            value={conductorData.gender || ""}
-                            onChange={e => setConductorData({ ...conductorData, gender: e.target.value })}>
-                            <option disabled value="">
-                              Select Gender
-                            </option>
-                            <option value={"Male"}>Male</option>
-                            <option value={"Female"}>Female</option>
-                          </Form.Control>
-                        </Col>
-                        <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>DOB</Form.Label>
-                          <Form.Control type="date" placeholder="DOB"
-                            onChange={e => setConductorData({ ...conductorData, dob: e.target.value })} />
-                        </Col>
-                      </Row>
-                      {/* ----------------section 2---------------- */}
-                      <Row className='mt-2'>
-                        <h6 className='fw-bold mt-2'> 2.Contact Informations</h6>
-                        <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Mobile No </Form.Label>
-                          <Form.Control type="text" name="mobileNo"
-                            onChange={e=>setConductorData({...conductorData,contact_info:{
-                              ...conductorData.contact_info,phone:e.target.value}})} />
-                        </Col>
-                        <Col>
-                        <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Employement Type</Form.Label>
-                          <Form.Control as="select"
-                            onChange={e => setConductorData({ ...conductorData, is_permanent: e.target.value })}
-                            value={conductorData.is_permanent}>
-                            <option disabled value="">
-                              Select 
-                            </option>
-                            <option value={"Permanent"}>Permanent</option>
-                            <option value={"Temporary"}>Temporary</option>
-                          </Form.Control>
+                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>G- Number</Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder='Enter PEN'
+                            onChange={e => setConductorData({ ...conductorData, PEN: e.target.value })}
+                          />
                         </Col>
                       </Row>
                       <Row className="mt-2">
                         <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Emergency Contact No </Form.Label>
-                          <Form.Control type="text" name="emergencyNo" />
+                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Designation</Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder='Enter Designation'
+                            onChange={e => setConductorData({ ...conductorData, Designation: e.target.value })}
+                          />
                         </Col>
                         <Col>
-                        {/* <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Vehicle No Plate </Form.Label>
-                          <Form.Control type="text" name="firstName" />
-                          <Form.Check type="checkbox" label="Only Available" className="mt-2" /> */}
-                        </Col>
-                      </Row>
-                      {/* ---------------- section 3-------------------- */}
-                      <Row className='mt-2'>
-                        <Col>
-                          
-                        </Col>
-                        <Col>
-                         
+                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>UNIT</Form.Label>
+                          <Form.Control
+                            type="text"
+                            placeholder='Enter UNIT'
+                            onChange={e => setConductorData({ ...conductorData, UNIT: e.target.value })}
+                          />
                         </Col>
                       </Row>
                     </Form.Group>
+
+                    {/* ----------------section 2---------------- */}
+                    <Row className='mt-2 mb-4'>
+                      <h6 className='fw-bold mt-2'>2. Contact Information</h6>
+                      <Col>
+                        <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Mobile No</Form.Label>
+                        <Form.Control
+                          type="text"
+                          placeholder='Enter Mobile No'
+                          onChange={e => setConductorData({
+                            ...conductorData,
+                            contact_info: { ...conductorData.contact_info, phone: e.target.value }
+                          })}
+                        />
+                      </Col>
+                      <Col>
+                        <Col>
+                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Employment Type</Form.Label>
+                          <Form.Control
+
+                            as="select"
+                            value={conductorData.is_permanent}
+                            onChange={e => setConductorData({ ...conductorData, is_permanent: e.target.value })}
+                          >
+                            <option value="" disabled>Select Employment Type</option>
+                            <option value="Permanent">Permanent</option>
+                            <option value="Badli">Badli</option>
+                          </Form.Control>
+                        </Col>
+                      </Col>
+                    </Row>
+
+                    {/* ----------------section 3-------------------- */}
+                    <Row className="mt-2">
+
+
+                    </Row>
+
                     <hr className='vehicle-horizontal-line' />
                     <div className="mt-4 text-end">
-                      <Button className='btn tbn rounded me-2' style={{ backgroundColor: '#f8f9fa', color: 'black' }}><FontAwesomeIcon className='me-2' icon={faXmark} />Cancel</Button>
-                      <Button className='btn tbn rounded ' style={{ backgroundColor: '#0d8a72' }}
-                        onClick={handleAddnewConductor}>
-                        Add Conductor</Button>
+                      <Button
+                        className='btn tbn rounded me-2'
+                        style={{ backgroundColor: '#f8f9fa', color: 'black' }}
+                      >
+                        <FontAwesomeIcon className='me-2' icon={faXmark} />Cancel
+                      </Button>
+                      <Button
+                        className='btn tbn rounded'
+                        style={{ backgroundColor: '#0d8a72' }}
+                        onClick={handleAddnewConductor}
+                      >
+                        Add Conductor
+                      </Button>
                     </div>
                   </Form>
                 </div>
               </Col>
-              <Col md={1}>
-              </Col>
+              <Col md={1}></Col>
             </Row>
           </div>
         </Col>
         <Col md={1}></Col>
       </Row>
-
     </>
-  )
-}
+  );
+};
 
-export default AddConductor
-
+export default AddConductor;
