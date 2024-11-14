@@ -16,14 +16,27 @@ import {
     faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
-import NavSidebar from "../../components/common/Sidebar/NavSidebar";
-import { getAllVehicles, updateVehicleStatus } from "../../services/allAPI";
+import { deleteSingleVehicleAPI, getAllVehicles, updateVehicleStatus } from "../../services/allAPI";
+import { Button, Form, Modal } from "react-bootstrap";
+import ReactPaginate from "react-paginate";
 
 const Vehicles = () => {
+    // const [showDocModal, setShowDocModal] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [filteredVehicles, setFilteredVehicles] = useState([]);
+
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [searchVehicle, setSearchVehicle] = useState("")
+    const [showDeleteId, setShowDeleteId] = useState(null);
     const [vehiclesData, setVehiclesData] = useState([]);
     const [activeStatus, setActiveStatus] = useState("ALL STATUSES");
     const [vehicleType, setVehicleType] = useState("All Types");
-    const [showEditOptions, setShowEditOptions] = useState({});
     const navigate = useNavigate();
 
     const getAllVehiclesData = async () => {
@@ -40,53 +53,101 @@ const Vehicles = () => {
             console.log(err);
         }
     };
-    // console.log(activeStatus)
-    // console.log(vehiclesData);
+    console.log(vehiclesData);
 
-    const toggleEditOptions = (vehicleId) => {
-        setShowEditOptions((prev) => ({
-            ...prev,
-            [vehicleId]: !prev[vehicleId],
-        }));
-    };
+
     const handleAddVehicle = () => {
         navigate('/add-vehicle')
     }
-    // const handleEdit = (vehicleId) => {
-    //     // Open edit modal or take any other action
-    //     console.log("Edit vehicle with ID:", vehicleId);
-    // };
+
 
     //   vehicle status changer
     const handleChangeVehicleStatus = async (vehicleData, updatedStatusValue) => {
-        const vehicleFormData = new FormData();
+        if (updatedStatusValue === "dock") {
+            // Showing the modal if DOCK is selected
+            setShow(true)
+        } else {
 
-        vehicleFormData.append("number", vehicleData.number);
-        vehicleFormData.append("model", vehicleData.model);
-        vehicleFormData.append("status", updatedStatusValue);
-        vehicleFormData.append("transport_type", vehicleData.transport_type);
-        vehicleFormData.append("odometer", vehicleData.odometer);
+            const vehicleFormData = new FormData();
 
-        try {
-            const res = await updateVehicleStatus(vehicleData._id, vehicleFormData);
-            if (res.status === 200) {
-                alert("vehicle status update successfull");
+            vehicleFormData.append("number", vehicleData.number);
+            vehicleFormData.append("model", vehicleData.model);
+            vehicleFormData.append("status", updatedStatusValue);
+            vehicleFormData.append("CLASS", vehicleData.CLASS);
+            vehicleFormData.append("odometer", vehicleData.odometer);
+
+            try {
+                const res = await updateVehicleStatus(vehicleData._id, vehicleFormData);
+                if (res.status === 200) {
+                    alert("vehicle status update successfull");
+                }
+            } catch (error) {
+                console.log(`error in updating vehicle status erro: ${error}`);
             }
-        } catch (error) {
-            console.log(`error in updating vehicle status erro: ${error}`);
         }
     };
 
+
+
+    // ------------------------------------------- Delete single vehicle -------------------------------------------
+    const handleShowDeleteOptions = (id) => {
+        setShowDeleteId((prevId) => (prevId === id ? null : id));
+    };
+
+
+    const handleDeleteSingleVehicle = async (vehicleId, BUSNO) => {
+        try {
+            const result = await deleteSingleVehicleAPI(vehicleId)
+            if (result) {
+                alert(`Vehicle ${BUSNO} deleted`);
+                setVehiclesData((prevData) => prevData.filter(vehicle => vehicle.vehicleId !== vehicleId));
+            }
+
+            // Refresh or update list after deletion
+        } catch (error) {
+            console.error("Error deleting vehicle:", error);
+            alert("Error deleting vehicle. Please try again.");
+        }
+    };
+
+    // ---------------------- pagination ----------------------
+    const displayedVehicles = filteredVehicles.slice(
+        currentPage * itemsPerPage, 
+        (currentPage + 1) * itemsPerPage
+    );
+
+
+    const handleItemsPerPageChange = (newItemsPerPage) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(0);
+    };
+
+    const handlePageClick = (data) => {
+        // console.log(data.selected);
+        setCurrentPage(data.selected);
+
+    }
+
     useEffect(() => {
+        const updatedFilteredVehicles = vehiclesData
+        .filter(vehicle => vehicleType === "All Types" || vehicle.CLASS === vehicleType)
+        .filter(vehicle => activeStatus === "ALL STATUSES" || activeStatus === vehicle.status)
+        .filter(vehicle => 
+            vehicle.BUSNO.toLowerCase().includes(searchVehicle.toLowerCase()) || 
+            vehicle.REGNO.toLowerCase().includes(searchVehicle.toLowerCase())
+        );
+
+    setFilteredVehicles(updatedFilteredVehicles);
+    setCurrentPage(0);
         getAllVehiclesData();
-    }, []);
+    }, [vehiclesData, activeStatus, vehicleType, searchVehicle]);
 
     return (
         <>
             <div className="row">
                 <Header />
                 <div className="col-md-2">
-                    <NavSidebar />
+
                 </div>
                 <div className="col-md-9">
                     <div className="d-flex justify-content-between my-1 mx-3">
@@ -105,7 +166,7 @@ const Vehicles = () => {
                     <hr className="vehicle-horizontal-line" />
 
                     <div className="d-flex">
-                        {["ALL STATUSES", "enroute", "available", "out_of_services"].map(
+                        {["ALL STATUSES", "en_route", "in_service", "dock"].map(
                             (status) => (
                                 <button
                                     key={status}
@@ -154,29 +215,171 @@ const Vehicles = () => {
                                         <li>
                                             <a
                                                 className="dropdown-item"
-                                                onClick={() => setVehicleType("deluxe")}
+                                                onClick={() => setVehicleType("FP")}
                                             >
-                                                Super Deluxe
+                                                FP
                                             </a>
                                         </li>
                                         <li>
                                             <a
                                                 className="dropdown-item"
-                                                onClick={() => setVehicleType("super")}
+                                                onClick={() => setVehicleType("ORD")}
                                             >
-                                                Fast Passenger
+                                                ORD
                                             </a>
                                         </li>
                                         <li>
                                             <a
                                                 className="dropdown-item"
-                                                onClick={() => setVehicleType("superfast")}
+                                                onClick={() => setVehicleType("JN AC")}
                                             >
-                                                Super Fast
+                                                JN AC
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("JN NAC")}
+                                            >
+                                                JN NAC
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SFP")}
+                                            >
+                                                SFP
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("S/DLX")}
+                                            >
+                                                S/DLX
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("S/EXP")}
+                                            >
+                                                S/EXP
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SEMI SLEEPER")}
+                                            >
+                                                SEMI SLEEPER
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SWIFT AC SEATER")}
+                                            >
+                                                SWIFT AC SEATER
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SWIFT SLEEPER")}
+                                            >
+                                                SWIFT SLEEPER
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SWIFT DLX")}
+                                            >
+                                                SWIFT DLX
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SS")}
+                                            >
+                                                SS
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SEATER CUM SLEEPER NON AC")}
+                                            >
+                                                SEATER CUM SLEEPER NON AC
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("SEATER CUM SLEEPER AC")}
+                                            >
+                                                SEATER CUM SLEEPER AC
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("S")}
+                                            >
+                                                S
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("ELECTRIC")}
+                                            >
+                                                ELECTRIC
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("EL DD")}
+                                            >
+                                                EL DD
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("BB AC SEATER")}
+                                            >
+                                                BB AC SEATER
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                className="dropdown-item"
+                                                onClick={() => setVehicleType("AC PREMIUM SF")}
+                                            >
+                                                AC PREMIUM SF
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
+
+                                <div className="btn-group">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Search Vehicle"
+                                        value={searchVehicle}
+                                        onChange={(e) => setSearchVehicle(e.target.value)}
+                                    />
+
+                                </div>
+
+
                             </div>
                             <div>
                                 <button
@@ -211,19 +414,16 @@ const Vehicles = () => {
                                         data-bs-toggle="dropdown"
                                         aria-expanded="false"
                                     >
-                                        10
+                                        {itemsPerPage}
                                     </button>
                                     <ul className="dropdown-menu">
-                                        <li>
-                                            <a className="dropdown-item" href="#">
-                                                20
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a className="dropdown-item" href="#">
-                                                30
-                                            </a>
-                                        </li>
+                                        {[10, 20, 30].map(size => (
+                                            <li key={size}>
+                                                <a className="dropdown-item" onClick={() => handleItemsPerPageChange(size)}>
+                                                    {size}
+                                                </a>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                                 <FontAwesomeIcon icon={faChevronLeft} />
@@ -242,24 +442,15 @@ const Vehicles = () => {
                                         <th>TYPE</th>
                                         <th>STATUS</th>
 
-                                        <th> {/*update */} </th>
+                                        <th> {/*for update */} </th>
+                                        <th>REMARKS</th>
                                         <th> {/*for delete option */}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {/* {vehiclesData.length>0 && vehiclesData.map(vehicle => (
                                         <tr key={vehicle.id}> */}
-                                    {vehiclesData
-                                        .filter(
-                                            (vehicle) =>
-                                                vehicleType === "All Types" ||
-                                                vehicle.transport_type === vehicleType
-                                        )
-                                        .filter((vehicle) =>
-                                            activeStatus == "ALL STATUSES"
-                                                ? true
-                                                : activeStatus == vehicle.status
-                                        )
+                                    {displayedVehicles
                                         .map((vehicle) => (
                                             <tr key={vehicle.id}>
                                                 <td>
@@ -276,12 +467,12 @@ const Vehicles = () => {
                                                 </td>
 
                                                 <td>
-                                                    <strong>{vehicle.number}</strong>
+                                                    <strong>{vehicle.BUSNO}</strong>
                                                     <br />
-                                                    <span>{vehicle.model}</span>
+                                                    <span>{vehicle.REGNO}</span>
                                                 </td>
 
-                                                <td>{vehicle.transport_type}</td>
+                                                <td>{vehicle.CLASS}</td>
 
                                                 <td>
                                                     <div
@@ -292,16 +483,16 @@ const Vehicles = () => {
                                                             display: "inline-block",
                                                         }}
                                                     >
-                                                        {vehicle.status === "available" && (
+                                                        {vehicle.status === "in_service" && (
                                                             <>
                                                                 <FontAwesomeIcon
                                                                     icon={faCircleCheck}
                                                                     style={{ color: "#189be3" }}
                                                                 />
-                                                                <span className="ms-2">Available</span>
+                                                                <span className="ms-2">In Service</span>
                                                             </>
                                                         )}
-                                                        {vehicle.status === "enroute" && (
+                                                        {vehicle.status === "en_route" && (
                                                             <>
                                                                 <FontAwesomeIcon
                                                                     icon={faLocationArrow}
@@ -310,13 +501,13 @@ const Vehicles = () => {
                                                                 <span className="ms-2">Enroute</span>
                                                             </>
                                                         )}
-                                                        {vehicle.status === "out_of_services" && (
+                                                        {vehicle.status === "dock" && (
                                                             <>
                                                                 <FontAwesomeIcon
                                                                     icon={faBan}
                                                                     style={{ color: "#db5c4d" }}
                                                                 />
-                                                                <span className="ms-2">Out of Services</span>
+                                                                <span className="ms-2">Dock</span>
                                                             </>
                                                         )}
                                                     </div>
@@ -339,10 +530,10 @@ const Vehicles = () => {
                                                                 className="dropdown-item"
                                                                 role="button"
                                                                 onClick={() =>
-                                                                    handleChangeVehicleStatus(vehicle, "enroute")
+                                                                    handleChangeVehicleStatus(vehicle, "en_route")
                                                                 }
                                                             >
-                                                                enroute
+                                                                Enroute
                                                             </li>
                                                             <li
                                                                 className="dropdown-item"
@@ -350,11 +541,11 @@ const Vehicles = () => {
                                                                 onClick={() =>
                                                                     handleChangeVehicleStatus(
                                                                         vehicle,
-                                                                        "available"
+                                                                        "in_service"
                                                                     )
                                                                 }
                                                             >
-                                                                available
+                                                                In Service
                                                             </li>
                                                             <li
                                                                 className="dropdown-item"
@@ -362,57 +553,114 @@ const Vehicles = () => {
                                                                 onClick={() =>
                                                                     handleChangeVehicleStatus(
                                                                         vehicle,
-                                                                        "out_of_services"
+                                                                        "dock"
                                                                     )
                                                                 }
                                                             >
-                                                                out of service
+                                                                ock
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </td>
 
-                                                {/* <td>
-                                                    <div style={{ position: "relative", width: "50px" }}>
-                                                         <FontAwesomeIcon
+                                                <td>{ }</td>
+                                                <td>
+                                                    <div style={{ position: "relative", width: "100px" }}>
+                                                        <FontAwesomeIcon
                                                             icon={faEllipsisVertical}
-                                                            onClick={() => toggleEditOptions(vehicle.id)}
                                                             style={{ cursor: "pointer" }}
-                                                        /> 
-                                                        {showEditOptions[vehicle.id] && (
-                                                            <div
-                                                                className="edit-options-dropdown"
-                                                                style={{
-                                                                    position: "absolute",
-                                                                    top: "100%",
-                                                                    right: 0,
-                                                                    background: "white",
-                                                                    border: "1px solid #ddd",
-                                                                    padding: "5px",
-
-                                                                    zIndex: 10,
-                                                                    borderRadius: "4px",
-                                                                }}
+                                                            onClick={() => handleShowDeleteOptions(vehicle._id)}
+                                                        />
+                                                        {showDeleteId === vehicle._id && (
+                                                            <button
+                                                                className="btn btn-danger"
+                                                                style={{ position: "absolute", top: 10, right: 10, zIndex: 10 }}
+                                                                onClick={() => handleDeleteSingleVehicle(vehicle._id, vehicle.BUSNO)}
                                                             >
-                                                                <button
-                                                                    onClick={() => handleEdit(vehicle.id)}
-                                                                    className="dropdown-item"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                            </div>
+                                                                Delete
+                                                            </button>
                                                         )}
                                                     </div>{" "}
-                                                </td> */}
+                                                </td>
+
                                             </tr>
                                         ))}
                                 </tbody>
                             </table>
                         </div>
+
+
+                        {/* pagination */}
+                        <ReactPaginate
+    previousLabel={'Previous'}
+    nextLabel={'Next'}
+    breakLabel={'...'}
+    pageCount={Math.ceil(filteredVehicles.length / itemsPerPage)}
+    marginPagesDisplayed={3}
+    pageRangeDisplayed={3}
+    onPageChange={handlePageClick}
+    containerClassName={'pagination justify-content-center'}
+    pageClassName={'page-item'}
+    pageLinkClassName={'page-link'}
+    previousClassName={'page-item'}
+    previousLinkClassName={'page-link'}
+    nextClassName={'page-item'}
+    nextLinkClassName={'page-link'}
+    breakClassName={'page-item'}
+    breakLinkClassName={'page-link'}
+    activeClassName={"active"}
+/>
+
                     </div>
                 </div>
                 <div className="col-md-1"></div>
             </div>
+
+
+
+
+            {/* Modal for DOCK details updation */}
+            <Modal size="lg"
+                centered
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm DOCK Status Change</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Label className="mb-1" style={{ fontSize: "14px" }}>DOCK DEPOT </Form.Label>
+                        <Form.Control type="text" name="firstName" placeholder='Enter the Depot'
+                            onChange={e => setConductorData({ ...conductorData, first_name: e.target.value })} />
+
+                        <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Description </Form.Label>
+                        <Form.Control as="textarea" name="firstName" placeholder='Enter the Description' rows={4}
+                            onChange={e => setConductorData({ ...conductorData, first_name: e.target.value })} />
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+
+                    <Button className="btn" style={{ backgroundColor: "#0d8a72", color: "white" }} onClick={() => {
+                        // Confirm DOC status change here
+                        setShowDockModal(false);
+                        handleChangeVehicleStatus(vehicleData, "dock");
+                    }} >Confirm</Button>
+                    <Button className="btn btn-danger" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+
+            {/* --------------------test------------------ */}
+
+
+
+
+
         </>
     );
 };
