@@ -23,7 +23,7 @@ export const addNewTrip = async (req, res) => {
                 depo: departure_location.depo,
             },
             arrival_location: {
-                depo: departure_location.depo,
+                depo: arrival_location.depo,
             },
             vehicle_id: vehicle_id,
             driver_id: driver_id,
