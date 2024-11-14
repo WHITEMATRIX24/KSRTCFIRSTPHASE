@@ -1,6 +1,6 @@
 // Import necessary modules
 import express from 'express';
-import { addNewVehicle, editVehicleDetails, getAllVehicles, getAllOutofServicesDetails, getAllAvilableServicesDetails, getAllOnRouteDetails, getAllVehiclesNumber, deleteVehicleById } from '../Controllers/VehicleController.js';
+import { addNewVehicle, editVehicleDetails, getAllVehicles, getAllOutofServicesDetails, getAllAvilableServicesDetails, getAllOnRouteDetails, getAllVehiclesNumber, deleteVehicleById, getvehicleById } from '../Controllers/VehicleController.js';
 import { addNewTrip, editTripDetails, editTripDetailsNew, getAllTripDetails, getAllCompletedTripDetails } from '../Controllers/TripController.js'; 
 import { addNewDriver, deleteDriverById, editDriverDetails, editLeaveStatus, getAllDriverDetails } from '../Controllers/DriverController.js';  
 import { addNewConductor, deleteConductorById, editConductorDetails, editLeaveStatusConductor, getAllConductorDetails } from '../Controllers/ConductorController.js';
@@ -26,7 +26,7 @@ router.get("/getOnRouteServices", getAllOnRouteDetails);
 // Get all Vehicles number
 router.get("/get-all-vehicles-number", getAllVehiclesNumber);
 // Get Vehicle Details by id
-// router.get("/get-vehicle-by-id/:vehicle_id", getVehicleById);
+router.get("/getVehicleById/:vehicle_id", getvehicleById);
 // Delete Vehicle By Id
 router.delete('/deleteVehicleById/:vehicle_id',deleteVehicleById)
 

@@ -139,7 +139,22 @@ export const deleteVehicleById = async (req, res) => {
             res.status(406).json("No vehicles found By this Id::::::");
         }
     } catch (err) {
-        console.log("Error at catch in vehicleController/addNewVehicle::::::", err);
+        console.log("Error at catch in vehicleController/deleteVehicleById::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+export const getvehicleById=async(req,res)=>{
+    const {vehicle_id}=req.params;
+    try{
+      const findvehicle=await Vehicles.findById({vehicle_id});
+      if(findvehicle){
+        res.status(200).json(findvehicle);
+      }else{
+        res.status(406).json("Vehicle Not Found by this Id::::::");
+      }
+    }catch(err){
+        console.log("Error at catch in vehicleController/getvehicleById::::::", err);
         res.status(500).json({ error: "Internal server error" });
     }
 }
