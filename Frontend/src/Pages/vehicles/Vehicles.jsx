@@ -112,7 +112,7 @@ const Vehicles = () => {
 
     // ---------------------- pagination ----------------------
     const displayedVehicles = filteredVehicles.slice(
-        currentPage * itemsPerPage, 
+        currentPage * itemsPerPage,
         (currentPage + 1) * itemsPerPage
     );
 
@@ -130,15 +130,15 @@ const Vehicles = () => {
 
     useEffect(() => {
         const updatedFilteredVehicles = vehiclesData
-        .filter(vehicle => vehicleType === "All Types" || vehicle.CLASS === vehicleType)
-        .filter(vehicle => activeStatus === "ALL STATUSES" || activeStatus === vehicle.status)
-        .filter(vehicle => 
-            vehicle.BUSNO.toLowerCase().includes(searchVehicle.toLowerCase()) || 
-            vehicle.REGNO.toLowerCase().includes(searchVehicle.toLowerCase())
-        );
+            .filter(vehicle => vehicleType === "All Types" || vehicle.CLASS === vehicleType)
+            .filter(vehicle => activeStatus === "ALL STATUSES" || activeStatus === vehicle.status)
+            .filter(vehicle =>
+                vehicle.BUSNO.toLowerCase().includes(searchVehicle.toLowerCase()) ||
+                vehicle.REGNO.toLowerCase().includes(searchVehicle.toLowerCase())
+            );
 
-    setFilteredVehicles(updatedFilteredVehicles);
-    setCurrentPage(0);
+        setFilteredVehicles(updatedFilteredVehicles);
+        setCurrentPage(0);
         getAllVehiclesData();
     }, [vehiclesData, activeStatus, vehicleType, searchVehicle]);
 
@@ -563,7 +563,7 @@ const Vehicles = () => {
                                                     </div>
                                                 </td>
 
-                                                <td>{ }</td>
+                                                <td>{vehicle.dock_reason} {vehicle.dock_depot}</td>
                                                 <td>
                                                     <div style={{ position: "relative", width: "100px" }}>
                                                         <FontAwesomeIcon
@@ -592,24 +592,24 @@ const Vehicles = () => {
 
                         {/* pagination */}
                         <ReactPaginate
-    previousLabel={'Previous'}
-    nextLabel={'Next'}
-    breakLabel={'...'}
-    pageCount={Math.ceil(filteredVehicles.length / itemsPerPage)}
-    marginPagesDisplayed={3}
-    pageRangeDisplayed={3}
-    onPageChange={handlePageClick}
-    containerClassName={'pagination justify-content-center'}
-    pageClassName={'page-item'}
-    pageLinkClassName={'page-link'}
-    previousClassName={'page-item'}
-    previousLinkClassName={'page-link'}
-    nextClassName={'page-item'}
-    nextLinkClassName={'page-link'}
-    breakClassName={'page-item'}
-    breakLinkClassName={'page-link'}
-    activeClassName={"active"}
-/>
+                            previousLabel={'Previous'}
+                            nextLabel={'Next'}
+                            breakLabel={'...'}
+                            pageCount={Math.ceil(filteredVehicles.length / itemsPerPage)}
+                            marginPagesDisplayed={3}
+                            pageRangeDisplayed={3}
+                            onPageChange={handlePageClick}
+                            containerClassName={'pagination justify-content-center'}
+                            pageClassName={'page-item'}
+                            pageLinkClassName={'page-link'}
+                            previousClassName={'page-item'}
+                            previousLinkClassName={'page-link'}
+                            nextClassName={'page-item'}
+                            nextLinkClassName={'page-link'}
+                            breakClassName={'page-item'}
+                            breakLinkClassName={'page-link'}
+                            activeClassName={"active"}
+                        />
 
                     </div>
                 </div>
