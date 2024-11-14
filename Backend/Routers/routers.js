@@ -1,10 +1,11 @@
 // Import necessary modules
 import express from 'express';
-import { addNewVehicle, editVehicleDetails, getAllVehicles, getAllOutofServicesDetails, getAllAvilableServicesDetails, getAllOnRouteDetails, getAllVehiclesNumber, deleteVehicleById } from '../Controllers/VehicleController.js';
+import { addNewVehicle, editVehicleDetails, getAllVehicles, getAllOutofServicesDetails, getAllAvilableServicesDetails, getAllOnRouteDetails, getAllVehiclesNumber, deleteVehicleById, getvehicleById } from '../Controllers/VehicleController.js';
 import { addNewTrip, editTripDetails, editTripDetailsNew, getAllTripDetails, getAllCompletedTripDetails } from '../Controllers/TripController.js'; 
 import { addNewDriver, deleteDriverById, editDriverDetails, editLeaveStatus, getAllDriverDetails } from '../Controllers/DriverController.js';  
 import { addNewConductor, deleteConductorById, editConductorDetails, editLeaveStatusConductor, getAllConductorDetails } from '../Controllers/ConductorController.js';
 import { getAllLedgerData, newLedgerData } from '../Controllers/LedgerController.js';
+import { adminLogin, editAdmindetailsById, getAllAdminDetails, Register } from '../Controllers/AdminController.js';
 // Initialize router
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router.get("/getOnRouteServices", getAllOnRouteDetails);
 // Get all Vehicles number
 router.get("/get-all-vehicles-number", getAllVehiclesNumber);
 // Get Vehicle Details by id
-// router.get("/get-vehicle-by-id/:vehicle_id", getVehicleById);
+router.get("/getVehicleById/:vehicle_id", getvehicleById);
 // Delete Vehicle By Id
 router.delete('/deleteVehicleById/:vehicle_id',deleteVehicleById)
 
@@ -70,6 +71,16 @@ router.put('/editTripDetails/:_id', editTripDetails);
 router.put('/editTripDetailsnew/:trip_id/:vehicle_id/:driver_id/:conductor_id', editTripDetailsNew);
 // get All Completed Trips
 router.get('/getAllCompletedTripDetails', getAllCompletedTripDetails);
+
+// <<<<<<.......Admin Router.......>>>>>
+// Reigster New Admin
+router.post('/registerAdmin',Register);
+// Login for Admins
+router.post('/adminLogin',adminLogin);
+// Get All Admin Details
+router.get('/allAdminDetails',getAllAdminDetails);
+// Edit Admin Details
+router.put('/editAdminDetails/:admin_id',editAdmindetailsById);
 
 
 // <<<<<<<...........LedgerRouter.......>>>>>>>>

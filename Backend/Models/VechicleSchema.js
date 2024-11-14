@@ -21,8 +21,14 @@ const vehicleSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["in_service", "en_route", "doc"],
+        enum: ["in_service", "en_route", "dock"],
         required: true
+    },
+    dock_reason:{
+        type:String
+    },
+    dock_depot:{
+       type:String 
     },
     maintenance_history: [
         {
