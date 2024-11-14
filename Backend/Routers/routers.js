@@ -26,7 +26,7 @@ router.get("/getOnRouteServices", getAllOnRouteDetails);
 // Get all Vehicles number
 router.get("/get-all-vehicles-number", getAllVehiclesNumber);
 // Get Vehicle Details by id
-// router.get("/get-vehicle-by-id/:vehicle_id", getVehicleById);
+router.get("/get-vehicle-by-id/:vehicle_id", getVehicleById);
 // Delete Vehicle By Id
 router.delete('/deleteVehicleById/:vehicle_id',deleteVehicleById)
 
