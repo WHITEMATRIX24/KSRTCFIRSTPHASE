@@ -21,7 +21,7 @@ const vehicleSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: [" in_service", "en_route", "doc"],
+        enum: ["in_service", "en_route", "doc"],
         required: true
     },
     maintenance_history: [
