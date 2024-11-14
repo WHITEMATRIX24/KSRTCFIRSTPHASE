@@ -8,8 +8,14 @@ export const getAllVehicles = async () => {
     return await commonAPI("GET", `${SERVERURL}/getAllVehicles`, "")
 }
 
-// addvehicle
+//delete single vehicle
+export const deleteSingleVehicleAPI = async (vehicleId) => {
+    return await commonAPI("DELETE", `${SERVERURL}/deleteVehicleById/${vehicleId}`, {})
+}
 
+
+
+// addvehicle
 export const addvehicleAPI = async (reqBody) => {
     return await commonAPI("POST", `${SERVERURL}/addNewVehichle`, reqBody, "")
 }
@@ -51,6 +57,8 @@ export const getDriversListApi = async () => {
     return commonAPI("GET", `${SERVERURL}/getAllDriverDetails`, "", "")
 }
 
+
+
 // get all conductors
 export const getConductorsListApi = async () => {
     return commonAPI("GET", `${SERVERURL}/getAllConductordetails`, "", "")
@@ -84,6 +92,12 @@ export const getAllDrivers = async () => {
     return await commonAPI("GET", `${SERVERURL}/getAllDriverDetails`, '', '');
 }
 
+//delete single driver
+export const deleteSingleDriverAPI = async (driverId) => {
+    return await commonAPI("DELETE", `${SERVERURL}/deleteDriverIdById/${driverId}`, {})
+}
+
+
 //  Edit driver Leave Status
 //  Edit driver Leave Status
 export const editLeaveStatusDriver = async (driver_id, reqbody) => {
@@ -99,6 +113,11 @@ export const editLeaveStatusConductor = async (conductor_id, reqbody) => {
 // Get All Conductor
 export const getAllConductor = async () => {
     return await commonAPI("GET", `${SERVERURL}/getAllConductordetails`, '', '');
+}
+
+//delete single conductor
+export const deleteSingleConductorAPI = async (conductorId) => {
+    return await commonAPI("DELETE", `${SERVERURL}/deleteConductorById/${conductorId}`, {})
 }
 
 export const getVechileByIdVD = async (vehicle_id) => {

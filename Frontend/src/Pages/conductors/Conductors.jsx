@@ -1,16 +1,21 @@
 import { faBan, faChevronLeft, faChevronRight, faCircleCheck, faEllipsisVertical, faGear, faLocationDot, faPlus, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react'
-import NavSidebar from '../../components/common/Sidebar/NavSidebar'
 import Header from '../../components/common/Header'
 import { useNavigate } from 'react-router-dom';
-import { editLeaveStatusConductor, getAllConductor } from '../../services/allAPI';
+import { deleteSingleConductorAPI, editLeaveStatusConductor, getAllConductor } from '../../services/allAPI';
 import { Button, Form, Modal } from 'react-bootstrap';
-
+import ReactPaginate from 'react-paginate';
 
 const Conductors = () => {
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+
     const [selectedConductor, setSelectedConductor] = useState("All Conductors");
     const [leaveStatus, setLeaveStatus] = useState("allstatus");
+    const [searchConductor, setSearchConductor] = useState("")
+    const [showDeleteId, setShowDeleteId] = useState(null);
+
 
     const [activeStatus, setActiveStatus] = useState('ALL STATUSES');
     const [employmentType, setEmploymentType] = useState('Employment Type');
@@ -51,12 +56,13 @@ const Conductors = () => {
         }
     };
 
+    // console.log(conductorData);
 
     const handleAllConductorData = async () => {
         try {
             const allConductor = await getAllConductor();
             if (allConductor.status == 200) {
-                console.log(allConductor.data);
+                // console.log(allConductor.data);
                 setConductorData(allConductor.data);
             } else {
                 console.log("Error in fetching Conductor Details:::::");
@@ -67,19 +73,71 @@ const Conductors = () => {
         }
     }
 
+    // ------------------------------------------- Delete single conductor -------------------------------------------
+    const handleShowDeleteOptions = (id) => {
+        setShowDeleteId((prevId) => (prevId === id ? null : id));
+    };
+
+    const handleDeleteSingleConductor = async (conductorId, EmployeeName) => {
+        try {
+            const result = await deleteSingleConductorAPI(conductorId)
+            if (result) {
+                alert(`${EmployeeName} deleted`);
+                setConductorData((prevData) => prevData.filter(conductor => conductor.conductorId !== conductorId));
+            }
+
+            // Refresh or update list after deletion
+        } catch (error) {
+            console.error("Error deleting conductor:", error);
+            alert("Error deleting conductor. Please try again.");
+        }
+    };
+
+
+    // ---------------------- pagination ----------------------
+    const displayedConductors = conductorData
+        .filter((conductor) => {
+            const nameMatch =
+                selectedConductor === "All Conductors" ||
+                `${conductor.EmployeeName}` === selectedConductor;
+
+            const statusMatch = activeStatus === "ALL STATUSES" ||
+                (activeStatus === "LEAVE STATUS" && conductor.on_leave === status) ||
+                (activeStatus === "PERMANENT" && conductor.is_permanent === "Permanent") ||
+                (activeStatus === "BADALI" && conductor.is_permanent === "Badali");
+
+            const employmentMatch = employmentType === "Employment Type" || conductor.is_permanent === employmentType;
+            const leaveStatusMatch = status === "Status" || conductor.on_leave === status;
+
+            return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
+
+
+        })
+        .filter((conductor) => leaveStatus == "allstatus" ? true : leaveStatus == conductor.on_leave
+        )
+        .filter(
+            (conductor) =>
+                conductor.EmployeeName.toLowerCase().includes(searchConductor.toLowerCase()) ||
+                conductor.PEN.toLowerCase().includes(searchConductor.toLowerCase())
+        )
+        .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
+
+    const handleItemsPerPageChange = (newItemsPerPage) => {
+        setItemsPerPage(newItemsPerPage);
+        setCurrentPage(0);
+    };
+
+    const handlePageClick = (data) => {
+        // console.log(data.selected);
+        setCurrentPage(data.selected);
+
+    }
+
     useEffect(() => {
         handleAllConductorData();
     }, [])
 
-    // const conductorsData = [
-    //     { id: 1, name: 'John V', type: 'Permanent', status: 'AVAILABLE', salary: 80000, phoneNumber: '9876543210' },
-    //     { id: 2, name: 'Abdul V', type: 'Temporary', status: 'ON LEAVE', salary: 85000, phoneNumber: '9876543210' },
-    //     { id: 3, name: 'Vishnu V', type: 'Permanent', status: 'ON LEAVE', salary: 80000, phoneNumber: '9876543210' },
-    //     { id: 4, name: 'John V', type: 'Permanent', status: 'ON LEAVE', salary: 86000, phoneNumber: '9876543210' },
-    //     { id: 5, name: 'Abdul V', type: 'Temporary', status: 'AVAILABLE', salary: 82000, phoneNumber: '9876543210' },
-    //     { id: 6, name: 'Vishnu V', type: 'Temporary', status: 'AVAILABLE', salary: 60000, phoneNumber: '9876543210' }
-
-    // ];
 
     // const filterConductors = () => {
     //     return conductorsData.filter(conductor => {
@@ -93,8 +151,8 @@ const Conductors = () => {
     const handleAddConductor = () => {
         navigate("/add-conductor")
     }
-    console.log(activeStatus);
-    console.log(leaveStatus);
+    // console.log(activeStatus);
+    // console.log(leaveStatus);
     const filter = (status) => {
         setActiveStatus(status)
         setLeaveStatus('allstatus')
@@ -106,7 +164,7 @@ const Conductors = () => {
             <div className="row">
                 <Header />
                 <div className="col-md-2">
-                    <NavSidebar />
+
                 </div>
                 <div className="col-md-9">
                     <div className='d-flex justify-content-between my-1 mx-3'>
@@ -117,7 +175,7 @@ const Conductors = () => {
                     <hr className='vehicle-horizontal-line' />
 
                     <div className='d-flex'>
-                        {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'TEMPORARY'].map((status, index) => (
+                        {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
                             status === 'LEAVE STATUS' ? (
                                 <div key={status} className="btn-group me-2">
                                     <button
@@ -162,7 +220,9 @@ const Conductors = () => {
                         {/* filter */}
                         <div className='d-flex justify-content-between py-2'>
                             <div>
-                                <div className="btn-group">
+
+                                {/* All conductor dropdown search */}
+                                {/* <div className="btn-group">
                                     <button
                                         type="button"
                                         className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2"
@@ -184,20 +244,33 @@ const Conductors = () => {
                                             <li key={conductor._id}>
                                                 <button
                                                     className="dropdown-item"
-                                                    onClick={() => setSelectedConductor(`${conductor.first_name} ${conductor.last_name}`)}
+                                                    onClick={() => setSelectedConductor(`${conductor.EmployeeName}`)}
                                                 >
-                                                    {conductor.first_name} {conductor.last_name}
+                                                    {conductor.EmployeeName}
                                                 </button>
                                             </li>
                                         ))}
                                     </ul>
+                                </div> */}
+
+                                {/* All conductor search by entering no or name */}
+                                <div className="btn-group">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Search Conductor by Name or No"
+                                        value={searchConductor}
+                                        onChange={(e) => setSearchConductor(e.target.value)}
+                                    />
+
                                 </div>
+
                                 <div className="btn-group">
                                     <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2" data-bs-toggle="dropdown" aria-expanded="false" >{employmentType}</button>
                                     <ul className="dropdown-menu">
                                         <li><a className="dropdown-item" onClick={() => setEmploymentType('Employment Type')}>Employment Type</a></li>
                                         <li><a className="dropdown-item" onClick={() => setEmploymentType('Permanent')}>Permanent</a></li>
-                                        <li><a className="dropdown-item" onClick={() => setEmploymentType('Temporary')}>Temporary</a></li>
+                                        <li><a className="dropdown-item" onClick={() => setEmploymentType('Badali')}>Badali</a></li>
 
                                     </ul>
                                 </div>
@@ -235,10 +308,22 @@ const Conductors = () => {
                             <div className="d-flex gap-4 align-items-center me-5">
                                 <p className="mb-0">Items on page</p>
                                 <div className="btn-group">
-                                    <button type="button" className="btn btn-light dropdown-toggle rounded px-4" data-bs-toggle="dropdown" aria-expanded="false" >10</button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-light dropdown-toggle rounded px-4"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        {itemsPerPage}
+                                    </button>
                                     <ul className="dropdown-menu">
-                                        <li><a className="dropdown-item" href="#">20</a></li>
-                                        <li><a className="dropdown-item" href="#">30</a></li>
+                                        {[10, 20, 30].map(size => (
+                                            <li key={size}>
+                                                <a className="dropdown-item" onClick={() => handleItemsPerPageChange(size)}>
+                                                    {size}
+                                                </a>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                                 <FontAwesomeIcon icon={faChevronLeft} />
@@ -253,35 +338,18 @@ const Conductors = () => {
                                         <th> {/*checkbox */}</th>
                                         <th> {/*image */}</th>
                                         <th>CONDUCTOR NAME</th>
+                                        <th>DESIGNATION</th>
                                         <th>EMPLOYMENT TYPE</th>
                                         <th>STATUS</th>
-                                        <th>SALARY</th>
-                                        <th>PHONE NUMBER</th>
+                                        {/* <th>SALARY</th> */}
+                                        {/* <th>PHONE NUMBER</th> */}
                                         <th> {/*for map */} </th>
                                         <th> {/*for delete option */}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {conductorData
-                                        .filter((conductor) => {
-                                            const nameMatch =
-                                                selectedConductor === "All Conductors" ||
-                                                `${conductor.first_name} ${conductor.last_name}` === selectedConductor;
+                                    {displayedConductors
 
-                                            const statusMatch = activeStatus === "ALL STATUSES" ||
-                                                (activeStatus === "LEAVE STATUS" && conductor.on_leave === status) ||
-                                                (activeStatus === "PERMANENT" && conductor.is_permanent === "Permanent") ||
-                                                (activeStatus === "TEMPORARY" && conductor.is_permanent === "Temporary");
-
-                                            const employmentMatch = employmentType === "Employment Type" || conductor.is_permanent === employmentType;
-                                            const leaveStatusMatch = status === "Status" || conductor.on_leave === status;
-
-                                            return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
-
-
-                                        })
-                                        .filter((conductor) => leaveStatus == "allstatus" ? true : leaveStatus == conductor.on_leave
-                                        )
                                         .map((conductor) => (
                                             <tr key={conductor.id}>
                                                 <td>
@@ -291,11 +359,14 @@ const Conductors = () => {
                                                     <img src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8" alt="" height={'50px'} width={'50px'} />
                                                 </td>
                                                 <td>
-                                                    <strong>{conductor.first_name} {conductor.last_name}</strong>
+                                                    <strong>{conductor.EmployeeName}</strong>
                                                     <br />
-                                                    <span>{conductor.license_number}</span>
+                                                    <span>{conductor.PEN}</span>
                                                 </td>
+                                                <td>
+                                                    {conductor["Designation "]}
 
+                                                </td>
                                                 <td>
                                                     {conductor.is_permanent}
                                                 </td>
@@ -318,15 +389,15 @@ const Conductors = () => {
                                                     </div>
                                                 </td>
 
-                                                <td>
+                                                {/* <td>
                                                     <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
                                                         ₹ INR 25,000
                                                     </div>
-                                                </td>
+                                                </td> */}
 
-                                                <td>
+                                                {/* <td>
                                                     {conductor.contact_info.phone}
-                                                </td>
+                                                </td> */}
 
                                                 <td>
                                                     <button className='btn-primary rounded p-1 px-3' style={{ backgroundColor: '#0d8a72', color: 'white', border: 'none' }}
@@ -366,7 +437,22 @@ const Conductors = () => {
 
 
                                                 <td>
-                                                    <FontAwesomeIcon icon={faEllipsisVertical} />
+                                                    <div style={{ position: "relative", width: "100px" }}>
+                                                        <FontAwesomeIcon
+                                                            icon={faEllipsisVertical}
+                                                            style={{ cursor: "pointer" }}
+                                                            onClick={() => handleShowDeleteOptions(conductor._id)}
+                                                        />
+                                                        {showDeleteId === conductor._id && (
+                                                            <button
+                                                                className="btn btn-danger"
+                                                                style={{ position: "absolute", top: 10, right: 10, zIndex: 10 }}
+                                                                onClick={() => handleDeleteSingleConductor(conductor._id, conductor.EmployeeName)}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )}
+                                                    </div>{" "}
                                                 </td>
 
                                             </tr>
@@ -377,6 +463,29 @@ const Conductors = () => {
                             </table>
 
                         </div>
+
+                        {/* pagination */}
+                        <ReactPaginate
+                            previousLabel={'Previous'}
+                            nextLabel={'Next'}
+                            breakLabel={'...'}
+                            pageCount={Math.ceil(conductorData.length / itemsPerPage)}
+                            marginPagesDisplayed={3}
+
+                            pageRangeDisplayed={3}
+                            onPageChange={handlePageClick}
+                            containerClassName={'pagination justify-content-center'}
+                            pageClassName={'page-item'}
+                            pageLinkClassName={'page-link'}
+                            previousClassName={'page-item'}
+                            previousLinkClassName={'page-link'}
+                            nextClassName={'page-item'}
+                            nextLinkClassName={'page-link'}
+                            breakClassName={'page-item'}
+                            breakLinkClassName={'page-link'}
+                            activeClassName={"active"}
+                        />
+
                     </div>
                 </div>
 

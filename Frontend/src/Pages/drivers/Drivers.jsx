@@ -2,14 +2,22 @@ import { faBan, faChevronLeft, faChevronRight, faCircleCheck, faEllipsisVertical
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react'
 import Header from '../../components/common/Header';
-import NavSidebar from '../../components/common/Sidebar/NavSidebar';
 import { useNavigate } from 'react-router-dom';
-import { editLeaveStatusDriver, getAllDrivers } from '../../services/allAPI';
+import { deleteSingleDriverAPI, editLeaveStatusDriver, getAllDrivers } from '../../services/allAPI';
 import { Button, Form, Modal } from 'react-bootstrap';
+import ReactPaginate from 'react-paginate';
 
 const Drivers = () => {
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+
   const [selectedDriver, setSelectedDriver] = useState("All Drivers");
   const [leaveStatus, setLeaveStatus] = useState("allstatus");
+  const [searchDriver, setSearchDriver] = useState("")
+
+  const [showDeleteId, setShowDeleteId] = useState(null);
 
   const [activeStatus, setActiveStatus] = useState('ALL STATUSES');
   const [employmentType, setEmploymentType] = useState('Employment Type');
@@ -62,6 +70,63 @@ const Drivers = () => {
       console.log(err);
     }
   }
+  // ------------------------------------------- Delete single driver -------------------------------------------
+  const handleShowDeleteOptions = (id) => {
+    setShowDeleteId((prevId) => (prevId === id ? null : id));
+  };
+
+  const handleDeleteSingleDriver = async (driverId, EmployeeName) => {
+    try {
+      const result = await deleteSingleDriverAPI(driverId)
+      if (result) {
+        alert(`${EmployeeName} deleted`);
+        setDriverData((prevData) => prevData.filter(driver => driver.driverId !== driverId));
+      }
+
+      // Refresh or update list after deletion
+    } catch (error) {
+      console.error("Error deleting driver:", error);
+      alert("Error deleting driver. Please try again.");
+    }
+  };
+
+  // ---------------------- pagination ----------------------
+  const displayedDrivers = driverData
+    .filter((driver) => {
+      const nameMatch =
+        selectedDriver === "All Drivers" ||
+        `${driver.EmployeeName}` === selectedDriver;
+
+      const statusMatch = activeStatus === "ALL STATUSES" ||
+        (activeStatus === "LEAVE STATUS" && driver.on_leave === status) ||
+        (activeStatus === "PERMANENT" && driver.is_Permanent === "Permanent") ||
+        (activeStatus === "BADALI" && driver.is_permanent === "Badali");
+
+      const employmentMatch = employmentType === "Employment Type" || driver.is_Permanent === employmentType;
+      const leaveStatusMatch = status === "Status" || driver.on_leave === status;
+
+      return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
+    })
+    .filter((driver) => leaveStatus == 'allstatus' ? true : leaveStatus == driver.on_leave)
+    .filter(
+      (driver) =>
+        driver.EmployeeName.toLowerCase().includes(searchDriver.toLowerCase()) ||
+        driver.PEN.toLowerCase().includes(searchDriver.toLowerCase())
+    )
+    .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(0);
+  };
+
+  const handlePageClick = (data) => {
+    // console.log(data.selected);
+    setCurrentPage(data.selected);
+
+  }
+
 
   useEffect(() => {
     handleAllDriverData();
@@ -83,7 +148,7 @@ const Drivers = () => {
       <div className="row">
         <Header />
         <div className="col-md-2">
-          <NavSidebar />
+
         </div>
         <div className="col-md-9">
           <div className='d-flex justify-content-between my-1 mx-3'>
@@ -96,7 +161,7 @@ const Drivers = () => {
           <hr className='vehicle-horizontal-line' />
 
           <div className='d-flex'>
-            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'TEMPORARY'].map((status, index) => (
+            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
               status === 'LEAVE STATUS' ? (
                 <div key={status} className="btn-group me-2">
                   <button
@@ -142,7 +207,8 @@ const Drivers = () => {
             {/* filter */}
             <div className='d-flex justify-content-between py-2'>
               <div>
-                <div className="btn-group">
+                {/* All driver dropdown search */}
+                {/* <div className="btn-group">
                   <button
                     type="button"
                     className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2"
@@ -164,20 +230,33 @@ const Drivers = () => {
                       <li key={driver._id}>
                         <button
                           className="dropdown-item"
-                          onClick={() => setSelectedDriver(`${driver.first_name} ${driver.last_name}`)}
+                          onClick={() => setSelectedDriver(`${driver.EmployeeName}`)}
                         >
-                          {driver.first_name} {driver.last_name}
+                          {driver.EmployeeName}
                         </button>
                       </li>
                     ))}
                   </ul>
+                </div> */}
+
+                {/* All driver search by entering no or name */}
+                <div className="btn-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Driver by Name or No"
+                    value={searchDriver}
+                    onChange={(e) => setSearchDriver(e.target.value)}
+                  />
+
                 </div>
+
                 <div className="btn-group">
                   <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2" data-bs-toggle="dropdown" aria-expanded="false" >{employmentType}</button>
                   <ul className="dropdown-menu">
                     <li><a className="dropdown-item" onClick={() => setEmploymentType('Employment Type')}>Employment Type</a></li>
                     <li><a className="dropdown-item" onClick={() => setEmploymentType('Permanent')}>Permanent</a></li>
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Temporary')}>Temporary</a></li>
+                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Badali')}>Badali</a></li>
 
                   </ul>
                 </div>
@@ -214,12 +293,24 @@ const Drivers = () => {
               <div className="d-flex gap-4 align-items-center me-5">
                 <p className="mb-0">Items on page</p>
                 <div className="btn-group">
-                  <button type="button" className="btn btn-light dropdown-toggle rounded px-4" data-bs-toggle="dropdown" aria-expanded="false" >10</button>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" href="#">20</a></li>
-                    <li><a className="dropdown-item" href="#">30</a></li>
-                  </ul>
-                </div>
+                                    <button
+                                        type="button"
+                                        className="btn btn-light dropdown-toggle rounded px-4"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        {itemsPerPage}
+                                    </button>
+                                    <ul className="dropdown-menu">
+                                        {[10, 20, 30].map(size => (
+                                            <li key={size}>
+                                                <a className="dropdown-item" onClick={() => handleItemsPerPageChange(size)}>
+                                                    {size}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                 <FontAwesomeIcon icon={faChevronLeft} />
                 <FontAwesomeIcon icon={faChevronRight} />
               </div>
@@ -232,32 +323,18 @@ const Drivers = () => {
                     <th> {/*checkbox */}</th>
                     <th> {/*image */}</th>
                     <th>DRIVER NAME</th>
+                    <th>DESIGNATION</th>
                     <th>EMPLOYMENT TYPE</th>
                     <th>STATUS</th>
-                    <th>SALARY</th>
-                    <th>PHONE NUMBER</th>
+                    {/* <th>SALARY</th> */}
+                    {/* <th>PHONE NUMBER</th> */}
                     <th> {/*for map */} </th>
                     <th> {/*for delete option */}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {driverData
-                    .filter((driver) => {
-                      const nameMatch =
-                        selectedDriver === "All Drivers" ||
-                        `${driver.first_name} ${driver.last_name}` === selectedDriver;
+                  {displayedDrivers
 
-                      const statusMatch = activeStatus === "ALL STATUSES" ||
-                        (activeStatus === "LEAVE STATUS" && driver.on_leave === status) ||
-                        (activeStatus === "PERMANENT" && driver.is_permanent === "Permanent") ||
-                        (activeStatus === "TEMPORARY" && driver.is_permanent === "Temporary");
-
-                      const employmentMatch = employmentType === "Employment Type" || driver.is_permanent === employmentType;
-                      const leaveStatusMatch = status === "Status" || driver.on_leave === status;
-
-                      return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
-                    })
-                    .filter((driver) => leaveStatus == 'allstatus' ? true : leaveStatus == driver.on_leave)
                     .map((driver) => (
                       <tr key={driver._id}>
                         <td>
@@ -267,13 +344,18 @@ const Drivers = () => {
                           <img src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8" alt="" height={'50px'} width={'50px'} />
                         </td>
                         <td>
-                          <strong>{driver.first_name} {driver.last_name}</strong>
+                          <strong>{driver.EmployeeName}</strong>
+
                           <br />
-                          <span>{driver.license_number}</span>
+                          <span>{driver.PEN}</span>
+                        </td>
+                        <td>
+                          {driver["Designation "]}
+
                         </td>
 
                         <td>
-                          {driver.is_permanent}
+                          {driver.is_Permanent}
                         </td>
 
                         <td>
@@ -294,15 +376,15 @@ const Drivers = () => {
                           </div>
                         </td>
 
-                        <td>
+                        {/* <td>
                           <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
                             ₹ INR 22,000
                           </div>
-                        </td>
+                        </td> */}
 
-                        <td>
+                        {/* <td>
                           {driver.contact_info.phone}
-                        </td>
+                        </td> */}
 
                         <td>
                           <button className='btn-primary rounded p-1 px-3' style={{ backgroundColor: '#0d8a72', color: 'white', border: 'none' }}
@@ -340,7 +422,22 @@ const Drivers = () => {
 
 
                         <td>
-                          <FontAwesomeIcon icon={faEllipsisVertical} />
+                          <div style={{ position: "relative", width: "100px" }}>
+                            <FontAwesomeIcon
+                              icon={faEllipsisVertical}
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleShowDeleteOptions(driver._id)}
+                            />
+                            {showDeleteId === driver._id && (
+                              <button
+                                className="btn btn-danger"
+                                style={{ position: "absolute", top: 10, right: 10, zIndex: 10 }}
+                                onClick={() => handleDeleteSingleDriver(driver._id, driver.EmployeeName)}
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>{" "}
                         </td>
 
                       </tr>
@@ -351,6 +448,30 @@ const Drivers = () => {
               </table>
 
             </div>
+
+
+            {/* pagination */}
+            <ReactPaginate
+              previousLabel={'Previous'}
+              nextLabel={'Next'}
+              breakLabel={'...'}
+              pageCount={Math.ceil(driverData.length / itemsPerPage)}
+              marginPagesDisplayed={3}
+
+              pageRangeDisplayed={3}
+              onPageChange={handlePageClick}
+              containerClassName={'pagination justify-content-center'}
+              pageClassName={'page-item'}
+              pageLinkClassName={'page-link'}
+              previousClassName={'page-item'}
+              previousLinkClassName={'page-link'}
+              nextClassName={'page-item'}
+              nextLinkClassName={'page-link'}
+              breakClassName={'page-item'}
+              breakLinkClassName={'page-link'}
+              activeClassName={"active"}
+            />
+
           </div>
         </div>
         <div className="col-md-1"></div>
