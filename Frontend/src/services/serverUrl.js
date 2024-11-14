@@ -1,3 +1,3 @@
-const SERVERURL = "https://ksrtcfirstphase-1.onrender.com"
+const SERVERURL = "https://ksrtc-backend.onrender.com"
 
 export default SERVERURL
