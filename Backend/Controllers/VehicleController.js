@@ -144,6 +144,7 @@ export const deleteVehicleById = async (req, res) => {
     }
 }
 
+// <<<<<:::::get Vehicle By ID::::::>>>>>
 export const getvehicleById=async(req,res)=>{
     const {vehicle_id}=req.params;
     try{
