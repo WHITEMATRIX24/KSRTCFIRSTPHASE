@@ -98,7 +98,6 @@ const tripSchema = new mongoose.Schema({
     trip_id: {
         type: String,
         required: true,
-        unique: true
     },
     trip_type: {
         type: String,
