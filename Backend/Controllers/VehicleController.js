@@ -147,7 +147,7 @@ export const deleteVehicleById = async (req, res) => {
 export const getvehicleById=async(req,res)=>{
     const {vehicle_id}=req.params;
     try{
-      const findvehicle=await Vehicles.findById({vehicle_id});
+      const findvehicle=await Vehicles.findById(vehicle_id);
       if(findvehicle){
         res.status(200).json(findvehicle);
       }else{
