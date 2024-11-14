@@ -29,11 +29,40 @@ const AddVehicle = () => {
   });
 
   const vehicleClasses = [
-    { name: 'FP', id: '1' },
-    { name: 'ORD', id: '2' },
-    { name: 'SP', id: '3' },
+    { name: 'AC PREMIUM SF', id: '1' },
+    { name: 'BB AC SEATER', id: '2' },
+    { name: 'CLASS', id: '3' },
+    { name: 'ELECTRIC', id: '4' },
+    { name: 'EL DD', id: '5' },
+    { name: 'FP', id: '6' },
+    { name: 'JN AC', id: '7' },
+    { name: 'JN NAC', id: '8' },
+    { name: 'ORD', id: '9' },
+    { name: 'S/DLX', id: '10' },
+    { name: 'S/EXP', id: '11' },
+    { name: 'SEATER CUM SLEEPER AC', id: '12' },
+    { name: 'SEATER CUM SLEEPER NON AC', id: '13' },
+    { name: 'SEMI SLEEPER', id: '14' },
+    { name: 'SFP', id: '15' },
+    { name: 'SP', id: '16' },
+    { name: 'SSFP', id: '17' },
+    { name: 'SWIFT AC SEATER', id: '18' },
+    { name: 'SWIFT DLX', id: '19' },
+    { name: 'SWIFT SLEEPER', id: '20' }
   ];
-  const depots = ['ADR', 'Bangalore', 'Chennai', 'Hyderabad', 'Mumbai'];
+
+  const depots = [
+    'ADR', 'ALP', 'ALY', 'ANK', 'ARD', 'ARK', 'ATL', 'CDM', 'CGR', 'CHT', 'CHY',
+    'CLD', 'CTL', 'CTR', 'EDT', 'EKM', 'EMY', 'ETP', 'GVR', 'HPD', 'IJK', 'KDR',
+    'KGD', 'KHD', 'KKD', 'KKM', 'KLM', 'KLP', 'KMG', 'KMR', 'KMY', 'KNI', 'KNP',
+    'KNR', 'KPM', 'KPT', 'KTD', 'KTM', 'KTP', 'KTR', 'KYM', 'MKD', 'MLA', 'MLP',
+    'MLT', 'MND', 'MNR', 'MPY', 'MVK', 'MVP', 'NBR', 'NDD', 'NDM', 'NPR', 'NTA',
+    'PBR', 'PDK', 'PDM', 'PLA', 'PLD', 'PLK', 'PLR', 'PMN', 'PNI', 'PNK', 'PNR',
+    'PPD', 'PPM', 'PRK', 'PSL', 'PTA', 'PVM', 'PVR', 'RNI', 'SBY', 'TDP', 'TDY',
+    'TLY', 'TMY', 'TPM', 'TSR', 'TVL', 'TVM CL', 'TVM CTY', 'TVRA', 'VDA', 'VDY',
+    'VJD', 'VKB', 'VKM', 'VLD', 'VRD', 'VTR', 'VZM'
+  ];
+
 
   const handleSearchChange = (type, value) => {
     setSearch(prevSearch => ({ ...prevSearch, [type]: value }));
@@ -76,7 +105,7 @@ const AddVehicle = () => {
 
     try {
       // API call to add vehicle
-      const result = await addvehicleAPI(vehicleData); 
+      const result = await addvehicleAPI(vehicleData);
       console.log("API Response:", result); // Log entire response for debugging
 
       // Handle different response statuses from the server
@@ -227,7 +256,7 @@ const AddVehicle = () => {
                           )}
                         </Form.Group>
                       </Col>
-                     
+
                     </Row>
 
                     <Row className="mt-4">
