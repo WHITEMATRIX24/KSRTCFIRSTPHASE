@@ -9,6 +9,7 @@ import './Header.css'
 import Divider from '@mui/material/Divider';
 import NavSidebar from './Sidebar/NavSidebar';
 import RealTimeData from '../RealTimeData/RealTimeData';
+import logo from '../../assets/logoKSRTC.png'
 
 function Header() {
 
@@ -33,18 +34,18 @@ function Header() {
         <Navbar.Brand className='w-100 d-flex px-3' href="#home">
           <img
             alt=""
-            src="https://play-lh.googleusercontent.com/Hm7mdo5V8AFPY8Vlt86CzlGDbCApcR2kAIek7lYnmRA_x7IXeyhQ6tACqjyXqNe28D8"
+            src={logo}
             width="30"
             height="30"
             className="d-inline-block align-top"
           />{' '}
           <h4 className='text-light ps-3'>K-TRACK "Enroute Kerala"</h4>
-          <h4 className='ms-3 text-light'><FontAwesomeIcon icon={faBars} onClick={toggleNav} /></h4>
-        </Navbar.Brand>
+{/*           <h4 className='ms-3 text-light'><FontAwesomeIcon icon={faBars} onClick={toggleNav} /></h4>
+ */}        </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav" className="justify-content-end">
-          <Navbar.Text className='d-flex border-start ps-2 align-items-center justify-content-center '>
-            <img className='UserImage' src="https://static.vecteezy.com/system/resources/thumbnails/048/174/549/small/portrait-of-a-young-man-with-a-serious-expression-free-photo.jpg" alt="" />
+          <Navbar.Text className='d-flex border-start ps-2 pe-3 align-items-center justify-content-center '>
+            <img className='UserImage' src={logo} alt="" />
             <div className='d-flex w-100 align-items-start    flex-column' style={{ lineHeight: '5px' }}>
               <p className='text-light ms-2'>UserName</p>
               <p className='text-light ms-2'>user@admin.com</p>
