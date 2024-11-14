@@ -3,7 +3,7 @@ import Vehicles from "../Models/VechicleSchema.js";
 // <<<<<<::::::::Adding New Vehicle Details::::::::>>>
 export const addNewVehicle = async (req, res) => {
     // console.log("in controller");
-    const { REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status } = req.body;
+    const { REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status,dock_reason,dock_depot} = req.body;
     console.log(req.body);
 
     try {
@@ -12,7 +12,7 @@ export const addNewVehicle = async (req, res) => {
             res.status(406).json("Vehicle is Already Existing:::::");
         } else {
             const newVehicle = new Vehicles({
-                REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status
+                REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status,dock_reason,dock_depot
             });
             await newVehicle.save();
             res.status(201).json(newVehicle);
@@ -41,10 +41,10 @@ export const getAllVehicles = async (req, res) => {
 // <<<<<:::::::::Editing Vehicle Details By vehicle_id:::::::::>>>>>>>> 
 export const editVehicleDetails = async (req, res) => {
     const { vehicle_id } = req.params;
-    const { REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status } = req.body;
+    const { REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status,dock_reason,dock_depot } = req.body;
     try {
         const updatedVehicle = await Vehicles.findByIdAndUpdate(vehicle_id, {
-            REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status
+            REGNO, BUSNO, CLASS, ALLOTTEDDEPOT, status,dock_reason,dock_depot
         }, { new: true });
 
         if (updatedVehicle) {
@@ -79,7 +79,7 @@ export const getAllVehiclesNumber = async (req, res) => {
 // <<<<<:::::::::Getting All out of service Vehicle Details from Db :::::::::>>>>>>>>
 export const getAllOutofServicesDetails = async (req, res) => {
     try {
-        const AllOSDetails = await Vehicles.find({ status: "doc" });
+        const AllOSDetails = await Vehicles.find({ status: "dock" });
         if (AllOSDetails) {
             res.status(200).json(AllOSDetails);
         } else {

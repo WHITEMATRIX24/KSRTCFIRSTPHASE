@@ -5,6 +5,7 @@ import { addNewTrip, editTripDetails, editTripDetailsNew, getAllTripDetails, get
 import { addNewDriver, deleteDriverById, editDriverDetails, editLeaveStatus, getAllDriverDetails } from '../Controllers/DriverController.js';  
 import { addNewConductor, deleteConductorById, editConductorDetails, editLeaveStatusConductor, getAllConductorDetails } from '../Controllers/ConductorController.js';
 import { getAllLedgerData, newLedgerData } from '../Controllers/LedgerController.js';
+import { adminLogin, editAdmindetailsById, getAllAdminDetails, Register } from '../Controllers/AdminController.js';
 // Initialize router
 const router = express.Router();
 
@@ -70,6 +71,16 @@ router.put('/editTripDetails/:_id', editTripDetails);
 router.put('/editTripDetailsnew/:trip_id/:vehicle_id/:driver_id/:conductor_id', editTripDetailsNew);
 // get All Completed Trips
 router.get('/getAllCompletedTripDetails', getAllCompletedTripDetails);
+
+// <<<<<<.......Admin Router.......>>>>>
+// Reigster New Admin
+router.post('/registerAdmin',Register);
+// Login for Admins
+router.post('/adminLogin',adminLogin);
+// Get All Admin Details
+router.get('/allAdminDetails',getAllAdminDetails);
+// Edit Admin Details
+router.put('/editAdminDetails/:admin_id',editAdmindetailsById);
 
 
 // <<<<<<<...........LedgerRouter.......>>>>>>>>
