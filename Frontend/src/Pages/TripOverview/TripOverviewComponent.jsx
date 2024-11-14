@@ -7,6 +7,7 @@ import {
   faClock,
   faGasPump,
   faIndianRupeeSign,
+  faL,
   faLocationDot,
   faMoon,
   faTriangleExclamation,
@@ -16,44 +17,64 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { getAllTripApi, getVehiclesNumberDetails } from "../../services/allAPI";
+import { getAllTripApi, getAllVehiclesApi, updateTripApiNew, updateVehicleStatus } from "../../services/allAPI";
+import { depoList } from "../../assets/depoList";
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
 
 function TripOverviewComponent() {
-  let dateToday = new Date();
-  dateToday = dateToday.toISOString().split("T")[0];
+  let dateToday = new Date(new Date().getTime() + 5.5 * 60 * 60 * 1000)
+  dateToday = dateToday.toISOString().split("T")[0]
+  
+
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => {
+    setShow(false)
+    setCancelDepo('')
+    setCancelReason("")
+  }
+  const handleShow = () => setShow(true);
 
   const [datePick, setDatePick] = useState(dateToday);
   const [chosenTrip, setChosenTrip] = useState(0);
-  const [tripStatuses] = useState([
-    "live",
-    "completed",
-    "with delay",
-    "failed",
-    "upcoming",
-  ]);
+  const [depo,setDepo]=useState("")
+  const [cancelDepo,setCancelDepo]=useState("")
+  const [cancelReason,setCancelReason]=useState("")
   const [trips, setTrips] = useState([]);
+  
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [trip, setTrip] = useState(filteredTrips[chosenTrip]);
-  const [vehicleDetailsData, setVehicleDetailsData] = useState([]);
+  
 
   useEffect(() => {
     getTripInitialData();
-    getVehicleNumberData();
   }, []);
 
   useEffect(() => {
     setFilteredTrips(
-      trips.filter((item) => item.start_date.split("T")[0] == datePick)
-    );
-  }, [datePick, trips]);
+      trips.filter((item) => (item.start_date.split("T")[0] == datePick) || (item.end_date.split("T")[0] == datePick))
+      .filter(item => {
+        if (!depo) return true
+        
+        const depoKeyword = depo.split(" ")[0].toLowerCase()
+        
+        return (
+          item.departure_location.depo.toLowerCase().includes(depoKeyword) ||
+          item.arrival_location.depo.toLowerCase().includes(depoKeyword)
+        )
+      }))
+    
+  }, [datePick, trips,depo]);
 
   useEffect(() => {
     setChosenTrip(0);
   }, [filteredTrips]);
 
   useEffect(() => {
-    setTrip(filteredTrips[chosenTrip]);
-  }, [filteredTrips, chosenTrip]);
+    setTrip(filteredTrips[chosenTrip])
+  }, [filteredTrips, chosenTrip])
 
   //   trips initial data
   const getTripInitialData = async () => {
@@ -67,90 +88,129 @@ function TripOverviewComponent() {
     }
   };
 
-  // chnages trip based on filter by bus
-  const handleBusSearch = (e) => {
-    const bus = e.target.value;
-    setChosenTrip(filteredTrips.findIndex((item) => item.bus == bus));
-  };
+  // // chnages trip based on filter by bus
+  // const handleBusSearch = (e) => {
+  //   const bus = e.target.value;
+  //   setChosenTrip(filteredTrips.findIndex((item) => item.bus == bus));
+  // };
 
   // returns color of trip statuses
   const tripStatusColor = (status) => {
-    if (status == 0 || status == 1 || status == 4) {
+    if ( status == "completed") {
       return "text-success";
-    } else if (status == 2) {
+    } else if (status == "live") {
+      return "text-info";
+    } else if (status == "upcoming") {
+      return "text-dark";
+    }else if (status == "with delay") {
       return "text-warning";
-    } else {
+    }else {
       return "text-danger";
     }
   };
 
   // returns styling for arrival time based on trip status
   const tripStatusArrival = (status) => {
-    if (status == 0 || status == 4) {
+    if (status == "live" || status == "upcoming") {
       return "opacity-50";
-    } else if (status == 3) {
+    } else if (status == "failed") {
       return "text-danger";
     } else {
       return "";
     }
   };
 
-  // returns color of location icon based events
-  const stopEventColor = (status) => {
-    if (status == 0) {
-      return "text-success";
-    } else if (status == 1) {
-      return "text-info";
-    } else if (status == 2) {
-      return "text-warning";
-    } else {
-      return "text-danger";
-    }
-  };
+  // // returns color of location icon based events
+  // const stopEventColor = (status) => {
+  //   if (status == 0) {
+  //     return "text-success";
+  //   } else if (status == 1) {
+  //     return "text-info";
+  //   } else if (status == 2) {
+  //     return "text-warning";
+  //   } else {
+  //     return "text-danger";
+  //   }
+  // };
 
-  // returns icons for events
-  const stopEventIcon = (status) => {
-    if (status == 0) {
-      return <FontAwesomeIcon icon={faCircleCheck} />;
-    } else if (status == 1 || status == 2) {
-      return <FontAwesomeIcon icon={faCircleInfo} />;
-    } else {
-      return <FontAwesomeIcon icon={faTriangleExclamation} />;
-    }
-  };
+  // // returns icons for events
+  // const stopEventIcon = (status) => {
+  //   if (status == 0) {
+  //     return <FontAwesomeIcon icon={faCircleCheck} />;
+  //   } else if (status == 1 || status == 2) {
+  //     return <FontAwesomeIcon icon={faCircleInfo} />;
+  //   } else {
+  //     return <FontAwesomeIcon icon={faTriangleExclamation} />;
+  //   }
+  // };
 
-  // number of errors
-  const numOfErrors = () => {
-    let arr = trip?.stops.filter((item) => item.type == 3);
-    return arr?.length;
-  };
+  // // number of errors
+  // const numOfErrors = () => {
+  //   let arr = trip?.stops.filter((item) => item.type == 3);
+  //   return arr?.length;
+  // };
 
-  // number of warnings
-  const numOfWarnings = () => {
-    let arr = trip?.stops.filter((item) => item.type == 2);
-    return arr?.length;
-  };
+  // // number of warnings
+  // const numOfWarnings = () => {
+  //   let arr = trip?.stops.filter((item) => item.type == 2);
+  //   return arr?.length;
+  // };
 
   //   vehicle data api handler
-  const getVehicleNumberData = async (vehicleId) => {
-    try {
-      const res = await getVehiclesNumberDetails();
-      setVehicleDetailsData(res.data);
-    } catch (error) {
-      console.log(
-        `error in fetching vehicle data in trips overview page error: ${error}`
-      );
-    }
-  };
 
-  const filterVehiclesNumber = (vehicleId) => {
-    const vehicleDetails = vehicleDetailsData?.find(
-      (val) => val._id === vehicleId
-    );
-    if (vehicleDetails) {
-      return vehicleDetails.number;
+  const [vehicles,setVehicles]=useState([])
+
+
+
+  useEffect(()=>{
+    getAllVehicles()
+  },[])
+
+  const getAllVehicles = async ()=>{
+    try{
+      const result = await getAllVehiclesApi()      
+      if(result.status==200){
+        setVehicles(result.data)
+      }else{
+        console.log("failed to fetch all vehicles",result.message);
+      }
+
+    }catch(err){
+      console.log("failed to fetch all vehicles",err);
     }
-  };
+  }
+
+
+
+
+  const handlecancelTrip =async () => {
+    if(!cancelDepo || !cancelReason){
+      alert("Fill The Empty Fields")
+    }else{
+    try{
+
+      const updatedTrip = {...trip,status:"failed"}
+
+
+      const vehicle = vehicles.find(item=>item._id==trip.vehicle_id)
+      const updatedVehicle = {...vehicle,status:"dock",dock_reason:cancelReason,dock_depot:cancelDepo.split(" ")[0]}
+      
+      const result = await updateTripApiNew(trip._id,trip.vehicle_id,trip.driver_id,trip.conductor_id,updatedTrip)
+
+      const result2 = await updateVehicleStatus(updatedVehicle._id,updatedVehicle)
+
+      if(result.status==200 && result2.status==200){
+        getTripInitialData();
+        alert("Trip cancelled successfully")
+      }      
+
+
+    }catch(err){
+      console.log("failed to cancel trip",err);
+    }
+    handleClose()
+  }
+  }
 
   return (
     <div>
@@ -163,20 +223,23 @@ function TripOverviewComponent() {
             </span>
           </div>
           <div className="p-2 border-bottom d-flex align-items-center gap-2 mb-2">
-            <select
-              defaultValue={""}
-              className="form-control"
-              onChange={(e) => handleBusSearch(e)}
-            >
-              <option disabled value="">
-                Filter By Vehicle
-              </option>
-              {filteredTrips.map((item, index) => (
-                <option key={index} value={item.bus}>
-                  {item.bus}
-                </option>
-              ))}
-            </select>
+            <div className="position-relative w-100 p-1">
+              <input type="search" className="form-control" placeholder="Filter By Depo" value={depo} onChange={(e)=>setDepo(e.target.value)}/>
+              <ul className="position-absolute bg-light" style={{width:"100%"}}>
+                {
+                  // Filter depo List
+
+                  depoList.filter(item => {
+                    if (!depo) return false
+                    const depoLower = depo.toLowerCase()
+                    return item.code.toLowerCase().includes(depoLower) || item.name.toLowerCase().includes(depoLower)
+                  }).slice(0,5)
+                  .map((item,index)=>(
+                    <li key={index} className="form-control pointer" onClick={()=>setDepo(item.code + " " + item.name)}>{item.code} {item.name}</li>
+                  ))
+                }
+              </ul>
+            </div>
             <label
               htmlFor="date"
               onClick={() => document.getElementById("date").showPicker()}
@@ -192,7 +255,7 @@ function TripOverviewComponent() {
             />
           </div>
 
-          {filteredTrips?.map((item, index) =>
+          {filteredTrips.length>0?filteredTrips.map((item, index) =>
             index == chosenTrip ? (
               <div
                 key={index}
@@ -204,29 +267,35 @@ function TripOverviewComponent() {
                     <div className="circlePick circle p-1 me-2">
                       <FontAwesomeIcon icon={faCarSide} />
                     </div>
-                    <h4>{filterVehiclesNumber(item?.vehicle_id)}</h4>
+                    <h4>
+                        {
+                          vehicles.length>0?
+                          vehicles.find(item2=>item.vehicle_id==item2._id)?.BUSNO
+                          :<></>
+                        }
+                    </h4>
                   </div>
                   <div
                     className={`d-flex flex-column align-items-end ${tripStatusColor(
-                      item?.status
+                      item?.status 
                     )}`}
                   >
                     <span className="fw-semibold">
-                      {tripStatuses.find((data) => data === item.status)}
+                      {item.status.toUpperCase()}
                     </span>
                     <span>{item?.trip_id}</span>
                   </div>
                 </div>
                 <div
                   className={`ms-5 mt-3 ${
-                    item?.status == 4 ? tripStatusArrival(item?.status) : ""
+                    item?.status == "upcoming" ? tripStatusArrival(item?.status) : ""
                   }`}
                 >
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faLocationDot} className="me-2" />
                     <div className="d-flex flex-column ms-2">
                       <span className="fw-semibold">
-                        {item?.departure_location.city}
+                        {item?.departure_location.depo} {depoList.find(item2=>item2.code==item?.departure_location.depo)?.name}
                       </span>
                       <span>{`${item?.start_date.split("T")[0]} , ${
                         item?.start_time
@@ -239,7 +308,7 @@ function TripOverviewComponent() {
                     <FontAwesomeIcon icon={faLocationDot} className="me-2" />
                     <div className="d-flex flex-column ms-2">
                       <span className="fw-semibold">
-                        {item?.arrival_location.city}
+                        {item?.arrival_location.depo} {depoList.find(item2=>item2.code==item?.arrival_location.depo)?.name}
                       </span>
                       <span>{`${item?.end_date.split("T")[0]} , ${
                         item?.end_time
@@ -259,7 +328,13 @@ function TripOverviewComponent() {
                     <div className="circle p-1 me-2">
                       <FontAwesomeIcon icon={faCarSide} />
                     </div>
-                    <h4>{filterVehiclesNumber(item.vehicle_id)}</h4>
+                    <h4>
+                        {
+                          vehicles.length>0?
+                          vehicles.find(item2=>item.vehicle_id==item2._id)?.BUSNO
+                          :<></>
+                        }
+                    </h4>
                   </div>
                   <div
                     className={`d-flex flex-column align-items-end ${tripStatusColor(
@@ -267,21 +342,21 @@ function TripOverviewComponent() {
                     )}`}
                   >
                     <span className="fw-semibold">
-                      {tripStatuses.find((data) => data === item.status)}
+                      {item.status.toUpperCase()}
                     </span>
                     <span>{item?.trip_id}</span>
                   </div>
                 </div>
                 <div
                   className={`ms-5 mt-3 ${
-                    item?.status == 4 ? tripStatusArrival(item?.status) : ""
+                    item?.status == "upcoming" ? tripStatusArrival(item?.status) : ""
                   }`}
                 >
                   <div className="d-flex align-items-center">
                     <FontAwesomeIcon icon={faLocationDot} className="me-2" />
                     <div className="d-flex flex-column ms-2">
                       <span className="fw-semibold">
-                        {item?.departure_location.city}
+                        {item?.departure_location.depo} {depoList.find(item2=>item2.code==item?.departure_location.depo)?.name}
                       </span>
                       <span>{`${item?.start_date.split("T")[0]} , ${
                         item?.start_time
@@ -294,7 +369,7 @@ function TripOverviewComponent() {
                     <FontAwesomeIcon icon={faLocationDot} className="me-2" />
                     <div className="d-flex flex-column ms-2">
                       <span className="fw-semibold">
-                        {item?.arrival_location.city}
+                        {item?.arrival_location.depo} {depoList.find(item2=>item2.code==item?.arrival_location.depo)?.name}
                       </span>
                       <span>{`${item?.end_date.split("T")[0]} , ${
                         item?.end_time
@@ -304,7 +379,7 @@ function TripOverviewComponent() {
                 </div>
               </div>
             )
-          )}
+          ):<></>}
         </div>
 
         <div className="col-8 details p-0">
@@ -384,7 +459,7 @@ function TripOverviewComponent() {
                   </div>
                   <div className="col">
                     <p className="m-0 text-secondary">
-                      <FontAwesomeIcon icon={faGasPump} /> Trip cost
+                      <FontAwesomeIcon icon={faGasPump} /> Trip Cost
                     </p>
                     <span className="fw-semibold">{trip?.fuelCost}</span>
                   </div>
@@ -447,9 +522,58 @@ function TripOverviewComponent() {
                 </div>
               </div> */}
             </div>
+            
           </div>
+          {
+            trip?.status=="live"?
+            <div className="d-flex justify-content-end pe-5 pt-3">
+              <button className="btn btn-outline-danger" onClick={handleShow}>Cancel Trip</button>
+            </div>:<></>
+          }
         </div>
       </div>
+
+
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cancelling Trip</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <label htmlFor="">Reason for cancelling</label>
+            <input type="text" placeholder="Reason" className="form-control m-1 mb-3" value={cancelReason} onChange={(e)=>setCancelReason(e.target.value)} />
+          
+            <div className="position-relative w-100 p-1">
+              <label htmlFor="cancelDepo">Bus Docked At (Select from the list)</label>
+              <input id="cancelDepo" type="search" className="form-control" placeholder="Enter Depo" value={cancelDepo} onChange={(e)=>setCancelDepo(e.target.value)}/>
+              <ul className="position-absolute" style={{width:"100%",left:"-30px"}}>
+                {
+                  // Filter depo List
+
+                  depoList.filter(item => {
+                    if (!cancelDepo) return false
+                    const depoLower = cancelDepo.toLowerCase()
+                    return item.code.toLowerCase().includes(depoLower) || item.name.toLowerCase().includes(depoLower)
+                  }).slice(0,5)
+                  .map((item,index)=>(
+                    <li key={index} className="form-control pointer" onClick={()=>setCancelDepo(item.code + " " + item.name)}>{item.code} {item.name}</li>
+                  ))
+                }
+              </ul>
+            </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handlecancelTrip}>
+            Cancel Trip
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
+
     </div>
   );
 }
