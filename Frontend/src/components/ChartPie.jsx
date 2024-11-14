@@ -48,7 +48,7 @@ function ChartPie({ data }) {
   console.log(onRouteCount);
 
   return (
-    <div className="m-5" style={{ width: "450px", height: "300px" }}>
+    <div className="m-5" style={{ width: "450px", height: "250px" }}>
       <Pie
         width={350}
         height={300}
@@ -82,6 +82,7 @@ function ChartPie({ data }) {
           responsive: true,
         }}
       />
+        <h6  className='mt-3' style={{ color: '#737373', fontWeight: "600"}}>Total Fleet Size: {data.length}</h6>
     </div>
   );
 }

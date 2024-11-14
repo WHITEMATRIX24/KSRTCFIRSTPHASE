@@ -8,7 +8,7 @@ import ChartPie from '../components/ChartPie'
 import ChartBar from '../components/ChartBar'
 import { faServicestack } from '@fortawesome/free-brands-svg-icons'
 import { getAllTripApi, getAllVehiclesApi, getOnRouteServicesApi, getAvilableServicesApi, getAllCompletedTripApi, getAllOutofServicesApi } from '../services/allAPI'
-
+import ExcelExport from '../components/ExcelExport '
 
 
 
@@ -20,9 +20,7 @@ function Dashboard() {
   const [TotalCollection, setTotalcollection] = useState(0)
   const [TotalFuelConsumption, setTotalFuelComsumption] = useState(0)
   const [outOfServicesCount, setOutOfServicesCount] = useState(0);
-
-
-  // const[CompletedTripDetails,setCompletedTripDetails]=useState({})
+  const[CompletedTripDetails,setCompletedTripDetails]=useState({})
 
   // get all Vehicle details
   const getAllVehicleDetails = async () => {
@@ -74,7 +72,7 @@ function Dashboard() {
       return total + item.collection_amount;
     }, 0)
     setTotalcollection(ctotal);
-    // setCompletedTripDetails(result.data);
+    setCompletedTripDetails(result.data);
   }
 
   useEffect(() => {
@@ -97,11 +95,14 @@ function Dashboard() {
         <div className="row">
           <div className="col-md-2"></div>
           <div className="col-md-10">
+          <ExcelExport data={CompletedTripDetails}  data1={AllvehicleData} fileName="Report"  />
             <RealTimeData />
+           
             {/* section1 */}
             {/* Dashboard Content */}
 
             <div className="row mt-2 ">
+           
               <div className="col-md-3">
                 <div style={{ backgroundColor: 'white' }} className='vehicle-data shadow w-100'>
                   <FontAwesomeIcon icon={faLocationDot} style={{ color: "#f73b3b", fontSize: '20px' }} className='ms-3 mt-2' />
@@ -141,20 +142,19 @@ function Dashboard() {
               <div className="col-md-6 " >
                 <div className='p-3 shadow' style={{ backgroundColor: 'white' }}>
                   {/* Pie Chart */}
-                  <h3 style={{ color: '#737373', fontWeight: "600", padding: "10px" }}>FLEET OVERVIEW</h3>
+                  <h4 className='mt-2' style={{ color: '#737373', fontWeight: "600"}}>FLEET OVERVIEW</h4>
                   <ChartPie data={AllvehicleData} />
-                  <h5 style={{ color: '#737373', fontWeight: "600", padding: "10px" }}>Total Fleet Size: {AllvehicleData.length}</h5>
-
+                
                 </div>
 
               </div>
               <div className="col-md-6">
                 <div className='p-3 shadow' style={{ backgroundColor: 'white' }}>
-                  <h3 style={{ color: '#737373', fontWeight: "600", padding: "10px" }}>REVENUE OVERVIEW</h3>
+                  <h4 className='mt-2'  style={{ color: '#737373', fontWeight: "600" }}>REVENUE OVERVIEW</h4>
 
                   {/* Bar Chart */}
                   <ChartBar collection={TotalCollection} fuelconsumtion={TotalFuelConsumption} revenew={TotalCollection - TotalFuelConsumption} />
-                  <div style={{ padding: "25px" }}></div>
+                  {/* <div style={{ padding: "25px" }}></div> */}
 
                 </div>
               </div>
