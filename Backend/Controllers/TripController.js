@@ -20,12 +20,10 @@ export const addNewTrip = async (req, res) => {
         const newTrip = new Trip({
             start_date, end_date, start_time, end_time, trip_id, trip_type,
             departure_location: {
-                city: departure_location.city,
-                address: departure_location.address
+                depo: departure_location.depo,
             },
             arrival_location: {
-                city: arrival_location.city,
-                address: arrival_location.address
+                depo: departure_location.depo,
             },
             vehicle_id: vehicle_id,
             driver_id: driver_id,
@@ -57,10 +55,9 @@ export const getAllTripDetails = async (req, res) => {
 
 // <<<<<:::::::::Editing Trip Details By trip_id:::::::::>>>>>>>> 
 export const editTripDetails = async (req, res) => {
-    console.log('inside')
+    // console.log('inside')
     const { start_date, end_date, start_time, end_time, departure_location, arrival_location, vehicle_id, conductor_id, driver_id, issues_reported, status, trip_id, trip_type, updated_at, collection_amount, fuelCost } = req.body;
-    console.log(status)
-
+    // console.log(status)
     const { _id } = req.params;
 
     try {
@@ -71,12 +68,10 @@ export const editTripDetails = async (req, res) => {
         const updatedTrip = await Trip.findByIdAndUpdate(_id, {
             start_date, end_date, start_time, end_time,
             departure_location: {
-                city: departure_location.city,
-                address: departure_location.address
+                depo: departure_location.depo,
             },
             arrival_location: {
-                city: arrival_location.city,
-                address: arrival_location.address
+                depo: departure_location.depo,
             },
             vehicle_id: vehicle_id,
             driver_id: driver_id,
@@ -112,12 +107,10 @@ export const editTripDetailsNew = async (req, res) => {
         const updatedTrip = await Trip.findByIdAndUpdate(trip_id, {
             start_date, end_date, start_time, end_time, status,
             departure_location: {
-                city: departure_location.city,
-                address: departure_location.address
+                depo: departure_location.depo,
             },
             arrival_location: {
-                city: arrival_location.city,
-                address: arrival_location.address
+                depo: departure_location.depo,
             },
             vehicle_id: vehicle_id,
             driver_id: driver_id,

@@ -25,13 +25,15 @@ const tripSchema = new mongoose.Schema({
         required: true
     },
     departure_location: {
+        depo: {
+            type: String,
+            required:true
+        },
         city: {
             type: String,
-            required: true
         },
         address: {
             type: String
-            // required: true
         },
         lat: {
             type: Number
@@ -41,13 +43,15 @@ const tripSchema = new mongoose.Schema({
         }
     },
     arrival_location: {
+        depo: {
+            type: String,
+            required:true
+        },
         city: {
             type: String,
-            required: true
         },
         address: {
             type: String
-            // required: true
         },
         lat: {
             type: Number
