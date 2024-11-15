@@ -73,7 +73,7 @@ export default function ScheduleTrip() {
   useEffect(() => {
     if (trips.length > 0 && vehicles.length > 0 && drivers.length > 0) {
       let arr = trips.map(item =>
-        ({ ...item, vehicleNumber: vehicles.find(item2 => item2._id == item.vehicle_id)?.number, driverName: drivers.find(item2 => item2._id == item.driver_id)?.first_name + " " + drivers.find(item2 => item2._id == item.driver_id)?.last_name })
+        ({ ...item, vehicleNumber: vehicles.find(item2 => item2._id == item.vehicle_id)?.BUSNO, driverName: drivers.find(item2 => item2._id == item.driver_id)?.EmployeeName })
       )
       setModifiedTrips(arr)
     }

@@ -17,7 +17,7 @@ const TripParameters = () => {
   const [returnStartDepo, setRetStartDepo] = useState("")
   const [returnEndDepo, setReturnEndDepo] = useState("")
 
-// 
+  // 
   const [searchDriver, setsearchDriver] = useState("")
   const [searchConductor, setsearchConductor] = useState("")
   const [searchBus, setsearchBus] = useState("")
@@ -35,10 +35,10 @@ const TripParameters = () => {
     start_date: "",
     end_date: "",
     departure_location: {
-     depo:"",
+      depo: "",
     },
     arrival_location: {
-      depo:"",
+      depo: "",
     },
     start_time: "",
     end_time: "",
@@ -52,10 +52,10 @@ const TripParameters = () => {
     start_date: "",
     end_date: "",
     departure_location: {
-      depo:"",
+      depo: "",
     },
     arrival_location: {
-      depo:"",
+      depo: "",
     },
     start_time: "",
     end_time: "",
@@ -274,10 +274,10 @@ const TripParameters = () => {
       start_date: "",
       end_date: "",
       departure_location: {
-        depo:"",
+        depo: "",
       },
       arrival_location: {
-        depo:"",
+        depo: "",
       },
       start_time: "",
       end_time: "",
@@ -290,10 +290,10 @@ const TripParameters = () => {
       start_date: "",
       end_date: "",
       departure_location: {
-        depo:"",
+        depo: "",
       },
       arrival_location: {
-        depo:"",
+        depo: "",
       },
       start_time: "",
       end_time: "",
@@ -306,54 +306,54 @@ const TripParameters = () => {
 
   }
 
-  const handlechangedriver=(id,searchvalue)=>{
+  const handlechangedriver = (id, searchvalue) => {
     setsearchDriver(searchvalue)
-    setOutboundTrip({...outboundTrip,driver_id:id})
-    setReturnTrip({...returnTrip,driver_id:id})
+    setOutboundTrip({ ...outboundTrip, driver_id: id })
+    setReturnTrip({ ...returnTrip, driver_id: id })
   }
-  const handlechangeconductor=(id,searchvalue)=>{
+  const handlechangeconductor = (id, searchvalue) => {
     setsearchConductor(searchvalue)
-    setOutboundTrip({...outboundTrip,conductor_id:id})
-    setReturnTrip({...returnTrip,conductor_id:id})
+    setOutboundTrip({ ...outboundTrip, conductor_id: id })
+    setReturnTrip({ ...returnTrip, conductor_id: id })
   }
-  const handlechangebus=(id,searchvalue)=>{
+  const handlechangebus = (id, searchvalue) => {
     setsearchBus(searchvalue)
-    setOutboundTrip({...outboundTrip,vehicle_id:id})
-    setReturnTrip({...returnTrip,vehicle_id:id})
+    setOutboundTrip({ ...outboundTrip, vehicle_id: id })
+    setReturnTrip({ ...returnTrip, vehicle_id: id })
   }
- 
-  
-console.log(outboundTrip);
-console.log(returnTrip);
+
+
+  console.log(outboundTrip);
+  console.log(returnTrip);
 
 
 
 
 
 
-  const hansleupdatevehiclestatus=async()=>{
-    try{
-     const timeinms= checkTimeEntries(outboundTrip.start_date, outboundTrip.start_time, returnTrip.end_date, returnTrip.end_time)/(1000*60*60*24)
+  const hansleupdatevehiclestatus = async () => {
+    try {
+      const timeinms = checkTimeEntries(outboundTrip.start_date, outboundTrip.start_time, returnTrip.end_date, returnTrip.end_time) / (1000 * 60 * 60 * 24)
 
       console.log(timeinms);
-      if(timeinms>=1){
+      if (timeinms >= 1) {
         console.log(outboundTrip.vehicle_id);
-        
-        const  vehiclestat=vehicles.find(item=>item._id==outboundTrip.vehicle_id)
-        const newvehiclestat={...vehiclestat,status:"en_route"}
-        const result=await updateVehicleStatus(outboundTrip.vehicle_id,newvehiclestat)
+
+        const vehiclestat = vehicles.find(item => item._id == outboundTrip.vehicle_id)
+        const newvehiclestat = { ...vehiclestat, status: "en_route" }
+        const result = await updateVehicleStatus(outboundTrip.vehicle_id, newvehiclestat)
         console.log(result);
-        
-        
+
+
       }
-      
-    }catch(err){
-      console.log("error in updating vehicle status",err);
-      
+
+    } catch (err) {
+      console.log("error in updating vehicle status", err);
+
     }
   }
 
-  
+
 
   return (
     <div> <Header />
@@ -435,9 +435,9 @@ console.log(returnTrip);
                                       className="form-control"
                                       style={{ opacity: item === startDepo ? "0" : "1" }}
                                       onClick={() => {
-                                       
+
                                         setStartDepo(item)
-                                        setOutboundTrip({...outboundTrip,departure_location:{...outboundTrip.departure_location,depo:item}})
+                                        setOutboundTrip({ ...outboundTrip, departure_location: { ...outboundTrip.departure_location, depo: item } })
                                       }}
                                     >
                                       {item}
@@ -467,9 +467,9 @@ console.log(returnTrip);
                                     className="form-control"
                                     style={{ opacity: item === endDepo ? "0" : "1" }}  // Hide the item that matches the input value
                                     onClick={() => {
-                                       
+
                                       setEndDepo(item)
-                                      setOutboundTrip({...outboundTrip,arrival_location:{...outboundTrip.arrival_location,depo:item}})
+                                      setOutboundTrip({ ...outboundTrip, arrival_location: { ...outboundTrip.arrival_location, depo: item } })
                                     }}
                                   >
                                     {item}
@@ -566,9 +566,9 @@ console.log(returnTrip);
                                     className="form-control"
                                     style={{ opacity: item === returnStartDepo ? "0" : "1" }}
                                     onClick={() => {
-                                       
+
                                       setRetStartDepo(item)
-                                      setReturnTrip({...returnTrip,departure_location:{...returnTrip.departure_location,depo:item}})
+                                      setReturnTrip({ ...returnTrip, departure_location: { ...returnTrip.departure_location, depo: item } })
                                     }}
                                   >
                                     {item}
@@ -597,9 +597,9 @@ console.log(returnTrip);
                                     className="form-control"
                                     style={{ opacity: item === returnEndDepo ? "0" : "1" }}
                                     onClick={() => {
-                                       
+
                                       setReturnEndDepo(item)
-                                      setReturnTrip({...returnTrip,arrival_location:{...returnTrip.arrival_location,depo:item}})
+                                      setReturnTrip({ ...returnTrip, arrival_location: { ...returnTrip.arrival_location, depo: item } })
                                     }}
                                   >
                                     {item}
@@ -663,7 +663,7 @@ console.log(returnTrip);
                             />
                             <ul className="position-absolute" style={{ width: "45%" }}>
                               {
-                                drivers.length>0?drivers
+                                drivers.length > 0 ? drivers
                                   .filter(item => !searchDriver ? false : item.PEN.toLowerCase().includes(searchDriver.toLowerCase()))
                                   .slice(0, 5)
                                   .map((item, index) => (
@@ -671,11 +671,11 @@ console.log(returnTrip);
                                       key={index}
                                       className="form-control"
                                       style={{ opacity: item.PEN === searchDriver ? "0" : "1" }}
-                                      onClick={() => handlechangedriver(item._id,item.PEN)}
+                                      onClick={() => handlechangedriver(item._id, item.PEN)}
                                     >
                                       {item.PEN} {item.EmployeeName}
                                     </li>
-                                  )): <></>
+                                  )) : <></>
                               }
                             </ul>
                           </Col>
@@ -703,7 +703,7 @@ console.log(returnTrip);
                             />
                             <ul className="position-absolute" style={{ width: "45%" }}>
                               {
-                                conductors.length>0?conductors
+                                conductors.length > 0 ? conductors
                                   .filter(item => !searchConductor ? false : item.PEN.toLowerCase().includes(searchConductor.toLowerCase()))
                                   .slice(0, 5)
                                   .map((item, index) => (
@@ -711,11 +711,11 @@ console.log(returnTrip);
                                       key={index}
                                       className="form-control"
                                       style={{ opacity: item.PEN === searchConductor ? "0" : "1" }}
-                                      onClick={() => handlechangeconductor(item._id,item.PEN)}
+                                      onClick={() => handlechangeconductor(item._id, item.PEN)}
                                     >
                                       {item.PEN} {item.EmployeeName}
                                     </li>
-                                  )): <></>
+                                  )) : <></>
                               }
                             </ul>
                           </Col>
@@ -753,31 +753,31 @@ console.log(returnTrip);
 
 
 
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="Search Bus"
-                              value={searchBus}
-                              onChange={(e) => setsearchBus(e.target.value)}
-                            />
-                            <ul className="position-absolute" style={{ width: "45%" }}>
-                              {
-                                vehicles.length>0?vehicles
-                                .filter(item=>!availableBusOnly ? true:item.status=="in_service"?true:false)
-                                  .filter(item => !searchBus ? false : item.BUSNO.toLowerCase().includes(searchBus.toLowerCase()))
-                                  .slice(0, 5)
-                                  .map((item, index) => (
-                                    <li
-                                      key={index}
-                                      className="form-control"
-                                      style={{ opacity: item.BUSNO === searchBus ? "0" : "1" ,height:item.BUSNO === searchBus ? "0" : ""}}
-                                      onClick={() => handlechangebus(item._id,item.BUSNO)}
-                                    >
-                                      {item.BUSNO} {item.CLASS}
-                                    </li>
-                                  )): <></>
-                              }
-                            </ul>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search Bus"
+                            value={searchBus}
+                            onChange={(e) => setsearchBus(e.target.value)}
+                          />
+                          <ul className="position-absolute" style={{ width: "45%" }}>
+                            {
+                              vehicles.length > 0 ? vehicles
+                                .filter(item => !availableBusOnly ? true : item.status == "in_service" ? true : false)
+                                // .filter(item => !searchBus ? false : item.BUSNO.toLowerCase().includes(searchBus.toLowerCase()))
+                                .slice(0, 5)
+                                .map((item, index) => (
+                                  <li
+                                    key={index}
+                                    className="form-control"
+                                    style={{ opacity: item.BUSNO === searchBus ? "0" : "1", height: item.BUSNO === searchBus ? "0" : "" }}
+                                    onClick={() => handlechangebus(item._id, item.BUSNO)}
+                                  >
+                                    {item.BUSNO} {item.CLASS}
+                                  </li>
+                                )) : <></>
+                            }
+                          </ul>
 
 
 
