@@ -1,21 +1,24 @@
 import { faBan, faChevronLeft, faChevronRight, faCircleCheck, faEllipsisVertical, faGear, faLocationDot, faPlus, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react'
-import Header from '../../components/common/Header'
+import Header from '../../components/common/Header';
 import { useNavigate } from 'react-router-dom';
 import { deleteSingleConductorAPI, editLeaveStatusConductor, getAllConductor } from '../../services/allAPI';
 import { Button, Form, Modal } from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 
 const Conductors = () => {
+
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [filteredConductors, setFilteredConductors] = useState([]);
+
 
     const [selectedConductor, setSelectedConductor] = useState("All Conductors");
     const [leaveStatus, setLeaveStatus] = useState("allstatus");
     const [searchConductor, setSearchConductor] = useState("")
-    const [showDeleteId, setShowDeleteId] = useState(null);
 
+    const [showDeleteId, setShowDeleteId] = useState(null);
 
     const [activeStatus, setActiveStatus] = useState('ALL STATUSES');
     const [employmentType, setEmploymentType] = useState('Employment Type');
@@ -25,16 +28,14 @@ const Conductors = () => {
     const [show, setShow] = useState(false);
     const [currentId, setCurrentId] = useState(null);
 
-    const handleClose = () => setShow(false);
+    // console.log(activeStatus);
 
+    const handleClose = () => setShow(false);
     const handleShow = (conductor) => {
         setCurrentId(conductor.conductor_id);
         setEditLeave({ on_leave: conductor.on_leave || "" }); // Initialize with current status
         setShow(true);
     };
-
-
-    const navigate = useNavigate();
 
     const handleLeaveStatus = async (on_leave) => {
         const reqBody = { on_leave };
@@ -56,13 +57,11 @@ const Conductors = () => {
         }
     };
 
-    // console.log(conductorData);
-
     const handleAllConductorData = async () => {
         try {
             const allConductor = await getAllConductor();
             if (allConductor.status == 200) {
-                // console.log(allConductor.data);
+                console.log(allConductor.data);
                 setConductorData(allConductor.data);
             } else {
                 console.log("Error in fetching Conductor Details:::::");
@@ -72,8 +71,7 @@ const Conductors = () => {
             console.log(err);
         }
     }
-
-    // ------------------------------------------- Delete single conductor -------------------------------------------
+    // ------------------------------------------- Delete single Conductor -------------------------------------------
     const handleShowDeleteOptions = (id) => {
         setShowDeleteId((prevId) => (prevId === id ? null : id));
     };
@@ -93,35 +91,9 @@ const Conductors = () => {
         }
     };
 
-
     // ---------------------- pagination ----------------------
-    const displayedConductors = conductorData
-        .filter((conductor) => {
-            const nameMatch =
-                selectedConductor === "All Conductors" ||
-                `${conductor.EmployeeName}` === selectedConductor;
-
-            const statusMatch = activeStatus === "ALL STATUSES" ||
-                (activeStatus === "LEAVE STATUS" && conductor.on_leave === status) ||
-                (activeStatus === "PERMANENT" && conductor.is_permanent === "Permanent") ||
-                (activeStatus === "BADALI" && conductor.is_permanent === "Badali");
-
-            const employmentMatch = employmentType === "Employment Type" || conductor.is_permanent === employmentType;
-            const leaveStatusMatch = status === "Status" || conductor.on_leave === status;
-
-            return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
-
-
-        })
-        .filter((conductor) => leaveStatus == "allstatus" ? true : leaveStatus == conductor.on_leave
-        )
-        .filter(
-            (conductor) =>
-                conductor.EmployeeName.toLowerCase().includes(searchConductor.toLowerCase()) ||
-                conductor.PEN.toLowerCase().includes(searchConductor.toLowerCase())
-        )
+    const displayedConductors = filteredConductors
         .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-
 
     const handleItemsPerPageChange = (newItemsPerPage) => {
         setItemsPerPage(newItemsPerPage);
@@ -134,31 +106,47 @@ const Conductors = () => {
 
     }
 
+
+    useEffect(() => {
+        const updatedFilteredConductors = conductorData
+            .filter((conductor) => {
+                const nameMatch =
+                    selectedConductor === "All Conductors" ||
+                    `${conductor.EmployeeName}` === selectedConductor;
+
+                const statusMatch =
+                    activeStatus === "ALL STATUSES" ||
+                    (activeStatus === "LEAVE STATUS" && conductor.on_leave === status) ||
+                    (activeStatus === "PERMANENT" && conductor.is_Permanent === "Permanent") ||
+                    (activeStatus === "BADALI" && conductor.is_Permanent === "Badali");
+
+                const employmentMatch = employmentType === "Employment Type" || conductor.is_Permanent === employmentType;
+                const leaveStatusMatch = status === "Status" || conductor.on_leave === status;
+
+                return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
+            })
+            .filter((conductor) => leaveStatus === 'allstatus' ? true : leaveStatus === conductor.on_leave)
+            .filter(
+                (conductor) =>
+                    conductor.EmployeeName.toLowerCase().includes(searchConductor.toLowerCase()) ||
+                    conductor.PEN.toLowerCase().includes(searchConductor.toLowerCase())
+            );
+        setFilteredConductors(updatedFilteredConductors);
+    }, [conductorData, selectedConductor, activeStatus, employmentType, status, leaveStatus, searchConductor]);
+
     useEffect(() => {
         handleAllConductorData();
-    }, [])
+    }, []);
 
 
-    // const filterConductors = () => {
-    //     return conductorsData.filter(conductor => {
-    //         const statusMatch = activeStatus === 'ALL STATUSES' || conductor.status === activeStatus;
-    //         const typeMatch = employmentType === 'Employment Type' || conductor.type === employmentType;
-    //         const specificStatusMatch = status === 'Status' || conductor.status === status.toUpperCase();
-    //         return statusMatch && typeMatch && specificStatusMatch;
-    //     });
-    // };
-    // const filteredConductors = filterConductors();
+    const navigate = useNavigate();
     const handleAddConductor = () => {
         navigate("/add-conductor")
     }
-    // console.log(activeStatus);
-    // console.log(leaveStatus);
     const filter = (status) => {
         setActiveStatus(status)
         setLeaveStatus('allstatus')
     }
-
-
     return (
         <>
             <div className="row">
@@ -169,7 +157,9 @@ const Conductors = () => {
                 <div className="col-md-9">
                     <div className='d-flex justify-content-between my-1 mx-3'>
                         <h4>Conductors</h4>
+
                         <button className='btn btn-success' onClick={handleAddConductor} style={{ backgroundColor: '#0d8a72', color: 'white' }}> <FontAwesomeIcon className='me-2' icon={faPlus} />ADD CONDUCTORS</button>
+
                     </div>
 
                     <hr className='vehicle-horizontal-line' />
@@ -213,6 +203,7 @@ const Conductors = () => {
                         ))}
                     </div>
 
+
                     <hr className='vehicle-horizontal-line' />
 
                     <div className='container-fluid'>
@@ -220,38 +211,37 @@ const Conductors = () => {
                         {/* filter */}
                         <div className='d-flex justify-content-between py-2'>
                             <div>
-
-                                {/* All conductor dropdown search */}
+                                {/* All Conductor dropdown search */}
                                 {/* <div className="btn-group">
-                                    <button
-                                        type="button"
-                                        className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        {selectedConductor}
-                                    </button>
-                                    <ul className="dropdown-menu">
-                                        <li>
-                                            <button
-                                                className="dropdown-item"
-                                                onClick={() => setSelectedConductor("All Conductors")}
-                                            >
-                                                All Conductors
-                                            </button>
-                                        </li>
-                                        {conductorData.map((conductor) => (
-                                            <li key={conductor._id}>
-                                                <button
-                                                    className="dropdown-item"
-                                                    onClick={() => setSelectedConductor(`${conductor.EmployeeName}`)}
-                                                >
-                                                    {conductor.EmployeeName}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div> */}
+                  <button
+                    type="button"
+                    className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    {selectedConductor}
+                  </button>
+                  <ul className="dropdown-menu">
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => setSelectedConductor("All Conductors")}
+                      >
+                        All Conductors
+                      </button>
+                    </li>
+                    {conductorData.map((conductor) => (
+                      <li key={conductor._id}>
+                        <button
+                          className="dropdown-item"
+                          onClick={() => setSelectedConductor(`${conductor.EmployeeName}`)}
+                        >
+                          {conductor.EmployeeName}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div> */}
 
                                 {/* All conductor search by entering no or name */}
                                 <div className="btn-group">
@@ -283,7 +273,6 @@ const Conductors = () => {
                                         <li><a className="dropdown-item" onClick={() => setStatus('Leave')}>On Leave</a></li>
 
                                     </ul>
-
                                 </div>
                             </div>
                             <div>
@@ -300,8 +289,8 @@ const Conductors = () => {
                         <div className="d-flex justify-content-between align-items-center mt-3">
                             {/* Left - gear and trash icons */}
                             <div className="d-flex gap-5 ms-5">
-                                <FontAwesomeIcon icon={faGear} />
-                                <FontAwesomeIcon icon={faTrashCan} />
+                                {/* <FontAwesomeIcon icon={faGear} />
+                <FontAwesomeIcon icon={faTrashCan} /> */}
                             </div>
 
                             {/* Right - Items on page, dropdown, pagination */}
@@ -351,7 +340,7 @@ const Conductors = () => {
                                     {displayedConductors
 
                                         .map((conductor) => (
-                                            <tr key={conductor.id}>
+                                            <tr key={conductor._id}>
                                                 <td>
                                                     <input type="checkbox" />
                                                 </td>
@@ -360,6 +349,7 @@ const Conductors = () => {
                                                 </td>
                                                 <td>
                                                     <strong>{conductor.EmployeeName}</strong>
+
                                                     <br />
                                                     <span>{conductor.PEN}</span>
                                                 </td>
@@ -367,13 +357,14 @@ const Conductors = () => {
                                                     {conductor["Designation "]}
 
                                                 </td>
+
                                                 <td>
-                                                    {conductor.is_permanent}
+                                                    {conductor.is_Permanent}
                                                 </td>
 
                                                 <td>
-                                                    <div className=' p-2 rounded' style={{ border: '1px solid black', borderRadius: '8px', display: 'inline-block' }}>
-                                                        {conductor.on_leave === 'Available' ?
+                                                    <div className='bg-light p-2 rounded' style={{ borderRadius: '8px', display: 'inline-block' }}>
+                                                        {conductor.on_leave == "Available" ?
                                                             (
                                                                 <FontAwesomeIcon icon={faCircleCheck} style={{ color: '#189be3' }} />
                                                             )
@@ -382,36 +373,34 @@ const Conductors = () => {
                                                                 <FontAwesomeIcon icon={faBan} style={{ color: '#db5c4d' }} />
                                                             )
                                                         }
+                                                        {conductor.on_leave}
 
 
-
-                                                        <span className="ms-2">{conductor.on_leave}</span>
+                                                        <span className="ms-2">{conductor.status}</span>
                                                     </div>
                                                 </td>
 
                                                 {/* <td>
-                                                    <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
-                                                        ₹ INR 25,000
-                                                    </div>
-                                                </td> */}
+                          <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
+                            ₹ INR 22,000
+                          </div>
+                        </td> */}
 
                                                 {/* <td>
-                                                    {conductor.contact_info.phone}
-                                                </td> */}
+                          {conductor.contact_info.phone}
+                        </td> */}
 
                                                 <td>
                                                     <button className='btn-primary rounded p-1 px-3' style={{ backgroundColor: '#0d8a72', color: 'white', border: 'none' }}
-                                                        onClick={() => handleShow({ conductor_id: conductor._id })} >Edit</button>
+                                                        onClick={() => handleShow({ conductor_id: conductor._id })}>Edit</button>
                                                 </td>
 
                                                 {/* ::::::::::::Modal Section:::::::: */}
-
                                                 <Modal show={show} onHide={handleClose} animation={false} >
                                                     <Modal.Header closeButton>
                                                         <Modal.Title>Edit Leave Status</Modal.Title>
                                                     </Modal.Header>
                                                     <Modal.Body>
-
                                                         <Form.Control as="select"
                                                             value={editleave.on_leave}
                                                             onChange={e => setEditLeave({ ...editleave, on_leave: e.target.value })} >
@@ -456,20 +445,21 @@ const Conductors = () => {
                                                 </td>
 
                                             </tr>
-                                        ))
-                                    }
+                                        ))}
+                                    {/* )) : <div><p>Nothing to Display</p></div>} */}
 
                                 </tbody>
                             </table>
 
                         </div>
 
+
                         {/* pagination */}
                         <ReactPaginate
                             previousLabel={'Previous'}
                             nextLabel={'Next'}
                             breakLabel={'...'}
-                            pageCount={Math.ceil(conductorData.length / itemsPerPage)}
+                            pageCount={Math.ceil(filteredConductors.length / itemsPerPage)}
                             marginPagesDisplayed={3}
 
                             pageRangeDisplayed={3}
@@ -488,7 +478,6 @@ const Conductors = () => {
 
                     </div>
                 </div>
-
                 <div className="col-md-1"></div>
             </div>
         </>
