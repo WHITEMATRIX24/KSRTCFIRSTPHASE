@@ -47,7 +47,7 @@ function NavSidebar() {
             {/* <li><a href="#" id='vehiclesoverview' className='my-1' onClick={() => toggelColor('vehiclesoverview')}>Vehicles Overview</a></li>
             <Divider /> */}
 
-            <li><a href="/" className='my-1' id='realTimeData' onClick={() => toggelColor('realTimeData')}>Real Time Data</a></li>
+            <li><a href="/dashboard" className='my-1' id='realTimeData' onClick={() => toggelColor('realTimeData')}>Real Time Data</a></li>
             <Divider />
             {/* <li><a href="#" className='my-1' id='Events' onClick={() => toggelColor('Events')}>Events</a></li>
             <Divider /> */}

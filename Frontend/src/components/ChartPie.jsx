@@ -53,7 +53,7 @@ function ChartPie({ data }) {
         width={350}
         height={300}
         data={{
-          labels: ["Out of services", "Avilabe", "On Route"],
+          labels: ["Dock", "In Service", "On Route"],
           datasets: [
             {
               label: "# of Votes",
@@ -82,7 +82,7 @@ function ChartPie({ data }) {
           responsive: true,
         }}
       />
-        <h6  className='mt-3' style={{ color: '#737373', fontWeight: "600"}}>Total Fleet Size: {data.length}</h6>
+      <h6 className='mt-3' style={{ color: '#737373', fontWeight: "600" }}>Total Fleet Size: {data.length}</h6>
     </div>
   );
 }
