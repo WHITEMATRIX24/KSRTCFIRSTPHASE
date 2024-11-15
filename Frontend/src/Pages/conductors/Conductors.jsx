@@ -359,7 +359,11 @@ const Conductors = () => {
                                                 </td>
 
                                                 <td>
-                                                    {conductor.is_Permanent}
+                                                    {conductor.is_permanent || conductor.is_Permanent
+                                                        ? ` ${conductor.is_permanent || conductor.is_Permanent}`
+                                                        : ''}
+
+
                                                 </td>
 
                                                 <td>
