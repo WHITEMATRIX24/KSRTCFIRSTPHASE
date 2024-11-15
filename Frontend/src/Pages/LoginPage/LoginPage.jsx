@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./loginpage.css";
 import { loginApiHandler } from "../../services/allAPI";
 import { useNavigate } from "react-router-dom";
@@ -33,6 +33,10 @@ const LoginPage = () => {
       console.log(`error in login error: ${error}`);
     }
   };
+
+  useEffect(() => {
+    alert("You are opening an untested Beta version");
+  }, []);
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100">
