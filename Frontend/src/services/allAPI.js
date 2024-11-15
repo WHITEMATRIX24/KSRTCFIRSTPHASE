@@ -15,6 +15,10 @@ export const deleteSingleVehicleAPI = async (vehicleId) => {
   );
 };
 
+//Edit VehicleStatus>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+export const editStatus=async(vehicle_id,reqbody)=>{
+  return await commonAPI("PUT",`${SERVERURL}/editVehicleById/${vehicle_id}`,reqbody,'');
+}
 // addvehicle
 export const addvehicleAPI = async (reqBody) => {
   return await commonAPI("POST", `${SERVERURL}/addNewVehichle`, reqBody, "");

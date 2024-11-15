@@ -11,6 +11,7 @@ const Drivers = () => {
 
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [filteredDrivers, setFilteredDrivers] = useState([]);
 
 
   const [selectedDriver, setSelectedDriver] = useState("All Drivers");
@@ -46,7 +47,7 @@ const Drivers = () => {
 
       if (editStatus.status === 200) {
         setEditLeave(editStatus.data);
-        await handleAllDriverData(); // Refresh the conductor data
+        await handleAllDriverData(); // Refresh the driver data
         handleClose();
       } else {
         console.log("Error at EditLeaveStatus:::::", editStatus);
@@ -91,30 +92,8 @@ const Drivers = () => {
   };
 
   // ---------------------- pagination ----------------------
-  const displayedDrivers = driverData
-    .filter((driver) => {
-      const nameMatch =
-        selectedDriver === "All Drivers" ||
-        `${driver.EmployeeName}` === selectedDriver;
-
-      const statusMatch = activeStatus === "ALL STATUSES" ||
-        (activeStatus === "LEAVE STATUS" && driver.on_leave === status) ||
-        (activeStatus === "PERMANENT" && driver.is_Permanent === "Permanent") ||
-        (activeStatus === "BADALI" && driver.is_permanent === "Badali");
-
-      const employmentMatch = employmentType === "Employment Type" || driver.is_Permanent === employmentType;
-      const leaveStatusMatch = status === "Status" || driver.on_leave === status;
-
-      return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
-    })
-    .filter((driver) => leaveStatus == 'allstatus' ? true : leaveStatus == driver.on_leave)
-    .filter(
-      (driver) =>
-        driver.EmployeeName.toLowerCase().includes(searchDriver.toLowerCase()) ||
-        driver.PEN.toLowerCase().includes(searchDriver.toLowerCase())
-    )
+  const displayedDrivers = filteredDrivers
     .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
@@ -129,10 +108,35 @@ const Drivers = () => {
 
 
   useEffect(() => {
+    const updatedFilteredDrivers = driverData
+      .filter((driver) => {
+        const nameMatch =
+          selectedDriver === "All Drivers" ||
+          `${driver.EmployeeName}` === selectedDriver;
+
+        const statusMatch =
+          activeStatus === "ALL STATUSES" ||
+          (activeStatus === "LEAVE STATUS" && driver.on_leave === status) ||
+          (activeStatus === "PERMANENT" && driver.is_Permanent === "Permanent") ||
+          (activeStatus === "BADALI" && driver.is_Permanent === "Badali");
+
+        const employmentMatch = employmentType === "Employment Type" || driver.is_Permanent === employmentType;
+        const leaveStatusMatch = status === "Status" || driver.on_leave === status;
+
+        return nameMatch && statusMatch && employmentMatch && leaveStatusMatch;
+      })
+      .filter((driver) => leaveStatus === 'allstatus' ? true : leaveStatus === driver.on_leave)
+      .filter(
+        (driver) =>
+          driver.EmployeeName.toLowerCase().includes(searchDriver.toLowerCase()) ||
+          driver.PEN.toLowerCase().includes(searchDriver.toLowerCase())
+      );
+    setFilteredDrivers(updatedFilteredDrivers);
+  }, [driverData, selectedDriver, activeStatus, employmentType, status, leaveStatus, searchDriver]);
+
+  useEffect(() => {
     handleAllDriverData();
-  }, [])
-
-
+  }, []);
 
 
   const navigate = useNavigate();
@@ -160,7 +164,7 @@ const Drivers = () => {
 
           <hr className='vehicle-horizontal-line' />
 
-          <div className='d-flex'>
+          {/* <div className='d-flex'>
             {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
               status === 'LEAVE STATUS' ? (
                 <div key={status} className="btn-group me-2">
@@ -197,16 +201,44 @@ const Drivers = () => {
                 </button>
               )
             ))}
+          </div> */}
+
+          <div className="d-flex">
+            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
+              status === 'LEAVE STATUS' ? (
+                <div key={status} className="btn-group me-2">
+                  <select
+                    className="form-select"
+                    value={leaveStatus}
+                    onChange={(e) => setLeaveStatus(e.target.value)}
+                  >
+                    <option disabled value="">
+                      Leave Status
+                    </option>
+                    <option value="Available">Leave Status</option>
+                    <option value="Available">Available</option>
+                    <option value="Leave">On Leave</option>
+                  </select>
+                </div>
+              ) : (
+                <button
+                  key={index}
+                  className="btn me-md-2"
+                  style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
+                  onClick={() => filter(status)}
+                >
+                  {status}
+                </button>
+              )
+            ))}
           </div>
-
-
           <hr className='vehicle-horizontal-line' />
 
           <div className='container-fluid'>
 
             {/* filter */}
             <div className='d-flex justify-content-between py-2'>
-              <div>
+              <div className='d-flex gap-2'>
                 {/* All driver dropdown search */}
                 {/* <div className="btn-group">
                   <button
@@ -245,13 +277,15 @@ const Drivers = () => {
                     type="text"
                     className="form-control"
                     placeholder="Search Driver by Name or No"
+                    style={{ width: '270px' }}
                     value={searchDriver}
                     onChange={(e) => setSearchDriver(e.target.value)}
                   />
 
                 </div>
 
-                <div className="btn-group">
+
+                {/* <div className="btn-group">
                   <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2" data-bs-toggle="dropdown" aria-expanded="false" >{employmentType}</button>
                   <ul className="dropdown-menu">
                     <li><a className="dropdown-item" onClick={() => setEmploymentType('Employment Type')}>Employment Type</a></li>
@@ -259,8 +293,9 @@ const Drivers = () => {
                     <li><a className="dropdown-item" onClick={() => setEmploymentType('Badali')}>Badali</a></li>
 
                   </ul>
-                </div>
-                <div className="btn-group">
+                </div> */}
+
+                {/* <div className="btn-group">
                   <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4" data-bs-toggle="dropdown" aria-expanded="false" >{status}</button>
 
                   <ul className="dropdown-menu">
@@ -269,7 +304,31 @@ const Drivers = () => {
                     <li><a className="dropdown-item" onClick={() => setStatus('Leave')}>On Leave</a></li>
 
                   </ul>
-                </div>
+                </div> */}
+
+                <Form.Control as="select" value={employmentType} onChange={(e) => setEmploymentType(e.target.value)}>
+                  <option disabled value="">
+                    Select Employment Type
+                  </option>
+                  <option value="Employment Type">Employment Type</option>
+                  <option value="Permanent">Permanent</option>
+                  <option value="Badali">Badali</option>
+
+                </Form.Control>
+
+                <Form.Control as="select" value={status} onChange={(e) => setStatus(e.target.value)}>
+                  <option disabled value="">
+                    Select Status
+                  </option>
+                  <option value="Status">All Status</option>
+                  <option value="Available">Available</option>
+                  <option value="Leave">On Leave</option>
+
+                </Form.Control>
+
+
+
+
               </div>
               <div>
                 <button className="btn btn-light border-dark rounded" onClick={() => {
@@ -293,24 +352,24 @@ const Drivers = () => {
               <div className="d-flex gap-4 align-items-center me-5">
                 <p className="mb-0">Items on page</p>
                 <div className="btn-group">
-                                    <button
-                                        type="button"
-                                        className="btn btn-light dropdown-toggle rounded px-4"
-                                        data-bs-toggle="dropdown"
-                                        aria-expanded="false"
-                                    >
-                                        {itemsPerPage}
-                                    </button>
-                                    <ul className="dropdown-menu">
-                                        {[10, 20, 30].map(size => (
-                                            <li key={size}>
-                                                <a className="dropdown-item" onClick={() => handleItemsPerPageChange(size)}>
-                                                    {size}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                  <button
+                    type="button"
+                    className="btn btn-light dropdown-toggle rounded px-4"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    {itemsPerPage}
+                  </button>
+                  <ul className="dropdown-menu">
+                    {[10, 20, 30].map(size => (
+                      <li key={size}>
+                        <a className="dropdown-item" onClick={() => handleItemsPerPageChange(size)}>
+                          {size}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <FontAwesomeIcon icon={faChevronLeft} />
                 <FontAwesomeIcon icon={faChevronRight} />
               </div>
@@ -455,7 +514,7 @@ const Drivers = () => {
               previousLabel={'Previous'}
               nextLabel={'Next'}
               breakLabel={'...'}
-              pageCount={Math.ceil(driverData.length / itemsPerPage)}
+              pageCount={Math.ceil(filteredDrivers.length / itemsPerPage)}
               marginPagesDisplayed={3}
 
               pageRangeDisplayed={3}
