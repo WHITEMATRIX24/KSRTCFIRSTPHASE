@@ -365,12 +365,15 @@ export default function OnGoingTrips() {
       console.log(result);
     }
   };
+  const [busLoading,setBusLoading ] = useState(false)
   const getAllBuses = async () => {
     try {
+      
       const result = await getAllVehicles();
       //console.log(result.data);
 
       if (result.status == 200) {
+        setBusLoading(true);
         setVehicles(result.data);
       } else {
         alert("Failed to load Bus Details");
@@ -395,6 +398,7 @@ export default function OnGoingTrips() {
       alert(result);
     }
   };
+  const [loading, setLoading] = useState(false)
 
   const getAllDriversList = async () => {
     try {
@@ -402,6 +406,7 @@ export default function OnGoingTrips() {
       //console.log(result.data);
 
       if (result.status == 200) {
+        setLoading(true)
         setDrivers(result.data);
       } else {
         alert("Failed to load Drivers Details");
@@ -410,7 +415,6 @@ export default function OnGoingTrips() {
       alert(`Failed to load Drivers Details ${err}`);
     }
   };
-
   useEffect(() => {
     getAllTrips();
     getAllBuses();
@@ -475,113 +479,128 @@ export default function OnGoingTrips() {
 
               {/* Toolbar with count of items */}
               <Row className="align-items-center mb-3">
-                <Col className="text-end">
+                {loading && <Col className="text-end">
                   {/* Displaying the count of filtered items */}
                   <span>Total Live Trips:</span>
                   <span className="text-info ms-2 me-5">
                     {filteredTrips.length}
                   </span>
-                </Col>
+                </Col>}
+                {!loading && <Col className="text-end">
+                  {/* Displaying the count of filtered items */}
+                  <span>Total Live Trips:</span>
+                  <span className="text-danger   ms-2 me-5">
+                    loading...
+                  </span>
+                </Col>}
+
               </Row>
 
               {/* Table */}
-              {filteredTrips.length > 0 && (
-                <Row>
-                  <Col>
-                    <Table
-                      hover
-                      responsive
-                      className="align-middle"
-                      style={{ borderSpacing: "0 10px" }}
-                    >
-                      <thead>
-                        <tr className="bg-light">
-                          <th>TRIPID</th>
-                          <th>VEHICLE</th>
-                          <th>DRIVER</th>
-                          <th>START DATE</th>
-                          <th>END DATE</th>
-                          <th></th>
-                          <th></th>
-                        </tr>
-                      </thead>
 
-                      <tbody>
-                        {filteredTrips.map((trip) => (
-                          <tr key={trip.trip_id} className="bg-white">
-                            <td>
-                              {trip.trip_id}{" "}
-                              <span className="text-primary ms-1">
-                                {trip?.trip_type.toUpperCase()}
-                              </span>{" "}
-                            </td>
-                            <td>
-                              <div className="d-flex align-items-center gap-2">
+              {loading && busLoading && <div>
+                {filteredTrips?.length > 0 && (
+                  <Row>
+                    <Col>
+                      <Table
+                        hover
+                        responsive
+                        className="align-middle"
+                        style={{ borderSpacing: "0 10px" }}
+                      >
+                        <thead>
+                          <tr className="bg-light">
+                            <th>TRIPID</th>
+                            <th>VEHICLE</th>
+                            <th>DRIVER</th>
+                            <th>START DATE</th>
+                            <th>END DATE</th>
+                            <th></th>
+                            <th></th>
+                          </tr>
+                        </thead>
+  
+                        <tbody>
+                          {filteredTrips.map((trip) => (
+                            <tr key={trip.trip_id} className="bg-white">
+                              <td>
+                                {trip.trip_id}{" "}
+                                <span className="text-primary ms-1">
+                                  {trip?.trip_type.toUpperCase()}
+                                </span>{" "}
+                              </td>
+                              <td>
+                                <div className="d-flex align-items-center gap-2">
+                                  <FontAwesomeIcon
+                                    icon={faBus}
+                                    className="text-muted me-2"
+                                  />
+                                  <div>
+                                    <div>{trip.BUSNO}</div>
+                                    <small className="text-muted">BUS</small>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
                                 <FontAwesomeIcon
-                                  icon={faBus}
+                                  icon={faUser}
                                   className="text-muted me-2"
                                 />
-                                <div>
-                                  <div>{trip.BUSNO}</div>
-                                  <small className="text-muted">BUS</small>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <FontAwesomeIcon
-                                icon={faUser}
-                                className="text-muted me-2"
-                              />
-                              {trip.EmployeeName}
-                            </td>
+                                {trip.EmployeeName}
+                              </td>
+  
+                              <td>
+                                {new Date(trip.start_date).toLocaleDateString()}
+                                <br />
+                                <small className="text-muted">
+                                  {new Date(trip.start_date).toLocaleTimeString()}
+                                </small>
+                              </td>
+                              <td>
+                                {new Date(trip.end_date).toLocaleDateString()}
+                                <br />
+                                <small className="text-muted">
+                                  {new Date(trip.end_date).toLocaleTimeString()}
+                                </small>
+                              </td>
+  
+                              <td>
+                                <button
+                                  className="btn btn-outline-success"
+                                  onClick={() => addCollectionModal(trip)}
+                                >
+                                  End Trip
+                                </button>
+                              </td>
+                              <td>
+                                <button
+                                  className="btn btn-outline-danger"
+                                  onClick={() => {
+                                    cancelCollectionModal(trip);
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </td>
+                              {/* <td>
+                              <Button variant="link" className="p-0">
+                                <FontAwesomeIcon className='text-danger' onClick={() => showDeleteModal(trip.id)} icon={faTrash} />
+                              </Button>
+                            </td> */}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </Col>
+                  </Row>
+                )}
+                { filteredTrips?.length == 0 && (
+                      <h6 className="text-danger text-center m-3">No Live Trips</h6>
 
-                            <td>
-                              {new Date(trip.start_date).toLocaleDateString()}
-                              <br />
-                              <small className="text-muted">
-                                {new Date(trip.start_date).toLocaleTimeString()}
-                              </small>
-                            </td>
-                            <td>
-                              {new Date(trip.end_date).toLocaleDateString()}
-                              <br />
-                              <small className="text-muted">
-                                {new Date(trip.end_date).toLocaleTimeString()}
-                              </small>
-                            </td>
-
-                            <td>
-                              <button
-                                className="btn btn-outline-success"
-                                onClick={() => addCollectionModal(trip)}
-                              >
-                                End Trip
-                              </button>
-                            </td>
-                            <td>
-                              <button
-                                className="btn btn-outline-success"
-                                onClick={() => {
-                                  cancelCollectionModal(trip);
-                                }}
-                              >
-                                Cancel
-                              </button>
-                            </td>
-                            {/* <td>
-                            <Button variant="link" className="p-0">
-                              <FontAwesomeIcon className='text-danger' onClick={() => showDeleteModal(trip.id)} icon={faTrash} />
-                            </Button>
-                          </td> */}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </Col>
-                </Row>
-              )}
-              {filteredTrips.length == 0 && (
-                <h6 className="text-danger">No Live Trips</h6>
+                )}
+              </div>}
+              {!loading   && (
+                <h6 className="text-danger text-center m-3">Loading Live Trips... Please Wait</h6>
               )}
             </Col>
 
