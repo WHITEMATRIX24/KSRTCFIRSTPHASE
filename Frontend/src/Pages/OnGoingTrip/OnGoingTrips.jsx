@@ -1,20 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Form, Table } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Form, Table } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCog, faTrash, faCalendar, faBus, faClock, faUser, faEllipsisV,
-  faL
-} from '@fortawesome/free-solid-svg-icons';
-import Header from '../../components/common/Header';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import { TextField }
-  from '@mui/material';
-import { getAllTripApi, updateTripApi, getAllVehicles, getDriversListApi, updateTripApiNew, updateVehicleStatus } from '../../services/allAPI';
+  faCog,
+  faTrash,
+  faCalendar,
+  faBus,
+  faClock,
+  faUser,
+  faEllipsisV,
+  faL,
+} from "@fortawesome/free-solid-svg-icons";
+import Header from "../../components/common/Header";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import { TextField } from "@mui/material";
+import {
+  getAllTripApi,
+  updateTripApi,
+  getAllVehicles,
+  getDriversListApi,
+  updateTripApiNew,
+  updateVehicleStatus,
+} from "../../services/allAPI";
 
 export default function OnGoingTrips() {
-
-   const depoList = [
+  const depoList = [
     { code: "ADR", name: "Adoor" },
     { code: "ALP", name: "Alappuzha" },
     { code: "ALY", name: "Aluva" },
@@ -109,58 +120,65 @@ export default function OnGoingTrips() {
     { code: "VLD", name: "" },
     { code: "VRD", name: "Vellarada" },
     { code: "VTR", name: "Vithura" },
-    { code: "VZM", name: "Vizhinjam" }
-]
-
-
+    { code: "VZM", name: "Vizhinjam" },
+  ];
 
   //state to store trip data
 
-  const [tripData, setNewTripData] = useState([])
-  const [vehicles, setVehicles] = useState([])
-  const [modifiedTrips, setModifiedTrips] = useState([])
-  const [drivers, setDrivers] = useState([])
-
-
+  const [tripData, setNewTripData] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [modifiedTrips, setModifiedTrips] = useState([]);
+  const [drivers, setDrivers] = useState([]);
 
   //state to store trip colleftion and fuel cost
   const [tripCost, setTripCost] = useState({
-    "collection": 0,
-    "Cost": 0
-  })
+    collection: 0,
+    Cost: 0,
+  });
 
   //state to validate whether data entered is number
   const [tripCostValidation, setTripCostValidation] = useState({
-    "collectionValid": false,
-  })
-
-
-  const [vehicleFilter, setVehicleFilter] = useState('');
-  const [tripFilter, setTripFilter] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-
-  // Filtered trips based on vehicle number and date
-  const filteredTrips = modifiedTrips.filter(trip => {
-    const matchesVehicle = trip.BUSNO.toLowerCase().includes(vehicleFilter.toLowerCase());
-    const matchesTrips = trip.trip_id.toLowerCase().includes(tripFilter.toLowerCase());
-    const matchesDate = dateFilter ? trip.startDate.startsWith(dateFilter) : true;
-    const liveVehicle = trip.status.toLowerCase().includes('live');
-
-    return matchesVehicle && matchesDate && liveVehicle && matchesTrips;
+    collectionValid: false,
   });
+
+  const [vehicleFilter, setVehicleFilter] = useState("");
+  const [tripFilter, setTripFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [filteredTrips, setFilteredTrips] = useState([]);
+  console.log(modifiedTrips);
+
+  useEffect(() => {
+    // Filtered trips based on vehicle number and date
+    if (!modifiedTrips) return;
+    const filtered = modifiedTrips.filter((trip) => {
+      const matchesVehicle =
+        trip.BUSNO &&
+        trip.BUSNO.toLowerCase().includes(vehicleFilter.toLowerCase());
+      // const matchesTrips =
+      //   trip.trip_id &&
+      //   trip.trip_id.toLowerCase().includes(tripFilter.toLowerCase());
+      const matchesDate = dateFilter
+        ? trip.startDate && trip.startDate.startsWith(dateFilter)
+        : true;
+      const liveVehicle =
+        trip.status && trip.status.toLowerCase().includes("live");
+      console.log({ matchesVehicle, matchesDate, liveVehicle });
+      return matchesVehicle && matchesDate && liveVehicle;
+    });
+    setFilteredTrips([...filtered]);
+  }, [modifiedTrips]);
+
+  console.log(`filtered trips: ${filteredTrips}`);
 
   //modal
 
   const [show, setShow] = useState(false);
-  const [editTrip, seteditTrip] = useState({
-    
-  });
+  const [editTrip, seteditTrip] = useState({});
   // State to track the list of input pairs (two separate inputs)
   const [inputPairs, setInputPairs] = useState([]);
-  const [fuel, setFuel] = useState([])
-  const [fuelCost, setFuelCost] = useState(0)
+  const [fuel, setFuel] = useState([]);
+  const [fuelCost, setFuelCost] = useState(0);
   const [outBound, setOutBound] = useState(false);
-
 
   /* Function to close modal */
   const handleClose = () => {
@@ -168,20 +186,23 @@ export default function OnGoingTrips() {
     setInputPairs([]);
     setFuel([]);
     setFuelCost("");
-    setShow(false)
-    
+    setShow(false);
   };
   /* Function to open modal */
 
   const addCollectionModal = (tripEditing) => {
     console.log(tripEditing);
 
-    setShow(true)
+    setShow(true);
     setInputPairs([]);
     setFuel([]);
     setFuelCost(0);
-    seteditTrip({...tripEditing, fuelCost: '0', status:'completed',collection_amount:'0'
-    })
+    seteditTrip({
+      ...tripEditing,
+      fuelCost: "0",
+      status: "completed",
+      collection_amount: "0",
+    });
     /* seteditTrip({
       _id:tripEditing._id,
       vehicle_id: tripEditing.vehicle_id,
@@ -205,227 +226,217 @@ export default function OnGoingTrips() {
     collection_amount:tripEditing.collection_amount
       }) */
     //console.log(editTrip);
-    
-    if(tripEditing.trip_type ==='outbound'){
-        setOutBound(true)
-    }
-    else{
-      setOutBound(false)
- 
-    }
 
+    if (tripEditing.trip_type === "outbound") {
+      setOutBound(true);
+    } else {
+      setOutBound(false);
+    }
   };
-
-
 
   //function to validate collection amount
   const valiadateCollection = (amount) => {
-    setTripCost({ ...tripCost, collection: amount })
-    seteditTrip({ ...editTrip, collection_amount: amount })
-    setTripCostValidation({ ...tripCostValidation, collectionValid: false })
-
-  }
-
-  
+    setTripCost({ ...tripCost, collection: amount });
+    seteditTrip({ ...editTrip, collection_amount: amount });
+    setTripCostValidation({ ...tripCostValidation, collectionValid: false });
+  };
 
   /* Function to add input boxes for entering fuel charge */
   const handleButtonClick = () => {
     // Add a new pair of input fields, each with its own state for the values
-    setInputPairs([...inputPairs, { liter: '', rate: '', total: '' }]);
+    setInputPairs([...inputPairs, { liter: "", rate: "", total: "" }]);
   };
 
   /* Function to save fuel charge */
   const handleInputChange = (index, field, event) => {
     // Update the value of either input1 or input2 for a specific input pair
     const newInputPairs = [...inputPairs];
-    let newFuel = fuel
-    let fuelCharge = 0
+    let newFuel = fuel;
+    let fuelCharge = 0;
     newInputPairs[index][field] = event.target.value;
-    newInputPairs[index]['total'] = newInputPairs[index]['liter'] * newInputPairs[index]['rate']
-    fuel[index] = newInputPairs[index]['total']
+    newInputPairs[index]["total"] =
+      newInputPairs[index]["liter"] * newInputPairs[index]["rate"];
+    fuel[index] = newInputPairs[index]["total"];
     setInputPairs(newInputPairs);
-    setFuel(newFuel)
-    fuelCharge = newFuel.reduce((a, b) => a + b)
+    setFuel(newFuel);
+    fuelCharge = newFuel.reduce((a, b) => a + b);
 
-    setFuelCost(fuelCharge)
-    setTripCost({ ...tripCost, Cost: fuelCost })
-    seteditTrip({ ...editTrip, fuelCost: fuelCharge })
-
+    setFuelCost(fuelCharge);
+    setTripCost({ ...tripCost, Cost: fuelCost });
+    seteditTrip({ ...editTrip, fuelCost: fuelCharge });
   };
 
-
-
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [password, setPassword] = useState("")
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [password, setPassword] = useState("");
 
   const handleCloseConfirmation = () => {
-    setShowConfirmation(false)
-    setPassword("")
+    setShowConfirmation(false);
+    setPassword("");
   };
   const handleOpeneConfirmation = () => {
-    console.log('open');
-    
+    console.log("open");
+
     console.log(editTrip);
-    
-    setShowConfirmation(true)
-    setShow(false)
-7
+
+    setShowConfirmation(true);
+    setShow(false);
+    7;
   };
   const ConfirmSave = () => {
-
     if (password === "1234") {
-      UpdateTripDetails()
+      UpdateTripDetails();
 
-      handleCloseConfirmation()
-     
+      handleCloseConfirmation();
+    } else {
+      alert("Wrong Password");
     }
-    else {
-      alert('Wrong Password')
-    }
-  }
+  };
 
   /* <<<<<  Cancel  >>>>> */
-  const [cancelDepo,setCancelDepo]=useState("")
-  const [cancelReason,setCancelReason]=useState("")
-  const [cancelTrip,setCancelTrip]=useState({})
+  const [cancelDepo, setCancelDepo] = useState("");
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelTrip, setCancelTrip] = useState({});
 
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  const cancelCollectionModal = (tripEditing)=>{
-      setCancelTrip(tripEditing)
-      handleShowCancelModal()
-  }
+  const cancelCollectionModal = (tripEditing) => {
+    setCancelTrip(tripEditing);
+    handleShowCancelModal();
+  };
 
   const handleCloseCancelModal = () => {
-    setShowCancelModal(false)
-    setCancelDepo('')
-    setCancelReason("")
-  }
-  const handleShowCancelModal = () =>setShowCancelModal(true);
+    setShowCancelModal(false);
+    setCancelDepo("");
+    setCancelReason("");
+  };
+  const handleShowCancelModal = () => setShowCancelModal(true);
 
-  const handlecancelTrip =async () => {
-    if(!cancelDepo || !cancelReason){
-      alert("Fill The Empty Fields")
-    }else{
-    try{
+  const handlecancelTrip = async () => {
+    if (!cancelDepo || !cancelReason) {
+      alert("Fill The Empty Fields");
+    } else {
+      try {
+        const updatedTrip = { ...cancelTrip, status: "failed" };
 
-      const updatedTrip = {...cancelTrip,status:"failed"}
+        const vehicle = vehicles.find(
+          (item) => item._id == cancelTrip.vehicle_id
+        );
+        const updatedVehicle = {
+          ...vehicle,
+          status: "dock",
+          dock_reason: cancelReason,
+          dock_depot: cancelDepo.split(" ")[0],
+        };
 
+        const result = await updateTripApiNew(
+          cancelTrip._id,
+          cancelTrip.vehicle_id,
+          cancelTrip.driver_id,
+          cancelTrip.conductor_id,
+          updatedTrip
+        );
+        //console.log(result)
+        const result2 = await updateVehicleStatus(
+          updatedVehicle._id,
+          updatedVehicle
+        );
 
-      const vehicle = vehicles.find(item=>item._id==cancelTrip.vehicle_id)
-      const updatedVehicle = {...vehicle,status:"dock",dock_reason:cancelReason,dock_depot:cancelDepo.split(" ")[0]}
-      
-      const result = await updateTripApiNew(cancelTrip._id,cancelTrip.vehicle_id,cancelTrip.driver_id,cancelTrip.conductor_id,updatedTrip)
-      //console.log(result)
-      const result2 = await updateVehicleStatus(updatedVehicle._id,updatedVehicle)
+        if (result.status == 200 && result2.status == 200) {
+          handleCloseCancelModal();
+        } else {
+          alert("Error in Updating Status");
+        }
 
-      if(result.status == 200  && result2.status == 200 ){
-        handleCloseCancelModal()
+        //console.log(result2);
+      } catch (err) {
+        console.log("failed to cancel trip", err);
       }
-      else{
-        alert('Error in Updating Status')
-      }
-
-      //console.log(result2);
-
-      
-    }catch(err){
-      console.log("failed to cancel trip",err);
+      handleCloseCancelModal();
     }
-    handleCloseCancelModal()
-  }
-  }
-
+  };
 
   const getAllTrips = async () => {
     const result = await getAllTripApi();
     console.log(result.data);
-    
-    
+
     if (result.status == 200) {
       setNewTripData(result.data);
-    }
-    else {
+    } else {
       console.log(result);
-
     }
-
-  }
+  };
   const getAllBuses = async () => {
     try {
-      const result = await getAllVehicles()
+      const result = await getAllVehicles();
       //console.log(result.data);
-      
+
       if (result.status == 200) {
-        setVehicles(result.data)
+        setVehicles(result.data);
       } else {
-        alert("Failed to load Bus Details")
+        alert("Failed to load Bus Details");
       }
     } catch (err) {
-      alert(`Failed to load Bus Details ${err}`)
+      alert(`Failed to load Bus Details ${err}`);
     }
-  }
+  };
 
   const UpdateTripDetails = async () => {
-    seteditTrip({ ...editTrip, collection_amount: tripCost.collection })
-    seteditTrip({ ...editTrip, fuelCost: tripCost.Cost })
-    seteditTrip({ ...editTrip, status: "completed" })
+    seteditTrip({ ...editTrip, collection_amount: tripCost.collection });
+    seteditTrip({ ...editTrip, fuelCost: tripCost.Cost });
+    seteditTrip({ ...editTrip, status: "completed" });
     //api to update trip details
-    const result = await updateTripApi(editTrip, editTrip._id)
-   // console.log(result);
-    
+    const result = await updateTripApi(editTrip, editTrip._id);
+    // console.log(result);
+
     if (result.status == 200) {
       handleClose();
-      Filter()
+      Filter();
+    } else {
+      alert(result);
     }
-    else {
-      alert(result)
-    }
-  }
+  };
 
   const getAllDriversList = async () => {
     try {
-      const result = await getDriversListApi()
-     //console.log(result.data);
-      
+      const result = await getDriversListApi();
+      //console.log(result.data);
+
       if (result.status == 200) {
-        setDrivers(result.data)
+        setDrivers(result.data);
       } else {
-        alert("Failed to load Drivers Details")
+        alert("Failed to load Drivers Details");
       }
     } catch (err) {
-      alert(`Failed to load Drivers Details ${err}`)
+      alert(`Failed to load Drivers Details ${err}`);
     }
-  }
+  };
 
   useEffect(() => {
     getAllTrips();
     getAllBuses();
-    getAllDriversList()
-  }, [])
+    getAllDriversList();
+  }, []);
   useEffect(() => {
-    if (tripData.length > 0 && vehicles.length > 0  && drivers.length > 0) {
-      let arr = tripData.map(item =>
-        ({ ...item, BUSNO: vehicles.find(item2 => item2._id == item.vehicle_id
-        )?.BUSNO,EmployeeName: drivers.find(item2 => item2._id == item.driver_id)?.EmployeeName})
-      )
-      setModifiedTrips(arr)
+    if (tripData.length > 0 && vehicles.length > 0 && drivers.length > 0) {
+      let arr = tripData.map((item) => ({
+        ...item,
+        BUSNO: vehicles.find((item2) => item2._id == item.vehicle_id)?.BUSNO,
+        EmployeeName: drivers.find((item2) => item2._id == item.driver_id)
+          ?.EmployeeName,
+      }));
+      setModifiedTrips(arr);
     }
-  }, [tripData, vehicles,vehicleFilter,dateFilter,tripFilter])
-
-
-
+  }, [tripData, vehicles, vehicleFilter, dateFilter, tripFilter, drivers]);
 
   return (
     <div>
       <Header />
-      <div className='' >
-
-        <Container fluid className="p-4" style={{ backgroundColor: '#f8f9fa' }}>
-          <Row className=''>
+      <div className="">
+        <Container fluid className="p-4" style={{ backgroundColor: "#f8f9fa" }}>
+          <Row className="">
             <Col md={2}></Col>
             <Col md={9}>
-              <h1 className=' h5 mb-5'>Live Trips</h1>
+              <h1 className=" h5 mb-5">Live Trips</h1>
 
               {/* Filters */}
               <Row className="mb-3 align-items-center">
@@ -437,7 +448,7 @@ export default function OnGoingTrips() {
                     onChange={(e) => setVehicleFilter(e.target.value)}
                   />
                 </Col>
-                
+
                 <Col md={3}>
                   <Form.Control
                     type="date"
@@ -447,7 +458,16 @@ export default function OnGoingTrips() {
                   />
                 </Col>
                 <Col md={3} className="text-end">
-                  <Button variant="link" className="text-muted" onClick={() => { setVehicleFilter(''); setDateFilter(''); }}>CLEAR</Button>
+                  <Button
+                    variant="link"
+                    className="text-muted"
+                    onClick={() => {
+                      setVehicleFilter("");
+                      setDateFilter("");
+                    }}
+                  >
+                    CLEAR
+                  </Button>
                 </Col>
               </Row>
 
@@ -455,70 +475,114 @@ export default function OnGoingTrips() {
 
               {/* Toolbar with count of items */}
               <Row className="align-items-center mb-3">
-
                 <Col className="text-end">
                   {/* Displaying the count of filtered items */}
                   <span>Total Live Trips:</span>
-                  <span className='text-info ms-2 me-5'>{filteredTrips.length}</span>
+                  <span className="text-info ms-2 me-5">
+                    {filteredTrips.length}
+                  </span>
                 </Col>
               </Row>
 
               {/* Table */}
-              {(filteredTrips.length > 0) && <Row>
-                <Col>
-                  <Table hover responsive className="align-middle" style={{ borderSpacing: '0 10px' }}>
-                    <thead>
-                      <tr className="bg-light">
-                        <th>TRIPID</th>
-                        <th>VEHICLE</th>
-                        <th>DRIVER</th>
-                        <th>START DATE</th>
-                        <th>END DATE</th>
-                        <th></th>
-                        <th></th>
+              {filteredTrips.length > 0 && (
+                <Row>
+                  <Col>
+                    <Table
+                      hover
+                      responsive
+                      className="align-middle"
+                      style={{ borderSpacing: "0 10px" }}
+                    >
+                      <thead>
+                        <tr className="bg-light">
+                          <th>TRIPID</th>
+                          <th>VEHICLE</th>
+                          <th>DRIVER</th>
+                          <th>START DATE</th>
+                          <th>END DATE</th>
+                          <th></th>
+                          <th></th>
+                        </tr>
+                      </thead>
 
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {filteredTrips.map(trip => (
-                        <tr key={trip.trip_id} className="bg-white">
-                          <td>{trip.trip_id} <span className="text-primary ms-1">{trip?.trip_type.toUpperCase()}</span> </td>
-                          <td>
-                            <div className="d-flex align-items-center gap-2">
-                              <FontAwesomeIcon icon={faBus} className="text-muted me-2" />
-                              <div>
-                                <div>{trip.BUSNO}</div>
-                                <small className="text-muted">BUS</small>
+                      <tbody>
+                        {filteredTrips.map((trip) => (
+                          <tr key={trip.trip_id} className="bg-white">
+                            <td>
+                              {trip.trip_id}{" "}
+                              <span className="text-primary ms-1">
+                                {trip?.trip_type.toUpperCase()}
+                              </span>{" "}
+                            </td>
+                            <td>
+                              <div className="d-flex align-items-center gap-2">
+                                <FontAwesomeIcon
+                                  icon={faBus}
+                                  className="text-muted me-2"
+                                />
+                                <div>
+                                  <div>{trip.BUSNO}</div>
+                                  <small className="text-muted">BUS</small>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td>
-                                <FontAwesomeIcon icon={faUser} className="text-muted me-2" />
-                                {trip.EmployeeName}
-                              </td>
+                            </td>
+                            <td>
+                              <FontAwesomeIcon
+                                icon={faUser}
+                                className="text-muted me-2"
+                              />
+                              {trip.EmployeeName}
+                            </td>
 
-                          <td>{new Date(trip.start_date).toLocaleDateString()}<br /><small className="text-muted">{new Date(trip.start_date).toLocaleTimeString()}</small></td>
-                          <td>{new Date(trip.end_date).toLocaleDateString()}<br /><small className="text-muted">{new Date(trip.end_date).toLocaleTimeString()}</small></td>
+                            <td>
+                              {new Date(trip.start_date).toLocaleDateString()}
+                              <br />
+                              <small className="text-muted">
+                                {new Date(trip.start_date).toLocaleTimeString()}
+                              </small>
+                            </td>
+                            <td>
+                              {new Date(trip.end_date).toLocaleDateString()}
+                              <br />
+                              <small className="text-muted">
+                                {new Date(trip.end_date).toLocaleTimeString()}
+                              </small>
+                            </td>
 
-                          <td>
-                            <button className='btn btn-outline-success' onClick={() => addCollectionModal(trip)} >End Trip</button>
-                          </td  >
-                           <td>
-                        <button className='btn btn-outline-success' onClick={()=>{cancelCollectionModal(trip)}}  >Cancel</button>
-                      </td> 
-                          {/* <td>
+                            <td>
+                              <button
+                                className="btn btn-outline-success"
+                                onClick={() => addCollectionModal(trip)}
+                              >
+                                End Trip
+                              </button>
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-outline-success"
+                                onClick={() => {
+                                  cancelCollectionModal(trip);
+                                }}
+                              >
+                                Cancel
+                              </button>
+                            </td>
+                            {/* <td>
                             <Button variant="link" className="p-0">
                               <FontAwesomeIcon className='text-danger' onClick={() => showDeleteModal(trip.id)} icon={faTrash} />
                             </Button>
                           </td> */}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Col>
-              </Row>}
-              {(filteredTrips.length == 0) && <h6 className='text-danger'>No Live Trips</h6>}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </Col>
+                </Row>
+              )}
+              {filteredTrips.length == 0 && (
+                <h6 className="text-danger">No Live Trips</h6>
+              )}
             </Col>
 
             <Col md={1}></Col>
@@ -531,80 +595,110 @@ export default function OnGoingTrips() {
             <Modal.Title>Add Collection</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-           { !outBound &&<Form className='m-3'>
+            {!outBound && (
+              <Form className="m-3">
+                <TextField
+                  required
+                  id="outlined-required"
+                  name="collection"
+                  label="Collection amount "
+                  className="w-100 mb-3"
+                  onChange={(e) => {
+                    valiadateCollection(e.target.value);
+                  }}
+                />
+                {tripCostValidation.collectionValid && (
+                  <p className="text-danger">Please enter valid amount</p>
+                )}
+                <>
+                  <button
+                    className="btn btn-outline-warning m-3"
+                    onClick={handleButtonClick}
+                  >
+                    Add Fuel Cost
+                  </button>
+                  {/* Render each input pair */}
+                  {inputPairs.map((pair, index) => (
+                    <div
+                      key={index}
+                      className="d-flex"
+                      style={{ marginBottom: "10px" }}
+                    >
+                      <TextField
+                        required
+                        id="outlined-required"
+                        name="liter"
+                        label="Fuel in Liter "
+                        className="w-25     me-3"
+                        value={pair.input1}
+                        onChange={(e) => handleInputChange(index, "liter", e)}
+                        placeholder={`Liters`}
+                      />
 
-              <TextField
-                required
-                id="outlined-required" name="collection"
-                label="Collection amount "
-                className='w-100 mb-3'
-                onChange={(e) => { valiadateCollection(e.target.value) }}
-              />
-              {tripCostValidation.collectionValid && <p className='text-danger'>Please enter valid amount</p>}
-              <>
-                <button className='btn btn-outline-warning m-3' onClick={handleButtonClick}>Add Fuel Cost</button>
-                {/* Render each input pair */}
-                {inputPairs.map((pair, index) => (
-                  <div key={index} className='d-flex' style={{ marginBottom: '10px' }}>
-                    <TextField
-                      required
-                      id="outlined-required" name="liter"
-                      label="Fuel in Liter "
-                      className='w-25     me-3'
-                      value={pair.input1}
-                      onChange={(e) => handleInputChange(index, 'liter', e)}
-                      placeholder={`Liters`} />
+                      <TextField
+                        required
+                        id="outlined-required"
+                        name="liter"
+                        label="Fuel Rate "
+                        className="w-25     me-3"
+                        value={pair.input2}
+                        onChange={(e) => handleInputChange(index, "rate", e)}
+                        placeholder={`₹ 0`}
+                      />
 
-                    <TextField
-                      required
-                      id="outlined-required" name="liter"
-                      label="Fuel Rate "
-                      className='w-25     me-3'
-                      value={pair.input2}
-                      onChange={(e) => handleInputChange(index, 'rate', e)}
-                      placeholder={`₹ 0`} />
-
-                    <TextField
-                      readOnly
-                      label="Total "
-
-                      id="outlined-required" name="Total"
-                      className='w-25     me-3'
-                      value={pair.total}
-                      placeholder={`₹ 0`} />
-
-                  </div>
-                ))}
-                <h6 className='text-danger'>Total Fuel Cost</h6>
-                <input
-                  className='form-control w-100 text-danger fs-3'
-
-                  type="text"
-                  value={`₹ ${fuelCost} `}
-                  placeholder='₹ 0'
-                />    </>
-            </Form>}
-            {outBound &&
-            <div>
-              <h5>Do You Want to Add Collection and Fuel Cost Details?</h5>
-              <button className='btn btn-outline-success m-3' onClick={()=>setOutBound(false)}>Yes</button>
-              <button className=' btn btn-danger'  onClick={handleOpeneConfirmation}>Save Without Collection </button>            </div>
-            }
+                      <TextField
+                        readOnly
+                        label="Total "
+                        id="outlined-required"
+                        name="Total"
+                        className="w-25     me-3"
+                        value={pair.total}
+                        placeholder={`₹ 0`}
+                      />
+                    </div>
+                  ))}
+                  <h6 className="text-danger">Total Fuel Cost</h6>
+                  <input
+                    className="form-control w-100 text-danger fs-3"
+                    type="text"
+                    value={`₹ ${fuelCost} `}
+                    placeholder="₹ 0"
+                  />{" "}
+                </>
+              </Form>
+            )}
+            {outBound && (
+              <div>
+                <h5>Do You Want to Add Collection and Fuel Cost Details?</h5>
+                <button
+                  className="btn btn-outline-success m-3"
+                  onClick={() => setOutBound(false)}
+                >
+                  Yes
+                </button>
+                <button
+                  className=" btn btn-danger"
+                  onClick={handleOpeneConfirmation}
+                >
+                  Save Without Collection{" "}
+                </button>{" "}
+              </div>
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            
-            {!outBound && <div>
-              <Button variant="primary" onClick={handleOpeneConfirmation}>
-                Save Changes
-              </Button>
-            </div>}
+
+            {!outBound && (
+              <div>
+                <Button variant="primary" onClick={handleOpeneConfirmation}>
+                  Save Changes
+                </Button>
+              </div>
+            )}
           </Modal.Footer>
         </Modal>
-
-
 
         {/* Modal for confirm trip collection a trip */}
         <Modal show={showConfirmation} onHide={handleCloseConfirmation}>
@@ -614,60 +708,92 @@ export default function OnGoingTrips() {
           <Modal.Body>
             <TextField
               required
-              id="outlined-required" name="password"
+              id="outlined-required"
+              name="password"
               label="Enter Password "
-              type='password'
-              className='w-100 mb-3'
-              onChange={(e) => { setPassword(e.target.value) }}
+              type="password"
+              className="w-100 mb-3"
+              onChange={(e) => {
+                setPassword(e.target.value);
+              }}
             />
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={handleCloseConfirmation}>
               Close
             </Button>
-            <Button variant="danger" onClick={ConfirmSave} >
+            <Button variant="danger" onClick={ConfirmSave}>
               Confirm Update
             </Button>
           </Modal.Footer>
         </Modal>
 
-
         <Modal show={showCancelModal} onHide={handleCloseCancelModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Cancelling Trip</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+          <Modal.Header closeButton>
+            <Modal.Title>Cancelling Trip</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <label htmlFor="">Reason for cancelling</label>
-            <input type="text" placeholder="Reason" className="form-control m-1 mb-3" value={cancelReason} onChange={(e)=>setCancelReason(e.target.value)} />
-          
+            <input
+              type="text"
+              placeholder="Reason"
+              className="form-control m-1 mb-3"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+            />
+
             <div className="position-relative w-100 p-1">
               <label htmlFor="cancelDepo">Bus Docked At</label>
-              <input id="cancelDepo" type="search" className="form-control" placeholder="Enter Depo" value={cancelDepo} onChange={(e)=>setCancelDepo(e.target.value)}/>
-              <ul className="position-absolute" style={{width:"100%",left:"-30px"}}>
+              <input
+                id="cancelDepo"
+                type="search"
+                className="form-control"
+                placeholder="Enter Depo"
+                value={cancelDepo}
+                onChange={(e) => setCancelDepo(e.target.value)}
+              />
+              <ul
+                className="position-absolute"
+                style={{ width: "100%", left: "-30px" }}
+              >
                 {
                   // Filter depo List
 
-                  depoList.filter(item => {
-                    if (!cancelDepo) return false
-                    const depoLower = cancelDepo.toLowerCase()
-                    return item.code.toLowerCase().includes(depoLower) || item.name.toLowerCase().includes(depoLower)
-                  }).slice(0,5)
-                  .map((item,index)=>(
-                    <li key={index} className="form-control pointer" onClick={()=>setCancelDepo(item.code + " " + item.name)}>{item.code} {item.name}</li>
-                  ))
+                  depoList
+                    .filter((item) => {
+                      if (!cancelDepo) return false;
+                      const depoLower = cancelDepo.toLowerCase();
+                      return (
+                        item.code.toLowerCase().includes(depoLower) ||
+                        item.name.toLowerCase().includes(depoLower)
+                      );
+                    })
+                    .slice(0, 5)
+                    .map((item, index) => (
+                      <li
+                        key={index}
+                        className="form-control pointer"
+                        onClick={() =>
+                          setCancelDepo(item.code + " " + item.name)
+                        }
+                      >
+                        {item.code} {item.name}
+                      </li>
+                    ))
                 }
               </ul>
             </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseCancelModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handlecancelTrip}>
-            Cancel Trip
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseCancelModal}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={handlecancelTrip}>
+              Cancel Trip
+            </Button>
+          </Modal.Footer>
+                
+        </Modal>
       </div>
     </div>
   );
