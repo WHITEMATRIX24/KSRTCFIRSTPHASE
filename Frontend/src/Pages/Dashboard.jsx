@@ -20,7 +20,7 @@ function Dashboard() {
   const [TotalCollection, setTotalcollection] = useState(0)
   const [TotalFuelConsumption, setTotalFuelComsumption] = useState(0)
   const [outOfServicesCount, setOutOfServicesCount] = useState(0);
-  const[CompletedTripDetails,setCompletedTripDetails]=useState({})
+  const [CompletedTripDetails, setCompletedTripDetails] = useState({})
 
   // get all Vehicle details
   const getAllVehicleDetails = async () => {
@@ -95,14 +95,14 @@ function Dashboard() {
         <div className="row">
           <div className="col-md-2"></div>
           <div className="col-md-10">
-          <ExcelExport data={CompletedTripDetails}  data1={AllvehicleData} fileName="Report"  />
+            <ExcelExport data={CompletedTripDetails} data1={AllvehicleData} fileName="Report" />
             <RealTimeData />
-           
+
             {/* section1 */}
             {/* Dashboard Content */}
 
             <div className="row mt-2 ">
-           
+
               <div className="col-md-3">
                 <div style={{ backgroundColor: 'white' }} className='vehicle-data shadow w-100'>
                   <FontAwesomeIcon icon={faLocationDot} style={{ color: "#f73b3b", fontSize: '20px' }} className='ms-3 mt-2' />
@@ -130,7 +130,7 @@ function Dashboard() {
                 <div style={{ backgroundColor: 'white' }} className='vehicle-data  shadow  w-100 '>
                   <FontAwesomeIcon icon={faServicestack} style={{ color: "#f73b3b", fontSize: '25px' }} className='ms-3 mt-1' />
                   <div className='d-flex align-items-center justify-content-center flex-column vehicle-data-text '> <p className='fw-bold fs-4 mt-3'>{outOfServicesCount}</p>
-                    <h6 className='text-secondary' style={{ fontSize: '13px', fontWeight: 'normal' }}>Total number of buses out of service</h6></div>
+                    <h6 className='text-secondary' style={{ fontSize: '13px', fontWeight: 'normal' }}>Total number of buses in dock</h6></div>
                 </div>
               </div>
             </div>
@@ -142,15 +142,15 @@ function Dashboard() {
               <div className="col-md-6 " >
                 <div className='p-3 shadow' style={{ backgroundColor: 'white' }}>
                   {/* Pie Chart */}
-                  <h4 className='mt-2' style={{ color: '#737373', fontWeight: "600"}}>FLEET OVERVIEW</h4>
+                  <h4 className='mt-2' style={{ color: '#737373', fontWeight: "600" }}>FLEET OVERVIEW</h4>
                   <ChartPie data={AllvehicleData} />
-                
+
                 </div>
 
               </div>
               <div className="col-md-6">
                 <div className='p-3 shadow' style={{ backgroundColor: 'white' }}>
-                  <h4 className='mt-2'  style={{ color: '#737373', fontWeight: "600" }}>REVENUE OVERVIEW</h4>
+                  <h4 className='mt-2' style={{ color: '#737373', fontWeight: "600" }}>REVENUE OVERVIEW</h4>
 
                   {/* Bar Chart */}
                   <ChartBar collection={TotalCollection} fuelconsumtion={TotalFuelConsumption} revenew={TotalCollection - TotalFuelConsumption} />
