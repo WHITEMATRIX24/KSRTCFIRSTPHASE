@@ -1,0 +1,11 @@
+.loginpage-input {
+  outline: none;
+  border: none;
+  background-color: rgb(239, 239, 239);
+}
+.loginpage-btn {
+  outline: none;
+  border: none;
+  background-color: #db2c07;
+  color: white;
+}
