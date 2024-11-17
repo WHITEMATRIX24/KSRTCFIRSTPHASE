@@ -240,11 +240,11 @@ const TripParameters = () => {
       !outboundTrip.driver_id ||
       !outboundTrip.conductor_id ||
       !outboundTrip.start_date ||
-      !outboundTrip.end_date ||
+      //!outboundTrip.end_date ||
       !outboundTrip.departure_location.depo ||
       !outboundTrip.arrival_location.depo ||
-      !outboundTrip.start_time ||
-      !outboundTrip.end_time
+      !outboundTrip.start_time 
+      // || !outboundTrip.end_time
     ) {
       alert("Fill All Fields");
     } else if (
@@ -252,23 +252,23 @@ const TripParameters = () => {
       !returnTrip.driver_id ||
       !returnTrip.conductor_id ||
       !returnTrip.start_date ||
-      !returnTrip.end_date ||
+     // !returnTrip.end_date ||
       !returnTrip.departure_location.depo ||
       !returnTrip.arrival_location.depo ||
-      !returnTrip.start_time ||
-      !returnTrip.end_time
+      !returnTrip.start_time //||
+     // !returnTrip.end_time
     ) {
       alert("Fill All Fields");
     } else if (
       !checkTimeEntries(
         outboundTrip.start_date,
         outboundTrip.start_time,
-        outboundTrip.end_date,
-        outboundTrip.end_time
+        /* outboundTrip.end_date,
+        outboundTrip.end_time */
       ) ||
       !checkTimeEntries(
-        outboundTrip.end_date,
-        outboundTrip.end_time,
+        /* outboundTrip.end_date,
+        outboundTrip.end_time, */
         returnTrip.start_date,
         returnTrip.start_time
       ) ||
@@ -281,8 +281,8 @@ const TripParameters = () => {
       !checkTimeEntries(
         outboundTrip.start_date,
         outboundTrip.start_time,
-        returnTrip.end_date,
-        returnTrip.end_time
+        /* returnTrip.end_date,
+        returnTrip.end_time */
       )
     ) {
       alert("Invalid Time Entry");

@@ -92,10 +92,8 @@ export default function ScheduleTrip() {
         ...item,
         vehicleNumber: vehicles.find((item2) => item2._id == item.vehicle_id)
           ?.number,
-        driverName:
-          drivers.find((item2) => item2._id == item.driver_id)?.first_name +
-          " " +
-          drivers.find((item2) => item2._id == item.driver_id)?.last_name,
+        employeeName:
+          drivers.find((item2) => item2._id == item.driver_id)?.EmployeeName
       }));
       setModifiedTrips(arr);
     }
@@ -311,7 +309,7 @@ export default function ScheduleTrip() {
                                 icon={faUser}
                                 className="text-muted me-2"
                               />
-                              {item.driverName}
+                              {item.employeeName}
                             </td>
                             <td>
                               {new Date(item.start_date).toLocaleDateString()}
@@ -321,11 +319,13 @@ export default function ScheduleTrip() {
                               </small>
                             </td>
                             <td>
-                              {new Date(item.end_date).toLocaleDateString()}
-                              <br />
-                              <small className="text-muted">
-                                {formatTime(item.end_time)}
+                             { item.end_date &&<> {new Date(item.start_date).toLocaleDateString()}</>}
+                             { !item.end_date &&<p className=""> ----</p>}
+                             <br />
+                             <small>
+                             { item.end_time &&<>  {formatTime(item.end_time)}</>}
                               </small>
+                              
                             </td>
                             <td>
                               {/* <FontAwesomeIcon icon={faClock} className="text-muted me-2" />
