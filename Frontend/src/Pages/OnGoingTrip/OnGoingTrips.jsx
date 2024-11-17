@@ -134,12 +134,14 @@ export default function OnGoingTrips() {
   const [tripCost, setTripCost] = useState({
     collection: 0,
     Cost: 0,
+    end_date:'',
+    end_time:''
   });
 
   //state to validate whether data entered is number
-  const [tripCostValidation, setTripCostValidation] = useState({
-    collectionValid: false,
-  });
+  const [tripDateValidation, setTripDateValidation] = useState(
+     false
+  );
 
   const [vehicleFilter, setVehicleFilter] = useState("");
   const [tripFilter, setTripFilter] = useState("");
@@ -238,8 +240,19 @@ export default function OnGoingTrips() {
   const valiadateCollection = (amount) => {
     setTripCost({ ...tripCost, collection: amount });
     seteditTrip({ ...editTrip, collection_amount: amount });
-    setTripCostValidation({ ...tripCostValidation, collectionValid: false });
+    setTripDateValidation(true);
   };
+
+  const setEndTime = (time)=>{
+    setTripCost({ ...tripCost, end_time: time });
+    seteditTrip({ ...editTrip, end_time: time });
+  }
+  const setEndDate = (date)=>{
+      setTripCost({ ...tripCost, end_date: date });
+    seteditTrip({ ...editTrip, end_date: date });
+  
+  }
+  
 
   /* Function to add input boxes for entering fuel charge */
   const handleButtonClick = () => {
@@ -273,14 +286,12 @@ export default function OnGoingTrips() {
     setShowConfirmation(false);
     setPassword("");
   };
+
+  
   const handleOpeneConfirmation = () => {
-    console.log("open");
-
     console.log(editTrip);
-
     setShowConfirmation(true);
     setShow(false);
-    7;
   };
   const ConfirmSave = () => {
     if (password === "1234") {
@@ -343,6 +354,7 @@ export default function OnGoingTrips() {
 
         if (result.status == 200 && result2.status == 200) {
           handleCloseCancelModal();
+          getAllTrips()
         } else {
           alert("Error in Updating Status");
         }
@@ -386,14 +398,16 @@ export default function OnGoingTrips() {
   const UpdateTripDetails = async () => {
     seteditTrip({ ...editTrip, collection_amount: tripCost.collection });
     seteditTrip({ ...editTrip, fuelCost: tripCost.Cost });
+    seteditTrip({ ...editTrip, end_date: tripCost.end_date });
+    seteditTrip({ ...editTrip, fuelCost: tripCost.end_time });
     seteditTrip({ ...editTrip, status: "completed" });
     //api to update trip details
     const result = await updateTripApi(editTrip, editTrip._id);
-    // console.log(result);
+    console.log(result);
 
     if (result.status == 200) {
       handleClose();
-      Filter();
+      getAllTrips()
     } else {
       alert(result);
     }
@@ -413,6 +427,16 @@ export default function OnGoingTrips() {
       }
     } catch (err) {
       alert(`Failed to load Drivers Details ${err}`);
+    }
+  };
+
+  const formatTime = (timeInput) => {
+    if (timeInput) {
+      const date = new Date(`1970-01-01T${timeInput}:00`);
+      const options = { hour: "numeric", minute: "2-digit", hour12: true };
+      return date.toLocaleTimeString("en-US", options);
+    } else {
+      return "";
     }
   };
   useEffect(() => {
@@ -550,19 +574,19 @@ export default function OnGoingTrips() {
                               </td>
   
                               <td>
-                                {new Date(trip.start_date).toLocaleDateString()}
+                              {new Date(trip.start_date).toLocaleDateString()}
                                 <br />
                                 <small className="text-muted">
-                                  {new Date(trip.start_date).toLocaleTimeString()}
+                                {formatTime(trip.start_time)}
                                 </small>
                               </td>
                               <td>
-                                {new Date(trip.end_date).toLocaleDateString()}
-                                <br />
-                                <small className="text-muted">
-                                  {new Date(trip.end_date).toLocaleTimeString()}
-                                </small>
-                              </td>
+                             { trip.end_date &&<> {new Date(trip.start_date).toLocaleDateString()}</>}
+                             { !trip.end_date &&<span className="mt-0"> ----</span>}
+                             <br />
+                             
+                             { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}
+                            </td>
   
                               <td>
                                 <button
@@ -614,6 +638,39 @@ export default function OnGoingTrips() {
             <Modal.Title>Add Collection</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+
+            <div className="p-3">
+            <Form.Label
+                            className="mb-1"
+                            style={{ fontSize: "14px" }}
+                          >
+                            End Date
+                          </Form.Label>
+                          <Form.Control
+                            type="date"
+                            placeholder="Select Date"
+                            value={tripData.end_date}
+                            onChange={(e) =>
+                              setEndDate(e.target.value)
+                            }
+                          />
+
+                          <Form.Label
+                            className="mb-1 mt-3"
+                            style={{ fontSize: "14px" }}
+                          >
+                            End Time
+                          </Form.Label>
+                          <input
+                            type="time"
+                            className="form-control"
+                            value={tripData.end_time}
+                            onChange={(e) =>
+                             setEndTime(e.target.value)
+                            }
+                          />
+                
+            </div>
             {!outBound && (
               <Form className="m-3">
                 <TextField
@@ -626,9 +683,8 @@ export default function OnGoingTrips() {
                     valiadateCollection(e.target.value);
                   }}
                 />
-                {tripCostValidation.collectionValid && (
-                  <p className="text-danger">Please enter valid amount</p>
-                )}
+                
+                
                 <>
                   <button
                     className="btn btn-outline-warning m-3"
@@ -676,9 +732,9 @@ export default function OnGoingTrips() {
                       />
                     </div>
                   ))}
-                  <h6 className="text-danger">Total Fuel Cost</h6>
+                  <h6 className="text-secondary mt-2">Total Fuel Cost</h6>
                   <input
-                    className="form-control w-100 text-danger fs-3"
+                    className="form-control w-100 text-danger fs-5"
                     type="text"
                     value={`₹ ${fuelCost} `}
                     placeholder="₹ 0"
@@ -688,6 +744,7 @@ export default function OnGoingTrips() {
             )}
             {outBound && (
               <div>
+                
                 <h5>Do You Want to Add Collection and Fuel Cost Details?</h5>
                 <button
                   className="btn btn-outline-success m-3"

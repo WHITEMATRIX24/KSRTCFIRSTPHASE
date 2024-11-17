@@ -22,7 +22,6 @@ const tripSchema = new mongoose.Schema({
     },
     end_date: {
         type: Date,
-        required: true
     },
     departure_location: {
         depo: {
@@ -66,7 +65,6 @@ const tripSchema = new mongoose.Schema({
     },
     end_time: {
         type: String,
-        required: true
     },
     status: {
         type: String,
