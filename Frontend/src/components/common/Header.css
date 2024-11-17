@@ -56,6 +56,22 @@
     padding: 10px;
     z-index: 100;
   }
+
+  .LogoutBtnCvr{
+    z-index: 10;
+    position: absolute;
+    right: 0;
+    width: 18%;
+    border-bottom: 1px solid red;
+  }
+  .logOutBtn{
+    width: 100%;
+    padding:15px 19px;
+    border: none;
+    font-size: 20px;
+    font-weight: 600;
+    color: rgb(176, 14, 14);
+  }
   
   
   @media screen and (max-width: 500px) {

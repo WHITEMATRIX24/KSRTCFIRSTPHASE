@@ -1,10 +1,19 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
-const ProtectRoutes = () => {
+const ProtectRoutes = ({ allowedRoles }) => {
   const auth = JSON.parse(sessionStorage.getItem("user"));
 
-  return auth ? <Outlet /> : <Navigate to="/" />;
+  if (!auth) {
+    return <Navigate to="/" />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(auth.role)) {
+    alert("You Have No Access to this Page....!")
+    return <Navigate to="/dashboard" />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectRoutes;

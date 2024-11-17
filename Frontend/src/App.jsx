@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Dashboard from "./Pages/Dashboard";
-
 import Vehicles from "./Pages/vehicles/Vehicles";
 import VehicleDetails from "./Pages/VehicleDetails/VehicleDetails";
 import Drivers from "./Pages/drivers/Drivers";
@@ -35,7 +34,9 @@ function App() {
           <Route path="/add-trip" element={<TripParameters />}></Route>
           <Route path="/scheduled-trips" element={<ScheduleTrip />}></Route>
           <Route path="/ongoing-trips" element={<OnGoingTrips />}></Route>
-          <Route path="/maintenance" element={<Maintenance />}></Route>
+          <Route element={<ProtectRoutes allowedRoles={["Admin", "Maintenance"]} />}>
+            <Route path="/maintanance" element={<Maintenance />} />
+          </Route>
         </Route>
       </Routes>
     </>

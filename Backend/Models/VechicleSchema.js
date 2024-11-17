@@ -22,7 +22,8 @@ const vehicleSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["in_service", "en_route", "dock"],
+      enum: ["in_service", "en_route", "dock","spare"],
+      default:"spare",
       required: true,
     },
     dock_reason: {

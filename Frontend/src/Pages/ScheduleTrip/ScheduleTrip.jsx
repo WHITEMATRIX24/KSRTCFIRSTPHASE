@@ -56,6 +56,8 @@ export default function ScheduleTrip() {
       alert(`Failed to load Drivers Details ${err}`);
     }
   };
+  console.log("Modified",modifiedTrips);
+  
 
   // get all buses
   const getAllBuses = async () => {
@@ -88,16 +90,22 @@ export default function ScheduleTrip() {
   // mdofied trip data
   useEffect(() => {
     if (trips.length > 0 && vehicles.length > 0 && drivers.length > 0) {
-      let arr = trips.map((item) => ({
-        ...item,
-        vehicleNumber: vehicles.find((item2) => item2._id == item.vehicle_id)
-          ?.number,
-        employeeName:
-          drivers.find((item2) => item2._id == item.driver_id)?.EmployeeName
-      }));
+      let arr = trips.map((item) => {
+        const vehicle = vehicles.find((item2) => item2._id == item.vehicle_id);
+        const driver = drivers.find((item2) => item2._id == item.driver_id);
+        console.log(vehicle);
+        
+  
+        return {
+          ...item,
+          vehicleNumber: vehicle?.BUSNO || "N/A",
+          employeeName: driver?.EmployeeName || "N/A"
+        };
+      });
       setModifiedTrips(arr);
     }
   }, [trips, vehicles, drivers]);
+  
 
   // formats time =>recieve time from time picker and returns formatted time
   const formatTime = (timeInput) => {

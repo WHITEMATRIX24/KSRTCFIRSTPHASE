@@ -54,19 +54,27 @@ function TripOverviewComponent() {
 
   useEffect(() => {
     setFilteredTrips(
-      trips.filter((item) => (item.start_date.split("T")[0] == datePick) || (item.end_date.split("T")[0] == datePick))
-      .filter(item => {
-        if (!depo) return true
-        
-        const depoKeyword = depo.split(" ")[0].toLowerCase()
-        
-        return (
-          item.departure_location.depo.toLowerCase().includes(depoKeyword) ||
-          item.arrival_location.depo.toLowerCase().includes(depoKeyword)
-        )
-      }))
-    
-  }, [datePick, trips,depo]);
+      trips
+        .filter((item) => {
+          // Ensure `start_date` and `end_date` are not null or undefined
+          const startDate = item.start_date ? item.start_date.split("T")[0] : null;
+          // const endDate = item.end_date ? item.end_date.split("T")[0] : null;
+  
+          return startDate === datePick ;
+        })
+        .filter((item) => {
+          if (!depo) return true;
+  
+          const depoKeyword = depo.split(" ")[0].toLowerCase();
+  
+          return (
+            item.departure_location.depo.toLowerCase().includes(depoKeyword) ||
+            item.arrival_location.depo.toLowerCase().includes(depoKeyword)
+          );
+        })
+    );
+  }, [datePick, trips, depo]);
+  
 
   useEffect(() => {
     setChosenTrip(0);
@@ -310,9 +318,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.arrival_location.depo} {depoList.find(item2=>item2.code==item?.arrival_location.depo)?.name}
                       </span>
-                      <span>{`${item?.end_date.split("T")[0]} , ${
+                      {/* <span>{`${item?.end_date.split("T")[0]} , ${
                         item?.end_time
-                      }`}</span>
+                      }`}</span> */}
                     </div>
                   </div>
                 </div>
@@ -371,9 +379,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.arrival_location.depo} {depoList.find(item2=>item2.code==item?.arrival_location.depo)?.name}
                       </span>
-                      <span>{`${item?.end_date.split("T")[0]} , ${
+                      {/* <span>{`${item?.end_date.split("T")[0]} , ${
                         item?.end_time
-                      }`}</span>
+                      }`}</span> */}
                     </div>
                   </div>
                 </div>

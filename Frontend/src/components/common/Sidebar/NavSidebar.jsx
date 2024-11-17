@@ -114,7 +114,7 @@ function NavSidebar() {
         <Divider />
         {activeMenu === 'maintenance' && (
           <ul className="submenu">
-            <li><a href="/maintenance" id='maintenancePlanner' className='my-2' onClick={() => toggelColor('maintenancePlanner')}>Maintenance Planner</a></li>
+            <li><a href="/maintanance" id='maintenancePlanner' className='my-2' onClick={() => toggelColor('maintenancePlanner')}>Maintenance Planner</a></li>
             <Divider />
             <li><a href="#" className='my-2' id='history' onClick={() => toggelColor('history')}>History</a></li>
             <Divider />
