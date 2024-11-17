@@ -106,3 +106,21 @@ export const deleteConductorById=async(req,res)=>{
         res.status(500).json({ error: "Internal server error" });    
     }
 }
+
+// Delete Selected Conductors::::
+export const deleteSelectedConductor = async (req, res) => {
+    const conductorIds = req.body;
+
+    try {
+        const deletedConductor = await Conductor.deleteMany({ _id: { $in: conductorIds } });
+        if (deletedConductor) {
+            res.status(200).json(deletedConductor);
+            console.log("Delete Selected Conductors SuccessFully::::");
+        } else {
+            res.status(406).json("Error in finding Selected Conductors to Delete:::::::")
+        }
+    } catch (err) {
+        console.log("Error at catch in DriverController/deleteSelectedConductor::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}

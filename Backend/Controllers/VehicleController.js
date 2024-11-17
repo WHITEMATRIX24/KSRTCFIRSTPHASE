@@ -470,3 +470,24 @@ export const getWeeklyVehicleMaintanenceDataController = async (req, res) => {
     res.status(500).json({ message: "server error" });
   }
 };
+
+
+// Delete Selected Vehicle::::
+export const deleteSelectedVehicle=async(req,res)=>{
+  const vehicleIds=req.body;
+  console.log(vehicleIds);
+  
+
+  try{
+      const deletedVehicles = await Vehicles.deleteMany({ _id: { $in: vehicleIds } });
+   if (deletedVehicles) {
+      res.status(200).json(deletedVehicles);
+      console.log("Delete Successfully::::");
+  } else {
+      res.status(406).json("No vehicles found By this Id::::::");
+  }
+  }catch(err){
+      console.log("Error at catch in vehicleController/deleteSelectedVehicle::::::", err);
+      res.status(500).json({ error: "Internal server error" });
+  }
+}

@@ -6,15 +6,6 @@ export const getAllVehicles = async () => {
   return await commonAPI("GET", `${SERVERURL}/getAllVehicles`, "");
 };
 
-//delete single vehicle
-export const deleteSingleVehicleAPI = async (vehicleId) => {
-  return await commonAPI(
-    "DELETE",
-    `${SERVERURL}/deleteVehicleById/${vehicleId}`,
-    {}
-  );
-};
-
 //Edit VehicleStatus>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 export const editStatus = async (vehicle_id, reqbody) => {
   return await commonAPI(
@@ -24,6 +15,35 @@ export const editStatus = async (vehicle_id, reqbody) => {
     ""
   );
 };
+//delete single vehicle
+export const deleteSingleVehicleAPI = async (vehicleId) => {
+  return await commonAPI(
+    "DELETE",
+    `${SERVERURL}/deleteVehicleById/${vehicleId}`,
+    {}
+  );
+};
+
+
+
+// delete multiple vehicles
+export const deleteMultipleVehiclesAPI = async (vehicleIds) => {
+  return await commonAPI("DELETE", `${SERVERURL}/deleteSelectedVehicles`, vehicleIds, "");
+};
+
+
+// delete multiple drivers
+export const deleteMultipleDriversAPI = async (driverIds) => {
+  return await commonAPI("DELETE", `${SERVERURL}/deleteSelectedDrivers`, driverIds, "");
+};
+
+
+// delete multiple conductors
+export const deleteMultipleConductorsAPI = async (ConductorIds) => {
+  return await commonAPI("DELETE", `${SERVERURL}/deleteSelectedConductors`, ConductorIds, "");
+};
+
+
 // addvehicle
 export const addvehicleAPI = async (reqBody) => {
   return await commonAPI("POST", `${SERVERURL}/addNewVehichle`, reqBody, "");
