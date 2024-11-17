@@ -112,3 +112,21 @@ export const deleteDriverById = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+// Delete Selected Drivers::::
+export const deleteSelectedDriver = async (req, res) => {
+    const DriverIds = req.body;
+
+    try {
+        const deletedDriver = await Driver.deleteMany({ _id: { $in: DriverIds } });
+        if (deletedDriver) {
+            res.status(200).json(deletedDriver);
+            console.log("Delete Selected Drivers SuccessFully::::");
+        } else {
+            res.status(406).json("Error in finding Selected Drivers to Delete:::::::")
+        }
+    } catch (err) {
+        console.log("Error at catch in DriverController/deleteSelectedDriver::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}

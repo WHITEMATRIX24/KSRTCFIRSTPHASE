@@ -15,6 +15,7 @@ import {
   getAllVehicleMaintanenceDataController,
   getDailyVehicleMaintanenceDataController,
   getWeeklyVehicleMaintanenceDataController,
+  deleteSelectedVehicle,
 } from "../Controllers/VehicleController.js";
 import {
   addNewTrip,
@@ -26,6 +27,7 @@ import {
 import {
   addNewDriver,
   deleteDriverById,
+  deleteSelectedDriver,
   editDriverDetails,
   editLeaveStatus,
   getAllDriverDetails,
@@ -33,6 +35,7 @@ import {
 import {
   addNewConductor,
   deleteConductorById,
+  deleteSelectedConductor,
   editConductorDetails,
   editLeaveStatusConductor,
   getAllConductorDetails,
@@ -70,7 +73,8 @@ router.get("/get-all-vehicles-number", getAllVehiclesNumber);
 router.get("/getVehicleById/:vehicle_id", getvehicleById);
 // Delete Vehicle By Id
 router.delete("/deleteVehicleById/:vehicle_id", deleteVehicleById);
-
+// Delete Selected Vehicles
+router.delete('/deleteSelectedVehicles',deleteSelectedVehicle)
 // <<<<<<<........Vehichel Maintanence Routes.........>>>>>>>
 
 // get all Vehicles Maintenance routes
@@ -114,7 +118,8 @@ router.put("/editDriverById/:driver_id", editDriverDetails);
 router.put("/editLeaveStatus/:driver_id", editLeaveStatus);
 // Delete Driver By driver_Id
 router.delete("/deleteDriverById/:driver_id", deleteDriverById);
-
+// Delete Selected Drivers
+router.delete('/deleteSelectedDrivers',deleteSelectedDriver);
 // <<<<<<<.......ConductorRouter.......>>>>>>>
 
 // Adding new Conductor
@@ -127,7 +132,8 @@ router.put("/editConductorById/:conductor_id", editConductorDetails);
 router.put("/editLeaveStatusConductor/:conductor_id", editLeaveStatusConductor);
 // Delete Conductor By conductor_Id
 router.delete("/deleteConductorById/:conductor_id", deleteConductorById);
-
+// Delete Selected Conductors
+router.delete('/deleteSelectedConductors',deleteSelectedConductor);
 // <<<<<<<...........TripRouter.......>>>>>>>>
 
 // Adding new Trip info
