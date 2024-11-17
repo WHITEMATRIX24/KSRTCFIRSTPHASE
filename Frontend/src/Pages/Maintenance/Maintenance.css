@@ -1,0 +1,18 @@
+.Maintenance{
+    .center{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .pointer{
+        cursor: pointer;
+    }
+    .j-center{
+        display: flex;
+        justify-content: center;
+    }
+    .a-center{
+        display: flex;
+        align-items: center;
+    }
+}

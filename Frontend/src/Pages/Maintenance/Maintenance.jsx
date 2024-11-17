@@ -3,18 +3,37 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import {
+  faCircleCheck,
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import {
-getAllVehicles,
+  getAllDailyMaintenanceApi,
+getAllWeeklyMaintenanceApi,
+updateDailyMaintenanceApi,
+updateWeeklyMaintenanceApi,
 } from "../../services/allAPI";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from "react-paginate";
+import './Maintenance.css'
 
 
 export default function Maintenance() {
+    const[weeklyData,setWeeklyData]=useState([])
+    const[dailyData,setDailyData]=useState([])
+    const[searchBus,setSearchBus]=useState("")
+    const[vehicle,setVehicle]=useState({})
+    const[weekCheckList,setWeekCheckList]=useState({
+      coolent_level:false,
+      engine_oil:false,
+      water_in_diesel_line:false
+    })
+    const[dailyCheckList,setDailyCheckList]=useState({
+      coolent_level:false,
+      engine_oil:false,
+      water_in_diesel_line:false
+    })
     const [currentPage, setCurrentPage] = useState(0);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filteredVehicles, setFilteredVehicles] = useState([]);
@@ -22,10 +41,18 @@ export default function Maintenance() {
     // const [show, setShow] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     // const [searchVehicle, setSearchVehicle] = useState("");
-    const [vehiclesData, setVehiclesData] = useState([]);
     const [activeStatus, setActiveStatus] = useState("Daily Maintenance");
     const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+      setSearchBus("")
+      setVehicle({})
+      setShow(false)
+      setWeekCheckList({
+        coolent_level:false,
+        engine_oil:false,
+        water_in_diesel_line:false
+      })
+    }
     const handleShow = () => setShow(true);
     // const [vehicleType, setVehicleType] = useState("All Types");
     // const [dockDetails, setDockDetails] = useState({
@@ -33,34 +60,14 @@ export default function Maintenance() {
     //   dock_reason: "",
     //   status: "dock",
     // });
-   
-    // api to get all vechicles
-    const getAllVehiclesData = async () => {
-      setLoading(true);
-      try {
-        const allVehicles = await getAllVehicles();
-        // console.log(allVehicles.data);
-        if (allVehicles.status == 200) {
-          setVehiclesData(allVehicles.data);
-        } else {
-          console.log("Something went wrong");
-        }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    // console.log(vehiclesData);
   
    
   
-    // console.log("vehicleData",vehiclesData);
     // ---------------------- pagination ----------------------
     const displayedVehicles = filteredVehicles.slice(
       currentPage * itemsPerPage,
       (currentPage + 1) * itemsPerPage
-    );
+    )
   
     const handleItemsPerPageChange = (newItemsPerPage) => {
       setItemsPerPage(newItemsPerPage);
@@ -70,34 +77,96 @@ export default function Maintenance() {
     const handlePageClick = (data) => {
       setCurrentPage(data.selected);
     };
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        await getAllVehiclesData();
-      };
-      fetchData();
-    }, []);
-  
-    useEffect(() => {
-      const updatedFilteredVehicles = vehiclesData
-        .filter(
-          (vehicle) =>
-            activeStatus === "Daily Maintenance" || vehicle.maintenance_data.weekleyMaintenanceUpdateStatus
-        )
-       
-        // console.log(activeStatus);
-        console.log(updatedFilteredVehicles);
-        
-      setFilteredVehicles(updatedFilteredVehicles);
-      setCurrentPage(0);
-    }, [vehiclesData, activeStatus]);
 
-    // console.log(vehiclesData);
+
+  const dueOn = (inputDate) => {
+    if(!inputDate){
+        return ""
+    }
+    const targetDate = new Date(inputDate);
+    const currentDate = new Date();
+    const diffInMS = targetDate-currentDate
+    if(diffInMS<0){
+        const days = Math.floor(diffInMS/(1000*60*60*24))*-1
+        return <span className='text-danger'>{`${days} days overdue`}</span>
+    }else{
+        const days = Math.floor(diffInMS/(1000*60*60*24))
+        return <span>{`${days} days left`}</span>
+    }
+  }
+
+
+  useEffect(()=>{
+    getAllWeaklyData()
+    getAllDailyData()
+  },[])
+
+  useEffect(()=>{
+    if(activeStatus=="Daily Maintenance"){
+      setFilteredVehicles(dailyData)
+    }else{
+      setFilteredVehicles(weeklyData)
+    }
+  },[activeStatus,dailyData,weeklyData])
+  
+  
+
+  const getAllWeaklyData = async () => {
+    try{
+      const result = await getAllWeeklyMaintenanceApi()
+      if(result.status==200){
+        setWeeklyData(result.data.allVehicleMaintanenceData)
+      }else{
+        console.log("Failed to fetch weekly data",result.message);
+      }
+    }catch(err){
+      console.log("Failed to fetch weekly data",err);
+    }
+  }
+
+  const getAllDailyData = async () => {
+    try{
+      const result = await getAllDailyMaintenanceApi()
+      if(result.status==200){
+        setDailyData(result.data.allVehicleMaintanenceData)
+      }else{
+        console.log("Failed to fetch daily data",result.message);
+      }
+    }catch(err){
+      console.log("Failed to fetch daily data",err);
+    }
+  }
+
+  const setBus = async (item) =>{
+    setSearchBus(item.BUSNO)
+    setVehicle(item)
+  }
+
+
+  const handleSubmit =async () => {
+    if(!vehicle.BUSNO){
+      alert("Please Choose Vehicle")
+    }try{
+      const date = new Date().getTime() + (1000*60*60*5.5)
+      const dateIst = new Date(date).toISOString()
+      if(activeStatus=="Daily Maintenance"){
+        const result = await updateDailyMaintenanceApi(dateIst,vehicle._id)
+        getAllDailyData()
+      }else{
+        const result = await updateWeeklyMaintenanceApi(dateIst,vehicle._id)
+        getAllWeaklyData()
+      }
+      handleClose()
+    }catch(err){
+      console.log("Failed to update maintenance",err);
+    }
+  }
+  
     
 
   return (
    <>
- <div className="row">
+ <div className="row Maintenance">
         <Header />
         <div className="col-md-2"></div>
         <div className="col-md-9">
@@ -194,7 +263,7 @@ export default function Maintenance() {
               <table className="vehicle-table table w-100 ">
                 <thead className="vehicle-thead ">
                   <tr>
-                    <th> {/*checkbox */}</th>
+                    <th>#</th>
                     <th> {/*image */}</th>
                     <th>VEHICLE</th>
                     <th>TYPE</th>
@@ -203,6 +272,9 @@ export default function Maintenance() {
                         {
                             activeStatus=="Daily Maintenance"?`DAILY MAINTENANCE  SATUS`:`WEEKLY MAINTENANCE SATUS`
                         }
+                    </th>
+                    <th>
+                        Last Maintained On
                     </th>
                     {
                         activeStatus=="Daily Maintenance"?
@@ -215,11 +287,12 @@ export default function Maintenance() {
                   </tr>
                 </thead>
                 <tbody>
-                  {displayedVehicles.map((vehicle) => (
+                  {displayedVehicles.map((vehicle,index) => (
                     <tr key={vehicle._id}>
                       <td>
-                        {" "}
-                        <input type="checkbox" />{" "}
+                        {currentPage * itemsPerPage + index + 1}
+                        {/* {" "}
+                        <input type="checkbox" />{" "} */}
                       </td>
                       <td>
                         <img
@@ -242,10 +315,24 @@ export default function Maintenance() {
                             :vehicle.maintenance_data.weekleyMaintenanceUpdateStatus?"maintained":"require maintenance"
                         }
                      </td>
+                     <td>
+                        {
+                            activeStatus=="Daily Maintenance"?
+                            <div className="d-flex flex-column">
+                                <span>{vehicle.maintenance_data.lastdailyMaintenanceUpdateDate?.split("T")[0]}</span>
+                                <span>{vehicle.maintenance_data.lastdailyMaintenanceUpdateDate?.split("T")[1].slice(0,5)}</span>
+                            </div>
+                            :
+                            <div className="d-flex flex-column">
+                                <span>{vehicle.maintenance_data.lastWeekelyMaintenanceUpdateDate?.split("T")[0]}</span>
+                                <span>{vehicle.maintenance_data.lastWeekelyMaintenanceUpdateDate?.split("T")[1].slice(0,5)}</span>
+                            </div>
+                        }
+                     </td>
                      {
                         activeStatus=="Daily Maintenance"?
                         <></>:
-                        <td>{vehicle.maintenance_data.weeklyMaintenanceDueDate?.split("T")[0]}</td>
+                        <td>{dueOn(vehicle.maintenance_data.weeklyMaintenanceDueDate)}</td>
                      }
                     </tr>
                   ))}
@@ -279,17 +366,60 @@ export default function Maintenance() {
       </div>
 
       {/* maitenance details modal */}
-      <Modal show={show} onHide={handleClose} size='lg'>
+      <Modal show={show} className='Maintenance' onHide={handleClose} size='lg'>
         <Modal.Header closeButton>
           <Modal.Title>{activeStatus=="Daily Maintenance"?' Examination for Daily Maintenance Details':' Examination for Weekly Maintenance Details'}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+        <Modal.Body>
+          <div className="row">
+            <div className="col">
+              <input type="text" className='form-control' placeholder='Enter Vehicle Number' value={searchBus} onChange={(e)=>setSearchBus(e.target.value)}/>
+              <div className="position-absolute w-50 pe-4">
+              {
+                filteredVehicles
+                .filter(item=>!searchBus?false: item.BUSNO?.toUpperCase().includes(searchBus.toUpperCase()))
+                .slice(0,5).map((item,index)=>(
+                  searchBus==item.BUSNO?<></>:
+                  <div key={index} className="form-control pointer" onClick={()=>setBus(item)}>
+                    {item.BUSNO}
+                  </div>
+                ))
+              }
+              </div>
+            </div>
+            <div className="col a-center">
+              {
+                vehicle?.BUSNO?<> <FontAwesomeIcon className='text-success me-2' icon={faCircleCheck} /> {vehicle.BUSNO}</>
+                :<></>
+              }
+            </div>
+          </div>
+          <h5 className='mt-4'>{activeStatus=="Daily Maintenance"?"Daily":"Weakly"} Maintenace Check List</h5>
+          <div className="row mt-3">
+            {
+              activeStatus=="Daily Maintenance"?
+              Object.keys(dailyCheckList).map((item,index)=>(
+                <div key={index} className="col-4 d-flex gap-2">
+                  <span>{item.split("_").map((item)=>`${item} `)} :</span>
+                  <input type="checkbox" checked={dailyCheckList[item]} onChange={(e)=>setDailyCheckList({...dailyCheckList,[item]:e.target.checked})}/>
+                </div>
+              )):
+              Object.keys(weekCheckList).map((item,index)=>(
+                <div key={index} className="col-4 d-flex gap-2">
+                  <span>{item.split("_").map((item)=>`${item} `)} :</span>
+                  <input type="checkbox" checked={weekCheckList[item]} onChange={(e)=>setWeekCheckList({...weekCheckList,[item]:e.target.checked})}/>
+                </div>
+              ))
+            }
+
+          </div>
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
+          <Button variant="primary" onClick={handleSubmit} disabled={activeStatus=="Daily Maintenance"?!Object.values(dailyCheckList).every(item=>item==true):!Object.values(weekCheckList).every(item=>item==true)}>
+            Update
           </Button>
         </Modal.Footer>
       </Modal>

@@ -210,3 +210,28 @@ export const EditVechicleStatus = async (vehicle_id, reBody) => {
 export const loginApiHandler = async (loginData) => {
   return await commonAPI("POST", `${SERVERURL}/adminLogin`, loginData, "");
 };
+
+
+
+
+// Maintainence
+
+// get weekly maintenance data
+export const getAllWeeklyMaintenanceApi = async () => {
+  return await commonAPI("GET",`${SERVERURL}/get-all-weekly-vehicle-maintanence-data`,"","")
+}
+
+// get daily maintenance data
+export const getAllDailyMaintenanceApi = async () => {
+  return await commonAPI("GET",`${SERVERURL}/get-all-daily-vehicle-maintanence-data`,"","")
+}
+
+// update weekly maintenance data
+export const updateWeeklyMaintenanceApi = async (date,vehicleId) => {  
+  return await commonAPI("PUT",`${SERVERURL}/update-vehicle-weekly-maintanence/${vehicleId}`,{weeklyUpdateDate:date},"")
+}
+
+// update daily maintenance data
+export const updateDailyMaintenanceApi = async (date,vehicleId) => {  
+  return await commonAPI("PUT",`${SERVERURL}/update-vehicle-daily-maintanence/${vehicleId}`,{dailyUpdateDate:date},"")
+}
