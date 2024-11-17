@@ -26,7 +26,6 @@ const Vehicles = () => {
         "VLD", "VRD", "VTR", "VZM"
     ]
 
-
     const [selectedVehicle, setSelectedVehicle] = useState(null);
     const [searchVehicle, setSearchVehicle] = useState("")
     const [showDeleteId, setShowDeleteId] = useState(null);
@@ -107,7 +106,6 @@ const Vehicles = () => {
         };
         console.log("VehicleId", vehicle_id);
         console.log(reqBody);
-
 
         try {
             const dockStatus = await editStatus(vehicle_id, reqBody);
@@ -249,7 +247,7 @@ const Vehicles = () => {
                     <hr className="vehicle-horizontal-line" />
 
                     <div className="d-flex">
-                        {["ALL STATUSES", "en_route", "in_service", "dock"].map(
+                        {["ALL STATUSES", "en_route", "in_service", "dock", "spare"].map(
                             (status) => (
                                 <button
                                     key={status}
@@ -354,9 +352,9 @@ const Vehicles = () => {
 
                         {/* table */}
                         {loading ? (
-                            <div className="text-center text-danger d-flex align-items-center justify-content-center" style={{height:'50vh'}}>
-                            <h4>Loading<Spinner className='ms-2' animation="border" variant="danger" /></h4>
-                          </div>
+                            <div className="text-center text-danger d-flex align-items-center justify-content-center" style={{ height: '50vh' }}>
+                                <h4>Loading<Spinner className='ms-2' animation="border" variant="danger" /></h4>
+                            </div>
                         ) : (
                             <div>
                                 <table className="vehicle-table table w-100 ">
@@ -376,7 +374,7 @@ const Vehicles = () => {
                                     <tbody>
 
                                         {displayedVehicles
-                                            .map((vehicle,index) => (
+                                            .map((vehicle, index) => (
                                                 <tr key={vehicle._id}>
                                                     <td>
                                                         <input
@@ -385,7 +383,7 @@ const Vehicles = () => {
                                                             onChange={() => handleCheckboxChange(vehicle._id)} // Handle checkbox change
                                                         />
                                                     </td>
-                                                    <td>{currentPage* itemsPerPage +index+1}</td>
+                                                    <td>{currentPage * itemsPerPage + index + 1}</td>
                                                     <td>
                                                         <img src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8" alt="" height={"50px"} width={"50px"} />
                                                     </td>
@@ -418,17 +416,7 @@ const Vehicles = () => {
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        {/* <div className="btn-group">
-                                                        <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: "#0d8a72", color: "white" }} > Update Status </button>
-                                                        <ul className="dropdown-menu">
-                                                            <li className="dropdown-item" role="button"
-                                                                onClick={() => handleChangeVehicleStatus(vehicle, "en_route")} > Enroute </li>
-                                                            <li className="dropdown-item" role="button"
-                                                                onClick={() => handleChangeVehicleStatus(vehicle, "in_service")} > In Service </li>
-                                                            <li className="dropdown-item" role="button"
-                                                                onClick={() => handleChangeVehicleStatus(vehicle, "dock")} > Dock </li>
-                                                        </ul>
-                                                    </div> */}
+                                                       
                                                         <Form.Control
                                                             as="select"
                                                             value=""

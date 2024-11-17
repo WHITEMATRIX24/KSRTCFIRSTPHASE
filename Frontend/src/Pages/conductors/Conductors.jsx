@@ -11,19 +11,12 @@ const Conductors = () => {
 
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState([]);
-
-
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filteredConductors, setFilteredConductors] = useState([]);
-
-
-  // const [selectedConductor, setSelectedConductor] = useState("All Conductors");
   const [leaveStatus, setLeaveStatus] = useState("allstatus");
   const [searchConductor, setSearchConductor] = useState("")
-
   const [showDeleteId, setShowDeleteId] = useState(null);
-
   const [activeStatus, setActiveStatus] = useState('ALL STATUSES');
   const [employmentType, setEmploymentType] = useState('Employment Type');
   const [status, setStatus] = useState('Status');
@@ -37,7 +30,7 @@ const Conductors = () => {
   const handleClose = () => setShow(false);
   const handleShow = (conductor) => {
     setCurrentId(conductor.conductor_id);
-    setEditLeave({ on_leave: conductor.on_leave || "" }); // Initialize with current status
+    setEditLeave({ on_leave: conductor.on_leave || "" }); 
     setShow(true);
   };
 
@@ -47,11 +40,11 @@ const Conductors = () => {
 
 
     try {
-      const editStatus = await editLeaveStatusConductor(currentId, reqBody); // Use currentId directly
+      const editStatus = await editLeaveStatusConductor(currentId, reqBody); 
 
       if (editStatus.status === 200) {
         setEditLeave(editStatus.data);
-        await handleAllConductorData(); // Refresh the conductor data
+        await handleAllConductorData(); 
         handleClose();
       } else {
         console.log("Error at EditLeaveStatus:::::", editStatus);
@@ -91,8 +84,6 @@ const Conductors = () => {
         alert(`${EmployeeName} deleted`);
         setConductorData((prevData) => prevData.filter(conductor => conductor.conductorId !== conductorId));
       }
-
-      // Refresh or update list after deletion
     } catch (error) {
       console.error("Error deleting conductor:", error);
       alert("Error deleting conductor. Please try again.");
@@ -155,10 +146,6 @@ const Conductors = () => {
   useEffect(() => {
     const updatedFilteredConductors = conductorData
       .filter((conductor) => {
-        // const nameMatch =
-        //   selectedConductor === "All Conductors" ||
-        //   `${conductor.EmployeeName}` === selectedConductor;
-
         const statusMatch =
           activeStatus === "ALL STATUSES" ||
           (activeStatus === "LEAVE STATUS" && conductor.on_leave === status) ||
@@ -209,77 +196,7 @@ const Conductors = () => {
 
           <hr className='vehicle-horizontal-line' />
 
-          {/* <div className='d-flex'>
-            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
-              status === 'LEAVE STATUS' ? (
-                <div key={status} className="btn-group me-2">
-                  <button
-                    className="btn dropdown-toggle"
-                    style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {status.toUpperCase()}
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <button className="dropdown-item" onClick={() => setLeaveStatus('allstatus')} >Leave Status</button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item" onClick={() => setLeaveStatus('Available')} >Available</button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item" onClick={() => setLeaveStatus('Leave')}>On Leave</button>
-                    </li>
-
-                  </ul>
-
-                </div>
-              ) : (
-                <button
-                  key={index}
-                  className="btn me-md-2"
-                  style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
-                  onClick={() => filter(status)}
-                >
-                  {status}
-                </button>
-              )
-            ))}
-          </div> */}
-          {/* <div className="d-flex">
-            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
-              status === 'LEAVE STATUS' ? (
-                <div key={status} className="btn-group me-2">
-                  <select
-                    className="form-select"
-                    value={leaveStatus}
-                    onChange={(e) => setLeaveStatus(e.target.value)}
-                  >
-                    <option disabled value="">
-                      Leave Status
-                    </option>
-                    <option value="Available">Leave Status</option>
-                    <option value="Available">Available</option>
-                    <option value="Leave">On Leave</option>
-                  </select>
-                </div>
-              ) : (
-                <button
-                  key={index}
-                  className="btn me-md-2"
-                  style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
-                  onClick={() => filter(status)}
-                >
-                  {status.toUpperCase()}
-                </button>
-              )
-            ))}
-          </div> */}
-
-
-
-
+          
           <div className="d-flex">
             {['ALL STATUSES', 'PERMANENT', 'BADALI'].map((status, index) => (
 
@@ -301,38 +218,7 @@ const Conductors = () => {
             {/* filter */}
             <div className='d-flex justify-content-between py-2'>
               <div className='d-flex gap-2'>
-                {/* All Conductor dropdown search */}
-                {/* <div className="btn-group">
-                  <button
-                    type="button"
-                    className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {selectedConductor}
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <button
-                        className="dropdown-item"
-                        onClick={() => setSelectedConductor("All Conductors")}
-                      >
-                        All Conductors
-                      </button>
-                    </li>
-                    {conductorData.map((conductor) => (
-                      <li key={conductor._id}>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => setSelectedConductor(`${conductor.EmployeeName}`)}
-                        >
-                          {conductor.EmployeeName}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div> */}
-
+                
                 {/* All conductor search by entering no or name */}
                 <div className="btn-group">
                   <input
@@ -346,15 +232,7 @@ const Conductors = () => {
 
                 </div>
 
-                {/* <div className="btn-group">
-                  <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2" data-bs-toggle="dropdown" aria-expanded="false" >{employmentType}</button>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Employment Type')}>Employment Type</a></li>
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Permanent')}>Permanent</a></li>
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Badali')}>Badali</a></li>
-
-                  </ul>
-                </div> */}
+                
                 {/* All conductor search by entering no or name */}
                 <Form.Control as="select" value={employmentType} onChange={(e) => setEmploymentType(e.target.value)}>
                   <option disabled value="">
@@ -375,16 +253,7 @@ const Conductors = () => {
                   <option value="Leave">On Leave</option>
 
                 </Form.Control>
-                {/* <div className="btn-group">
-                  <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4" data-bs-toggle="dropdown" aria-expanded="false" >{status}</button>
-
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" onClick={() => setStatus('Status')}>Status</a></li>
-                    <li><a className="dropdown-item" onClick={() => setStatus('Available')}>Available</a></li>
-                    <li><a className="dropdown-item" onClick={() => setStatus('Leave')}>On Leave</a></li>
-
-                  </ul>
-                </div> */}
+                
               </div>
               <div>
                 <button className="btn btn-light border-dark rounded" onClick={() => {
@@ -443,13 +312,12 @@ const Conductors = () => {
                   <thead>
                     <tr>
                       <th> {/*checkbox */}</th>
+                      <th>S.No</th>
                       <th> {/*image */}</th>
                       <th>CONDUCTOR NAME</th>
                       <th>DESIGNATION</th>
                       <th>EMPLOYMENT TYPE</th>
                       <th>STATUS</th>
-                      {/* <th>SALARY</th> */}
-                      {/* <th>PHONE NUMBER</th> */}
                       <th> {/*for map */} </th>
                       <th> {/*for delete option */}</th>
                     </tr>
@@ -503,16 +371,7 @@ const Conductors = () => {
                             </div>
                           </td>
 
-                          {/* <td>
-                          <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
-                            ₹ INR 22,000
-                          </div>
-                        </td> */}
-
-                          {/* <td>
-                          {conductor.contact_info.phone}
-                        </td> */}
-
+                        
                           <td>
                             <button className='btn-primary rounded p-1 px-3' style={{ backgroundColor: '#0d8a72', color: 'white', border: 'none' }}
                               onClick={() => handleShow({ conductor_id: conductor._id })}>Edit</button>

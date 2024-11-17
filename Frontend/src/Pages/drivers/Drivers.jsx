@@ -10,18 +10,12 @@ import ReactPaginate from 'react-paginate';
 const Drivers = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState([]);
-
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filteredDrivers, setFilteredDrivers] = useState([]);
-
-
-  // const [selectedDriver, setSelectedDriver] = useState("All Drivers");
   const [leaveStatus, setLeaveStatus] = useState("allstatus");
   const [searchDriver, setSearchDriver] = useState("")
-
   const [showDeleteId, setShowDeleteId] = useState(null);
-
   const [activeStatus, setActiveStatus] = useState('ALL STATUSES');
   const [employmentType, setEmploymentType] = useState('Employment Type');
   const [status, setStatus] = useState('Status');
@@ -35,7 +29,7 @@ const Drivers = () => {
   const handleClose = () => setShow(false);
   const handleShow = (driver) => {
     setCurrentId(driver.driver_id);
-    setEditLeave({ on_leave: driver.on_leave || "" }); // Initialize with current status
+    setEditLeave({ on_leave: driver.on_leave || "" }); 
     setShow(true);
   };
 
@@ -45,11 +39,11 @@ const Drivers = () => {
 
 
     try {
-      const editStatus = await editLeaveStatusDriver(currentId, reqBody); // Use currentId directly
+      const editStatus = await editLeaveStatusDriver(currentId, reqBody);
 
       if (editStatus.status === 200) {
         setEditLeave(editStatus.data);
-        await handleAllDriverData(); // Refresh the driver data
+        await handleAllDriverData(); 
         handleClose();
       } else {
         console.log("Error at EditLeaveStatus:::::", editStatus);
@@ -90,7 +84,7 @@ const Drivers = () => {
         setDriverData((prevData) => prevData.filter(driver => driver.driverId !== driverId));
       }
 
-      // Refresh or update list after deletion
+
     } catch (error) {
       console.error("Error deleting driver:", error);
       alert("Error deleting driver. Please try again.");
@@ -154,9 +148,7 @@ const Drivers = () => {
   useEffect(() => {
     const updatedFilteredDrivers = driverData
       .filter((driver) => {
-        // const nameMatch =
-        //   selectedDriver === "All Drivers" ||
-        //   `${driver.EmployeeName}` === selectedDriver;
+
 
         const statusMatch =
           activeStatus === "ALL STATUSES" ||
@@ -213,74 +205,7 @@ const Drivers = () => {
 
           <hr className='vehicle-horizontal-line' />
 
-          {/* <div className='d-flex'>
-            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
-              status === 'LEAVE STATUS' ? (
-                <div key={status} className="btn-group me-2">
-                  <button
-                    className="btn dropdown-toggle"
-                    style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {status.toUpperCase()}
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <button className="dropdown-item" onClick={() => setLeaveStatus('allstatus')} >Leave Status</button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item" onClick={() => setLeaveStatus('Available')} >Available</button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item" onClick={() => setLeaveStatus('Leave')}>On Leave</button>
-                    </li>
-
-                  </ul>
-
-                </div>
-              ) : (
-                <button
-                  key={index}
-                  className="btn me-md-2"
-                  style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
-                  onClick={() => filter(status)}
-                >
-                  {status}
-                </button>
-              )
-            ))}
-          </div> */}
-
-          {/* <div className="d-flex">
-            {['ALL STATUSES', 'LEAVE STATUS', 'PERMANENT', 'BADALI'].map((status, index) => (
-              status === 'LEAVE STATUS' ? (
-                <div key={status} className="btn-group me-2">
-                  <select
-                    className="form-select"
-                    value={leaveStatus}
-                    onChange={(e) => setLeaveStatus(e.target.value)}
-                  >
-                    <option disabled value="">
-                      Leave Status
-                    </option>
-                    <option value="Available">Leave Status</option>
-                    <option value="Available">Available</option>
-                    <option value="Leave">On Leave</option>
-                  </select>
-                </div>
-              ) : (
-                <button
-                  key={index}
-                  className="btn me-md-2"
-                  style={{ borderBottom: activeStatus === status ? '3px solid green' : 'none' }}
-                  onClick={() => filter(status)}
-                >
-                  {status}
-                </button>
-              )
-            ))}
-          </div> */}
+          
 
 
           <div className="d-flex">
@@ -305,38 +230,7 @@ const Drivers = () => {
             {/* filter */}
             <div className='d-flex justify-content-between py-2'>
               <div className='d-flex gap-2'>
-                {/* All driver dropdown search */}
-                {/* <div className="btn-group">
-                  <button
-                    type="button"
-                    className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {selectedDriver}
-                  </button>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <button
-                        className="dropdown-item"
-                        onClick={() => setSelectedDriver("All Drivers")}
-                      >
-                        All Drivers
-                      </button>
-                    </li>
-                    {driverData.map((driver) => (
-                      <li key={driver._id}>
-                        <button
-                          className="dropdown-item"
-                          onClick={() => setSelectedDriver(`${driver.EmployeeName}`)}
-                        >
-                          {driver.EmployeeName}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div> */}
-
+                
                 {/* All driver search by entering no or name */}
                 <div className="btn-group">
                   <input
@@ -351,26 +245,7 @@ const Drivers = () => {
                 </div>
 
 
-                {/* <div className="btn-group">
-                  <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4 me-2" data-bs-toggle="dropdown" aria-expanded="false" >{employmentType}</button>
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Employment Type')}>Employment Type</a></li>
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Permanent')}>Permanent</a></li>
-                    <li><a className="dropdown-item" onClick={() => setEmploymentType('Badali')}>Badali</a></li>
-
-                  </ul>
-                </div> */}
-
-                {/* <div className="btn-group">
-                  <button type="button" className="btn btn-light border-dark border-1 dropdown-toggle rounded px-4" data-bs-toggle="dropdown" aria-expanded="false" >{status}</button>
-
-                  <ul className="dropdown-menu">
-                    <li><a className="dropdown-item" onClick={() => setStatus('Status')}>Status</a></li>
-                    <li><a className="dropdown-item" onClick={() => setStatus('Available')}>Available</a></li>
-                    <li><a className="dropdown-item" onClick={() => setStatus('Leave')}>On Leave</a></li>
-
-                  </ul>
-                </div> */}
+                
 
                 <Form.Control as="select" value={employmentType} onChange={(e) => setEmploymentType(e.target.value)}>
                   <option disabled value="">
@@ -454,6 +329,7 @@ const Drivers = () => {
                   <thead>
                     <tr>
                       <th> {/*checkbox */}</th>
+                      <th>S.No</th>
                       <th> {/*image */}</th>
                       <th>DRIVER NAME</th>
                       <th>DESIGNATION</th>
@@ -513,17 +389,6 @@ const Drivers = () => {
                               <span className="ms-2">{driver.status}</span>
                             </div>
                           </td>
-
-                          {/* <td>
-                          <div className=' p-2' style={{ borderRadius: '8px', display: 'inline-block' }}>
-                            ₹ INR 22,000
-                          </div>
-                        </td> */}
-
-                          {/* <td>
-                          {driver.contact_info.phone}
-                        </td> */}
-
                           <td>
                             <button className='btn-primary rounded p-1 px-3' style={{ backgroundColor: '#0d8a72', color: 'white', border: 'none' }}
                               onClick={() => handleShow({ driver_id: driver._id })}>Edit</button>
