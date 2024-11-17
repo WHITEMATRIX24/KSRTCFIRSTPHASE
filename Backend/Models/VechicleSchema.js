@@ -1,63 +1,64 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const vehicleSchema = new mongoose.Schema({
+const vehicleSchema = new mongoose.Schema(
+  {
     REGNO: {
-        type: String,
-        required: true,
-        unique: true
+      type: String,
+      required: true,
+      unique: true,
     },
-    BUSNO:{
-        type: String,
-        required: true,
-        unique: true
+    BUSNO: {
+      type: String,
+      required: true,
+      unique: true,
     },
     CLASS: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
-    ALLOTTEDDEPOT:{
-        type: String,
-        required:true 
+    ALLOTTEDDEPOT: {
+      type: String,
+      required: true,
     },
     status: {
-        type: String,
-        enum: ["in_service", "en_route", "dock"],
-        required: true
+      type: String,
+      enum: ["in_service", "en_route", "dock"],
+      required: true,
     },
-    dock_reason:{
-        type:String
+    dock_reason: {
+      type: String,
     },
-    dock_depot:{
-       type:String 
+    dock_depot: {
+      type: String,
     },
-    maintenance_history: [
-        {
-            maintenance_date: {
-                type: Date
-            },
-            issue_reported: {
-                type: String
-            },
-            repair_done: {
-                type: String
-            },
-            cost: {
-                type: Number
-            }
-        }
-    ],
-    created_at: {
+    maintenance_data: {
+      weekleyMaintenanceUpdateStatus: {
+        type: Boolean,
+        default: false,
+      },
+      lastWeekelyMaintenanceUpdateDate: {
         type: Date,
-        default: Date.now
-    },
-    updated_at: {
+        default: null,
+      },
+      dailyMaintenanceUpdateStatus: {
+        type: Boolean,
+        default: false,
+      },
+      lastdailyMaintenanceUpdateDate: {
         type: Date,
-        default: Date.now
-    }
-});
+        default: null,
+      },
+      weeklyMaintenanceDueDate: {
+        type: Date,
+        default: null,
+      },
+    },
+  },
+  { timestamps: true }
+);
 
 // Create the model
-const Vehicles = mongoose.model('Vehicles', vehicleSchema);
+const Vehicles = mongoose.model("Vehicles", vehicleSchema);
 
 // Export the model as default
 export default Vehicles;
