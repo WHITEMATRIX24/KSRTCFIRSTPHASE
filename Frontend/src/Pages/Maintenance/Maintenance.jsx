@@ -17,6 +17,8 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import ReactPaginate from "react-paginate";
 import './Maintenance.css'
+import { dailyMaintenanceChecklist } from '../../assets/weeklyCheckLists';
+import { WeeklyMaintenanceChecklist } from '../../assets/dailyCheckLists';
 
 
 export default function Maintenance() {
@@ -24,18 +26,10 @@ export default function Maintenance() {
     const[dailyData,setDailyData]=useState([])
     const[searchBus,setSearchBus]=useState("")
     const[vehicle,setVehicle]=useState({})
-    const[weekCheckList,setWeekCheckList]=useState({
-      coolent_level:false,
-      engine_oil:false,
-      water_in_diesel_line:false
-    })
-    const[dailyCheckList,setDailyCheckList]=useState({
-      coolent_level:false,
-      engine_oil:false,
-      water_in_diesel_line:false
-    })
+    const[weekCheckList,setWeekCheckList]=useState(WeeklyMaintenanceChecklist)
+    const[dailyCheckList,setDailyCheckList]=useState(dailyMaintenanceChecklist)
     const [currentPage, setCurrentPage] = useState(0);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(50);
     const [filteredVehicles, setFilteredVehicles] = useState([]);
     const [loading, setLoading] = useState(false);
     // const [show, setShow] = useState(false);
@@ -47,11 +41,8 @@ export default function Maintenance() {
       setSearchBus("")
       setVehicle({})
       setShow(false)
-      setWeekCheckList({
-        coolent_level:false,
-        engine_oil:false,
-        water_in_diesel_line:false
-      })
+      setDailyCheckList(dailyMaintenanceChecklist)
+      setWeekCheckList(WeeklyMaintenanceChecklist)
     }
     const handleShow = () => setShow(true);
     // const [vehicleType, setVehicleType] = useState("All Types");
@@ -146,19 +137,21 @@ export default function Maintenance() {
   const handleSubmit =async () => {
     if(!vehicle.BUSNO){
       alert("Please Choose Vehicle")
-    }try{
-      const date = new Date().getTime() + (1000*60*60*5.5)
-      const dateIst = new Date(date).toISOString()
-      if(activeStatus=="Daily Maintenance"){
-        const result = await updateDailyMaintenanceApi(dateIst,vehicle._id)
-        getAllDailyData()
-      }else{
-        const result = await updateWeeklyMaintenanceApi(dateIst,vehicle._id)
-        getAllWeaklyData()
+    }else{
+      try{
+        const date = new Date().getTime() + (1000*60*60*5.5)
+        const dateIst = new Date(date).toISOString()
+        if(activeStatus=="Daily Maintenance"){
+          const result = await updateDailyMaintenanceApi(dateIst,vehicle._id)
+          getAllDailyData()
+        }else{
+          const result = await updateWeeklyMaintenanceApi(dateIst,vehicle._id)
+          getAllWeaklyData()
+        }
+        handleClose()
+      }catch(err){
+        console.log("Failed to update maintenance",err);
       }
-      handleClose()
-    }catch(err){
-      console.log("Failed to update maintenance",err);
     }
   }
   
@@ -239,10 +232,10 @@ export default function Maintenance() {
                     {itemsPerPage}
                   </button>
                   <ul className="dropdown-menu">
-                    {[10, 20, 30].map((size) => (
+                    {[50, 100].map((size) => (
                       <li key={size}>
                         <a
-                          className="dropdown-item"
+                          className="dropdown-item pointer"
                           onClick={() => handleItemsPerPageChange(size)}
                         >
                           {size}
@@ -395,20 +388,20 @@ export default function Maintenance() {
             </div>
           </div>
           <h5 className='mt-4'>{activeStatus=="Daily Maintenance"?"Daily":"Weakly"} Maintenace Check List</h5>
-          <div className="row mt-3">
+          <div className="row j-center gap-1 mt-3">
             {
               activeStatus=="Daily Maintenance"?
               Object.keys(dailyCheckList).map((item,index)=>(
-                <div key={index} className="col-4 d-flex gap-2">
-                  <span>{item.split("_").map((item)=>`${item} `)} :</span>
-                  <input type="checkbox" checked={dailyCheckList[item]} onChange={(e)=>setDailyCheckList({...dailyCheckList,[item]:e.target.checked})}/>
-                </div>
+                <label key={index} htmlFor={item} className="col-4 d-flex j-between form-control bg-greenish w-30 text-greenish pointer a-center h-30">
+                  <span >{item} :</span>
+                  <input className='checkBox' id={item} type="checkbox" checked={dailyCheckList[item]} onChange={(e)=>setDailyCheckList({...dailyCheckList,[item]:e.target.checked})}/>
+                </label>
               )):
               Object.keys(weekCheckList).map((item,index)=>(
-                <div key={index} className="col-4 d-flex gap-2">
-                  <span>{item.split("_").map((item)=>`${item} `)} :</span>
-                  <input type="checkbox" checked={weekCheckList[item]} onChange={(e)=>setWeekCheckList({...weekCheckList,[item]:e.target.checked})}/>
-                </div>
+                <label key={index} htmlFor={item} className="col-4 d-flex j-between form-control bg-greenish w-30 text-greenish pointer">
+                  <span>{item} :</span>
+                  <input className='checkBox' id={item} type="checkbox" checked={weekCheckList[item]} onChange={(e)=>setWeekCheckList({...weekCheckList,[item]:e.target.checked})}/>
+                </label>
               ))
             }
 
