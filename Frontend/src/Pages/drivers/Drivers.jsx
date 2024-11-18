@@ -11,7 +11,7 @@ const Drivers = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
   const [filteredDrivers, setFilteredDrivers] = useState([]);
   const [leaveStatus, setLeaveStatus] = useState("allstatus");
   const [searchDriver, setSearchDriver] = useState("")
@@ -96,10 +96,8 @@ const Drivers = () => {
   const handleCheckboxChange = (driverId) => {
     setChecked((prevChecked) => {
       if (prevChecked.includes(driverId)) {
-        // If the driver ID is already checked, remove it
         return prevChecked.filter(id => id !== driverId);
       } else {
-        // If the driver ID is not checked, add it
         return [...prevChecked, driverId];
       }
     });
@@ -307,9 +305,9 @@ const Drivers = () => {
                     <option disabled value="">
                       Items per Page
                     </option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                    
                   </select>
                 </div>
 

@@ -243,26 +243,28 @@ const TripParameters = () => {
       //!outboundTrip.end_date ||
       !outboundTrip.departure_location.depo ||
       !outboundTrip.arrival_location.depo ||
-      !outboundTrip.start_time 
+      !outboundTrip.start_time
       // || !outboundTrip.end_time
     ) {
       alert("Fill All Fields");
+      return;
     } else if (
       !returnTrip.vehicle_id ||
       !returnTrip.driver_id ||
       !returnTrip.conductor_id ||
       !returnTrip.start_date ||
-     // !returnTrip.end_date ||
+      // !returnTrip.end_date ||
       !returnTrip.departure_location.depo ||
-      !returnTrip.arrival_location.depo ||
-      !returnTrip.start_time //||
-     // !returnTrip.end_time
+      !returnTrip.arrival_location.depo
+      // !returnTrip.start_time //||
+      // !returnTrip.end_time
     ) {
       alert("Fill All Fields");
+      return;
     } else if (
       !checkTimeEntries(
         outboundTrip.start_date,
-        outboundTrip.start_time,
+        outboundTrip.start_time
         /* outboundTrip.end_date,
         outboundTrip.end_time */
       ) ||
@@ -280,12 +282,13 @@ const TripParameters = () => {
       ) ||
       !checkTimeEntries(
         outboundTrip.start_date,
-        outboundTrip.start_time,
+        outboundTrip.start_time
         /* returnTrip.end_date,
         returnTrip.end_time */
       )
     ) {
       alert("Invalid Time Entry");
+      return;
     } else {
       const numbers = "0123456789";
       const length = 8;

@@ -24,25 +24,35 @@ export const deleteSingleVehicleAPI = async (vehicleId) => {
   );
 };
 
-
-
 // delete multiple vehicles
 export const deleteMultipleVehiclesAPI = async (vehicleIds) => {
-  return await commonAPI("DELETE", `${SERVERURL}/deleteSelectedVehicles`, vehicleIds, "");
+  return await commonAPI(
+    "DELETE",
+    `${SERVERURL}/deleteSelectedVehicles`,
+    vehicleIds,
+    ""
+  );
 };
-
 
 // delete multiple drivers
 export const deleteMultipleDriversAPI = async (driverIds) => {
-  return await commonAPI("DELETE", `${SERVERURL}/deleteSelectedDrivers`, driverIds, "");
+  return await commonAPI(
+    "DELETE",
+    `${SERVERURL}/deleteSelectedDrivers`,
+    driverIds,
+    ""
+  );
 };
-
 
 // delete multiple conductors
 export const deleteMultipleConductorsAPI = async (ConductorIds) => {
-  return await commonAPI("DELETE", `${SERVERURL}/deleteSelectedConductors`, ConductorIds, "");
+  return await commonAPI(
+    "DELETE",
+    `${SERVERURL}/deleteSelectedConductors`,
+    ConductorIds,
+    ""
+  );
 };
-
 
 // addvehicle
 export const addvehicleAPI = async (reqBody) => {
@@ -209,4 +219,46 @@ export const EditVechicleStatus = async (vehicle_id, reBody) => {
 // login api
 export const loginApiHandler = async (loginData) => {
   return await commonAPI("POST", `${SERVERURL}/adminLogin`, loginData, "");
+};
+
+// Maintainence
+
+// get weekly maintenance data
+export const getAllWeeklyMaintenanceApi = async () => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/get-all-weekly-vehicle-maintanence-data`,
+    "",
+    ""
+  );
+};
+
+// get daily maintenance data
+export const getAllDailyMaintenanceApi = async () => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/get-all-daily-vehicle-maintanence-data`,
+    "",
+    ""
+  );
+};
+
+// update weekly maintenance data
+export const updateWeeklyMaintenanceApi = async (date, vehicleId) => {
+  return await commonAPI(
+    "PUT",
+    `${SERVERURL}/update-vehicle-weekly-maintanence/${vehicleId}`,
+    { weeklyUpdateDate: date },
+    ""
+  );
+};
+
+// update daily maintenance data
+export const updateDailyMaintenanceApi = async (date, vehicleId) => {
+  return await commonAPI(
+    "PUT",
+    `${SERVERURL}/update-vehicle-daily-maintanence/${vehicleId}`,
+    { dailyUpdateDate: date },
+    ""
+  );
 };

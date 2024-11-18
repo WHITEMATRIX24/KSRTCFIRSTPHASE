@@ -12,7 +12,7 @@ const Conductors = () => {
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(50);
   const [filteredConductors, setFilteredConductors] = useState([]);
   const [leaveStatus, setLeaveStatus] = useState("allstatus");
   const [searchConductor, setSearchConductor] = useState("")
@@ -93,10 +93,8 @@ const Conductors = () => {
   const handleCheckboxChange = (conductorId) => {
     setChecked((prevChecked) => {
       if (prevChecked.includes(conductorId)) {
-        // If the conductor ID is already checked, remove it
         return prevChecked.filter(id => id !== conductorId);
       } else {
-        // If the conductor ID is not checked, add it
         return [...prevChecked, conductorId];
       }
     });
@@ -291,9 +289,8 @@ const Conductors = () => {
                     <option disabled value="">
                       Items per Page
                     </option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
                   </select>
                 </div>
 

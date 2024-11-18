@@ -11,6 +11,8 @@ export const addNewVehicle = async (req, res) => {
     status,
     dock_reason,
     dock_depot,
+    breakdown_time,
+    breakdown_depot,
   } = req.body;
   console.log(req.body);
 
@@ -27,6 +29,8 @@ export const addNewVehicle = async (req, res) => {
         status,
         dock_reason,
         dock_depot,
+        breakdown_time,
+        breakdown_depot,
       });
       await newVehicle.save();
       res.status(201).json(newVehicle);
@@ -66,6 +70,8 @@ export const editVehicleDetails = async (req, res) => {
     status,
     dock_reason,
     dock_depot,
+    breakdown_time,
+    breakdown_depot,
   } = req.body;
   try {
     const updatedVehicle = await Vehicles.findByIdAndUpdate(
@@ -78,6 +84,8 @@ export const editVehicleDetails = async (req, res) => {
         status,
         dock_reason,
         dock_depot,
+        breakdown_time,
+        breakdown_depot,
       },
       { new: true }
     );

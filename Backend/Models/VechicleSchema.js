@@ -22,14 +22,20 @@ const vehicleSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["in_service", "en_route", "dock","spare"],
-      default:"spare",
+      enum: ["in_service", "en_route", "dock", "breakdown", "spare"],
+      default: "spare",
       required: true,
     },
     dock_reason: {
       type: String,
     },
     dock_depot: {
+      type: String,
+    },
+    breakdown_time: {
+      type: String,
+    },
+    breakdown_depot: {
       type: String,
     },
     maintenance_data: {

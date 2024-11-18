@@ -12,7 +12,7 @@ const Vehicles = () => {
     const [loading, setLoading] = useState(false);
     const [checked, setChecked] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(50);
     const [filteredVehicles, setFilteredVehicles] = useState([]);
     const [filteredDepots, setFilteredDepots] = useState([]);
     const depotList = [
@@ -44,6 +44,12 @@ const Vehicles = () => {
         setDockDetails({ dock_depot: "", dock_reason: "", status: "dock" });
         setShow(true)
     };
+
+    const [breakdownDetails, setBreakdownDetails] = useState({
+        breakdown_depot: "", breakdown_time: "", status: "breakdown"
+    });
+    const [showBreakdown, setShowBreakdown] = useState(false);
+
 
     // api to get all vechicles
     const getAllVehiclesData = async () => {
@@ -78,6 +84,11 @@ const Vehicles = () => {
                 handleShow(vehicleData);
                 setShow(true);
                 return;
+            } else if (updatedStatusValue === "breakdown") {
+                setSelectedVehicle(vehicleData);
+                setBreakdownDetails({ breakdown_depot: "", time: "" });
+                setShowBreakdown(true);
+                return;
             }
             const updatedStatus = await editStatus(vehicle_id, reqbody);
             if (updatedStatus.status === 200) {
@@ -95,6 +106,7 @@ const Vehicles = () => {
 
     // console.log("vehicleData",vehiclesData);
 
+
     // Confirming the dock status change
     const confirmDockStatusChange = async () => {
         if (!selectedVehicle) return;
@@ -104,8 +116,8 @@ const Vehicles = () => {
             dock_depot: dockDetails.dock_depot,
             dock_reason: dockDetails.dock_reason
         };
-        console.log("VehicleId", vehicle_id);
-        console.log(reqBody);
+        // console.log("VehicleId", vehicle_id);
+        // console.log(reqBody);
 
         try {
             const dockStatus = await editStatus(vehicle_id, reqBody);
@@ -121,6 +133,34 @@ const Vehicles = () => {
         }
     };
 
+    // Confirming the breakdown status change
+    const confirmBreakdownStatusChange = async () => {
+        if (!selectedVehicle) return;
+        const vehicle_id = selectedVehicle._id;
+        const reqBody = {
+            status: "breakdown",
+            breakdown_depot: breakdownDetails.breakdown_depot,
+            breakdown_time: breakdownDetails.breakdown_time
+        };
+        try {
+            const breakdownStatus = await editStatus(vehicle_id, reqBody);
+            if (breakdownStatus.status === 200) {
+                console.log("Change Status Successfully");
+                console.log(breakdownDetails.breakdown_depot);
+                console.log(breakdownDetails.breakdown_time);
+
+
+                getAllVehiclesData();
+            } else {
+                alert("Error in Updating Status.");
+            }
+            setShowBreakdown(false);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+
     //api to Delete single vehicle
     const handleDeleteSingleVehicle = async (vehicleId, BUSNO) => {
         try {
@@ -135,7 +175,6 @@ const Vehicles = () => {
             alert("Error deleting vehicle. Please try again.");
         }
     };
-
     const handleShowDeleteOptions = (id) => {
         setShowDeleteId((prevId) => (prevId === id ? null : id));
     };
@@ -184,6 +223,8 @@ const Vehicles = () => {
         currentPage * itemsPerPage,
         (currentPage + 1) * itemsPerPage
     );
+    console.log(displayedVehicles);
+
 
     const handleItemsPerPageChange = (newItemsPerPage) => {
         setItemsPerPage(newItemsPerPage);
@@ -194,13 +235,22 @@ const Vehicles = () => {
         setCurrentPage(data.selected);
 
     }
-    const handleDepotInputChange = (e) => {
+    const handleDepotInputChange = (e, isBreakdown = false) => {
         const value = e.target.value;
-        setDockDetails({ ...dockDetails, dock_depot: value });
-        const filtered = depotList.filter(depot =>
-            depot.toLowerCase().includes(value.toLowerCase())
-        );
-        setFilteredDepots(filtered);
+        if (isBreakdown) {
+            setBreakdownDetails({ ...breakdownDetails, breakdown_depot: value });
+            const filtered = depotList.filter(depot =>
+                depot.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredDepots(filtered);
+        } else {
+            setDockDetails({ ...dockDetails, dock_depot: value });
+            const filtered = depotList.filter(depot =>
+                depot.toLowerCase().includes(value.toLowerCase())
+            );
+            setFilteredDepots(filtered);
+        }
+
     };
 
     // handle depot selection
@@ -247,7 +297,7 @@ const Vehicles = () => {
                     <hr className="vehicle-horizontal-line" />
 
                     <div className="d-flex">
-                        {["ALL STATUSES", "en_route", "in_service", "dock", "spare"].map(
+                        {["ALL STATUSES", "en_route", "in_service", "dock", "breakdown", "spare"].map(
                             (status) => (
                                 <button
                                     key={status}
@@ -342,9 +392,8 @@ const Vehicles = () => {
                                         <option disabled value="">
                                             Items per Page
                                         </option>
-                                        <option value={10}>10</option>
-                                        <option value={20}>20</option>
-                                        <option value={30}>30</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
                                     </select>
                                 </div>
                             </div>
@@ -413,10 +462,16 @@ const Vehicles = () => {
                                                                     <span className="ms-2">Dock</span>
                                                                 </>
                                                             )}
+                                                            {vehicle.status === "breakdown" && (
+                                                                <>
+                                                                    <FontAwesomeIcon icon={faBan} style={{ color: "#db5c4d" }} />
+                                                                    <span className="ms-2">Breakdown</span>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </td>
                                                     <td>
-                                                       
+
                                                         <Form.Control
                                                             as="select"
                                                             value=""
@@ -430,6 +485,7 @@ const Vehicles = () => {
                                                             <option style={{ color: "black" }} className="bg-light" value="en_route">Enroute</option>
                                                             <option style={{ color: "black" }} className="bg-light" value="in_service">In Service</option>
                                                             <option style={{ color: "black" }} className="bg-light" value="dock">Dock</option>
+                                                            <option style={{ color: "black" }} className="bg-light" value="breakdown">Breakdown</option>
                                                         </Form.Control>
 
                                                         {/* Modal for DOCK details updation */}
@@ -479,6 +535,53 @@ const Vehicles = () => {
                                                                 <Button className="btn btn-danger" onClick={handleClose}> Cancel </Button>
                                                             </Modal.Footer>
                                                         </Modal>
+
+                                                        {/* Modal for BREAKDOWN details updation */}
+                                                        <Modal size="lg" centered show={showBreakdown} onHide={() => setShowBreakdown(false)} backdrop="static" keyboard={false}>
+                                                            <Modal.Header closeButton>
+                                                                <Modal.Title>Confirm BREAKDOWN Status Change</Modal.Title>
+                                                            </Modal.Header>
+                                                            <Modal.Body>
+                                                                <Form>
+                                                                    <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Breakdown Depot</Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        placeholder='Type to search depot'
+                                                                        value={breakdownDetails.breakdown_depot}
+                                                                        onChange={(e) => handleDepotInputChange(e, true)} // Use the same handler for depot input
+                                                                    />
+                                                                    {filteredDepots.length > 0 && (
+                                                                        <ul className="list-group">
+                                                                            {filteredDepots.map((depot, index) => (
+                                                                                <li
+                                                                                    key={index}
+                                                                                    className="list-group-item"
+                                                                                    style={{ cursor: "pointer" }}
+                                                                                    onClick={() => {
+                                                                                        setBreakdownDetails({ ...breakdownDetails, breakdown_depot: depot }); // Update breakdown depot
+                                                                                        setFilteredDepots([]);
+                                                                                    }}
+                                                                                >
+                                                                                    {depot}
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    )}
+                                                                    <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Time of Breakdown</Form.Label>
+                                                                    <Form.Control
+                                                                        type="time" // Use 'time' input type
+                                                                        value={breakdownDetails.breakdown_time}
+                                                                        onChange={(e) => setBreakdownDetails({ ...breakdownDetails, breakdown_time: e.target.value })}
+                                                                    />
+                                                                </Form>
+                                                            </Modal.Body>
+                                                            <Modal.Footer>
+                                                                <Button className="btn" style={{ backgroundColor: "#0d8a72", color: "white" }} onClick={confirmBreakdownStatusChange}>
+                                                                    Confirm
+                                                                </Button>
+                                                                <Button className="btn btn-danger" onClick={() => setShowBreakdown(false)}>Cancel</Button>
+                                                            </Modal.Footer>
+                                                        </Modal>
                                                     </td>
                                                     <td>
                                                         {vehicle.status === 'dock' && vehicle.dock_depot && (
@@ -487,6 +590,13 @@ const Vehicles = () => {
                                                                 {vehicle.dock_reason}
                                                             </p>
                                                         )}
+                                                        {vehicle.status === 'breakdown' && vehicle.breakdown_depot && (
+                                                            <p>
+                                                                Breakdown at {vehicle.breakdown_depot} <br />
+                                                                {vehicle.breakdown_time}
+                                                            </p>
+                                                        )}
+
                                                     </td>
                                                     <td>
                                                         <div style={{ position: "relative", width: "100px" }}>

@@ -1,0 +1,35 @@
+.Maintenance{
+    .center{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .pointer{
+        cursor: pointer;
+    }
+    .j-center{
+        display: flex;
+        justify-content: center;
+    }
+    .a-center{
+        display: flex;
+        align-items: center;
+    }
+    .bg-greenish{
+        background-color: #c3db9f;
+    }
+    .w-30{
+        width: 30%;
+    }
+    .text-greenish{
+        color: #6a7a52;
+    }
+    .j-between{
+        display: flex;
+        justify-content: space-between;
+    }
+    .checkBox{
+        accent-color: #5f7743;      
+    }
+
+}
