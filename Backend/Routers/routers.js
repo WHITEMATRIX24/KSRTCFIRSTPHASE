@@ -16,6 +16,7 @@ import {
   getDailyVehicleMaintanenceDataController,
   getWeeklyVehicleMaintanenceDataController,
   deleteSelectedVehicle,
+  getAllVehiclesByDepoName,
 } from "../Controllers/VehicleController.js";
 import {
   addNewTrip,
@@ -23,6 +24,9 @@ import {
   editTripDetailsNew,
   getAllTripDetails,
   getAllCompletedTripDetails,
+  getAllTripByDepoName,
+  getTripdetailsUpcomingbyDepoName,
+  getTripLiveBydepoName,
 } from "../Controllers/TripController.js";
 import {
   addNewDriver,
@@ -74,7 +78,10 @@ router.get("/getVehicleById/:vehicle_id", getvehicleById);
 // Delete Vehicle By Id
 router.delete("/deleteVehicleById/:vehicle_id", deleteVehicleById);
 // Delete Selected Vehicles
-router.delete('/deleteSelectedVehicles',deleteSelectedVehicle)
+router.delete('/deleteSelectedVehicles',deleteSelectedVehicle);
+// get All vehicles By depoName;
+router.get("/getAllVehicleByDeponame/:depoName",getAllVehiclesByDepoName);
+
 // <<<<<<<........Vehichel Maintanence Routes.........>>>>>>>
 
 // get all Vehicles Maintenance routes
@@ -149,6 +156,12 @@ router.put(
 );
 // get All Completed Trips
 router.get("/getAllCompletedTripDetails", getAllCompletedTripDetails);
+// get Trip details in OverView arrival_Location || departure_location==depoName
+router.get("/getTripinOverView/:depoName",getAllTripByDepoName);
+// get TripDetails By status==Upcoming && departure_location==deponame
+router.get("/getUpcomingTripByDeponame/:depoName",getTripdetailsUpcomingbyDepoName);
+// get Trip Details By live Status && departure_location||arrival_location==depoName
+router.get("/getLiveTripsBydepoName/:depoName",getTripLiveBydepoName)
 
 // <<<<<<.......Admin Router.......>>>>>
 // Reigster New Admin

@@ -481,21 +481,42 @@ export const getWeeklyVehicleMaintanenceDataController = async (req, res) => {
 
 
 // Delete Selected Vehicle::::
-export const deleteSelectedVehicle=async(req,res)=>{
-  const vehicleIds=req.body;
+export const deleteSelectedVehicle = async (req, res) => {
+  const vehicleIds = req.body;
   console.log(vehicleIds);
-  
 
-  try{
-      const deletedVehicles = await Vehicles.deleteMany({ _id: { $in: vehicleIds } });
-   if (deletedVehicles) {
+
+  try {
+    const deletedVehicles = await Vehicles.deleteMany({ _id: { $in: vehicleIds } });
+    if (deletedVehicles) {
       res.status(200).json(deletedVehicles);
       console.log("Delete Successfully::::");
-  } else {
+    } else {
       res.status(406).json("No vehicles found By this Id::::::");
+    }
+  } catch (err) {
+    console.log("Error at catch in vehicleController/deleteSelectedVehicle::::::", err);
+    res.status(500).json({ error: "Internal server error" });
   }
-  }catch(err){
-      console.log("Error at catch in vehicleController/deleteSelectedVehicle::::::", err);
-      res.status(500).json({ error: "Internal server error" });
+}
+
+// <<< GetAll Vehicles from depoName >>>
+export const getAllVehiclesByDepoName = async (req, res) => {
+  const { depoName } = req.params;
+  console.log(depoName);
+  
+
+  try {
+    const vehicleDetails = await Vehicles.find({ALLOTEDDEPOT:depoName});
+    console.log("DATA",vehicleDetails);
+    
+    if(vehicleDetails){
+      res.status(200).json(vehicleDetails);
+    }else{
+      res.status(404).json({ message: "No vehicle details found for this depot name" });
+    }
+  } catch (err) {
+    console.log("Error at catch in vehicleController/getAllVehiclesByDepoName::::::", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
