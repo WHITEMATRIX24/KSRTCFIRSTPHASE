@@ -6,11 +6,11 @@ const adminSchema = new mongoose.Schema(
     userName: {
       type: String,
       required: true,
+      unique:true
     },
     depoName: {
       type: String,
-      required: true,
-      unique: true,
+      required: true
     },
     password: {
       type: String,
@@ -18,7 +18,7 @@ const adminSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Admin", "Depo", "Maintenance"],
+      enum: ["Admin", "Depo", "Maintenance","Staff"],
       default: "Depo",
     },
   },
