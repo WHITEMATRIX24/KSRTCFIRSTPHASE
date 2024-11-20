@@ -17,6 +17,19 @@ const AddDriver = () => {
     phone: "",
   });
 
+  // cleaar filed
+  const handleCancel = () => {
+    setDriverData({
+      EmployeeName: "",
+      PEN: "",
+      Designation: "",
+      UNIT: "",
+      is_permanent: "",
+      on_leave: "Available",
+      phone: "",
+    });
+  };
+
   const handleAddnewDriver = async () => {
     if (!driverData) {
       console.error("driverData is undefined");
@@ -167,7 +180,7 @@ const AddDriver = () => {
 
                     <hr className="vehicle-horizontal-line" />
                     <div className="mt-4 text-end">
-                      <Button className="btn tbn rounded me-2" style={{ backgroundColor: '#f8f9fa', color: 'black' }}>
+                      <Button className="btn tbn rounded me-2" onClick={handleCancel} style={{ backgroundColor: '#f8f9fa', color: 'black' }}>
                         <FontAwesomeIcon className="me-2" icon={faXmark} />Cancel
                       </Button>
                       <Button
