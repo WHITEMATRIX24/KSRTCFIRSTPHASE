@@ -15,12 +15,15 @@ import Header from "../../components/common/Header";
 import { useNavigate } from "react-router-dom";
 import {
   getAllTripApi,
+  getAllUpcomingTripApi,
   getAllVehicles,
   getDriversListApi,
   updateTripApiNew,
 } from "../../services/allAPI";
 
 export default function ScheduleTrip() {
+  const [depoName,setDepoName] = useState('')
+  const [role,setRole] = useState("")
   const [trips, setTrips] = useState([]);
   const [date, setDate] = useState("");
   const [vehicleSearch, setVehicleSearch] = useState("");
@@ -31,16 +34,32 @@ export default function ScheduleTrip() {
 
   // get all trips
   const getTrips = async () => {
-    try {
-      const result = await getAllTripApi();
-      if (result.status == 200) {
+   if(role == "Staff"){ try {
+      const result = await getAllUpcomingTripApi(depoName);
+      console.log(result);
+      
+      if (result.status == 200) {        
         setTrips(result.data);
       } else {
-        alert("Failed to fetch Trips data");
+       // alert("Failed to fetch Trips data");
       }
     } catch (err) {
       alert(`Failed to load trips ${err}`);
-    }
+    }}
+    else if(role == "Admin"){
+      try {
+        const result = await getAllTripApi();
+        console.log(result);
+        
+        if (result.status == 200) {        
+          setTrips(result.data);
+        } else {
+         // alert("Failed to fetch Trips data");
+        }
+      } catch (err) {
+        alert(`Failed to load trips ${err}`);
+      }}
+    
   };
 
   // get drivers list
@@ -56,8 +75,6 @@ export default function ScheduleTrip() {
       alert(`Failed to load Drivers Details ${err}`);
     }
   };
-  console.log("Modified",modifiedTrips);
-  
 
   // get all buses
   const getAllBuses = async () => {
@@ -85,28 +102,28 @@ export default function ScheduleTrip() {
     } finally {
       setIsLoadingApi(false);
     }
-  }, []);
+  }, [depoName]);
 
   // mdofied trip data
   useEffect(() => {
     if (trips.length > 0 && vehicles.length > 0 && drivers.length > 0) {
-      let arr = trips.map((item) => {
-        const vehicle = vehicles.find((item2) => item2._id == item.vehicle_id);
-        const driver = drivers.find((item2) => item2._id == item.driver_id);
-        console.log(vehicle);
-        
-  
-        return {
-          ...item,
-          vehicleNumber: vehicle?.BUSNO || "N/A",
-          employeeName: driver?.EmployeeName || "N/A"
-        };
-      });
+      let arr = trips.map((item) => ({
+        ...item,
+        BusNo: vehicles.find((item2) => item2._id == item.vehicle_id)
+          ?.BUSNO,
+        employeeName:
+          drivers.find((item2) => item2._id == item.driver_id)?.EmployeeName
+      }));
       setModifiedTrips(arr);
     }
   }, [trips, vehicles, drivers]);
-  
 
+  useEffect(()=>{
+    const userDetails=JSON.parse(sessionStorage.getItem("user"));
+    console.log("User",userDetails);
+   setDepoName(userDetails.depoName)
+   setRole(userDetails.role)
+  },[])
   // formats time =>recieve time from time picker and returns formatted time
   const formatTime = (timeInput) => {
     if (timeInput) {
@@ -146,12 +163,16 @@ export default function ScheduleTrip() {
   const handleScheduleButton = () => {
     navigate("/add-trip");
   };
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   const handleLive = async (id) => {
-    const trip = trips.find((item) => item._id == id);
+    setCurrentDateTime(new Date());
+    const options = { hour: "numeric", minute: "2-digit", hour12: true };
+  const time = currentDateTime.toLocaleTimeString("en-US", options); // e.g., '14:30:45'
 
+    const trip = trips.find((item) => item._id == id);
     if (trip.status != "live") {
-      let obj = { ...trip, status: "live" };
+      let obj = { ...trip, status: "live", start_time:time  };
       console.log(obj);
       const result = await updateTripApiNew(
         obj._id,
@@ -160,6 +181,8 @@ export default function ScheduleTrip() {
         obj.conductor_id,
         obj
       );
+     console.log(result);
+      
       getTrips();
     }
   };
@@ -242,12 +265,12 @@ export default function ScheduleTrip() {
                       .filter((item) =>
                         !vehicleSearch
                           ? true
-                          : item.vehicleNumber.search(vehicleSearch) == -1
+                          : item.BusNo.search((vehicleSearch.toUpperCase())) == -1
                           ? false
                           : true
                       )
-                      .filter((item) => item.status == "upcoming").length
-                  }
+                      .filter((item) => item.status == "upcoming" && (item.departure_location.depo == depoName)).length
+            }
                 </span>
               </Col>
             </Row>
@@ -286,11 +309,13 @@ export default function ScheduleTrip() {
                         .filter((item) =>
                           !vehicleSearch
                             ? true
-                            : item.vehicleNumber.search(vehicleSearch) == -1
+                            : item.BusNo.search(vehicleSearch.toUpperCase()) == -1
                             ? false
                             : true
                         )
                         .filter((item) => item.status == "upcoming")
+                        .filter((item) => item.departure_location.depo == depoName)
+
                         .map((item, index) => (
                           <tr key={index} className="bg-white">
                             <td>{/* <Form.Check type="checkbox" /> */}</td>
@@ -307,7 +332,7 @@ export default function ScheduleTrip() {
                                   className="text-muted me-2"
                                 />
                                 <div>
-                                  <div>{item.vehicleNumber}</div>
+                                  <div>{item.BusNo}</div>
                                   <small className="text-muted">BUS</small>
                                 </div>
                               </div>

@@ -10,6 +10,7 @@ import {
   faRoad,
   faGasPump,
   faL,
+  faCircleNotch,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import {
@@ -32,7 +33,13 @@ const TripParameters = () => {
   const [searchDriver, setsearchDriver] = useState("");
   const [searchConductor, setsearchConductor] = useState("");
   const [searchBus, setsearchBus] = useState("");
+  const [loadingCond,setLoadingCond]=useState(false)
+  const [loadingDriv,setLoadingDriv]=useState(false)
+  const [loadingVeh,setLoadingVeh]=useState(false)
 
+  console.log(loadingCond,loadingDriv,loadingVeh);
+
+  
   const [vehicle_id, setVehicle_id] = useState("");
   const [outboundTrip, setOutboundTrip] = useState({
     vehicle_id: vehicle_id,
@@ -48,7 +55,7 @@ const TripParameters = () => {
     },
     start_time: "",
     end_time: "",
-    trip_type: "outbound",
+    trip_type: "",
   });
 
   const [returnTrip, setReturnTrip] = useState({
@@ -74,8 +81,10 @@ const TripParameters = () => {
   const [drivers, setDrivers] = useState([]);
   const [conductors, setConductors] = useState([]);
 
+
   // get all buses
   const getAllBuses = async () => {
+    setLoadingVeh(true)
     try {
       const result = await getAllVehicles();
       if (result.status == 200) {
@@ -86,6 +95,7 @@ const TripParameters = () => {
     } catch (err) {
       alert(`Failed to load Bus Details ${err}`);
     }
+    setLoadingVeh(false)
   };
 
   // filter buses based on availablility
@@ -99,8 +109,11 @@ const TripParameters = () => {
 
   // get All drivers list
   const getAllDriversList = async () => {
+    setLoadingDriv(true)
     try {
       const result = await getDriversListApi();
+      console.log(result);
+      
       if (result.status == 200) {
         const filteredDrivers = result.data.filter(
           (driver) => driver.on_leave === "Available"
@@ -112,12 +125,16 @@ const TripParameters = () => {
     } catch (err) {
       alert(`Failed to load Drivers Details ${err}`);
     }
+    setLoadingDriv(false)
   };
 
   // get All Conductors list
   const getAllConductorsList = async () => {
+    setLoadingCond(true)
     try {
       const result = await getConductorsListApi();
+      console.log(result);
+      
       if (result.status == 200) {
         const filteredConductors = result.data.filter(
           (conductor) => conductor.on_leave === "Available"
@@ -129,6 +146,7 @@ const TripParameters = () => {
     } catch (err) {
       alert(`Failed to load Conductors Details ${err}`);
     }
+    setLoadingCond(false)
   };
 
   // api calls for fetching data
@@ -194,30 +212,32 @@ const TripParameters = () => {
       )
     ) {
       return <span className="text-danger">Invalid Time Entry</span>;
-    } else if (
-      !checkTimeEntries(
-        outboundTrip.end_date,
-        outboundTrip.end_time,
-        returnTrip.start_date,
-        returnTrip.start_time
-      )
-    ) {
-      return <span className="text-danger">Invalid Time Entry</span>;
-    } else if (
-      !checkTimeEntries(
-        returnTrip.start_date,
-        returnTrip.start_time,
-        returnTrip.end_date,
-        returnTrip.end_time
-      )
-    ) {
-      return <span className="text-danger">Invalid Time Entry</span>;
-    } else {
+    } 
+    // else if (
+    //   !checkTimeEntries(
+    //     outboundTrip.end_date,
+    //     outboundTrip.end_time,
+    //     returnTrip.start_date,
+    //     returnTrip.start_time
+    //   )
+    // ) {
+    //   return <span className="text-danger">Invalid Time Entry</span>;
+    // } else if (
+    //   !checkTimeEntries(
+    //     returnTrip.start_date,
+    //     returnTrip.start_time,
+    //     returnTrip.end_date,
+    //     returnTrip.end_time
+    //   )
+    // ) {
+    //   return <span className="text-danger">Invalid Time Entry</span>;
+    // } 
+    else {
       const diffInMs = checkTimeEntries(
         outboundTrip.start_date,
         outboundTrip.start_time,
-        returnTrip.end_date,
-        returnTrip.end_time
+        outboundTrip.end_date,
+        outboundTrip.end_time
       );
 
       const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
@@ -240,37 +260,40 @@ const TripParameters = () => {
       !outboundTrip.driver_id ||
       !outboundTrip.conductor_id ||
       !outboundTrip.start_date ||
-      //!outboundTrip.end_date ||
+      !outboundTrip.end_date ||
       !outboundTrip.departure_location.depo ||
       !outboundTrip.arrival_location.depo ||
-      !outboundTrip.start_time
-      // || !outboundTrip.end_time
+      !outboundTrip.start_time ||
+      !outboundTrip.trip_type ||
+      !outboundTrip.end_time
     ) {
       alert("Fill All Fields");
       return;
-    } else if (
-      !returnTrip.vehicle_id ||
-      !returnTrip.driver_id ||
-      !returnTrip.conductor_id ||
-      !returnTrip.start_date ||
-      // !returnTrip.end_date ||
-      !returnTrip.departure_location.depo ||
-      !returnTrip.arrival_location.depo
-      // !returnTrip.start_time //||
-      // !returnTrip.end_time
-    ) {
-      alert("Fill All Fields");
-      return;
-    } else if (
+    } 
+    // else if (
+    //   !returnTrip.vehicle_id ||
+    //   !returnTrip.driver_id ||
+    //   !returnTrip.conductor_id ||
+    //   !returnTrip.start_date ||
+    //   // !returnTrip.end_date ||
+    //   !returnTrip.departure_location.depo ||
+    //   !returnTrip.arrival_location.depo
+    //   // !returnTrip.start_time //||
+    //   // !returnTrip.end_time
+    // ) {
+    //   alert("Fill All Fields");
+    //   return;
+    // } 
+    else if (
       !checkTimeEntries(
         outboundTrip.start_date,
-        outboundTrip.start_time
-        /* outboundTrip.end_date,
-        outboundTrip.end_time */
+        outboundTrip.start_time,
+        outboundTrip.end_date,
+        outboundTrip.end_time
       ) ||
       !checkTimeEntries(
-        /* outboundTrip.end_date,
-        outboundTrip.end_time, */
+        outboundTrip.end_date,
+        outboundTrip.end_time,
         returnTrip.start_date,
         returnTrip.start_time
       ) ||
@@ -282,9 +305,9 @@ const TripParameters = () => {
       ) ||
       !checkTimeEntries(
         outboundTrip.start_date,
-        outboundTrip.start_time
-        /* returnTrip.end_date,
-        returnTrip.end_time */
+        outboundTrip.start_time,
+        returnTrip.end_date,
+        returnTrip.end_time
       )
     ) {
       alert("Invalid Time Entry");
@@ -300,8 +323,8 @@ const TripParameters = () => {
       }
 
       addTripApiFunction({ ...outboundTrip, trip_id });
-      addTripApiFunction({ ...returnTrip, trip_id });
-      hansleupdatevehiclestatus();
+      // addTripApiFunction({ ...returnTrip, trip_id });
+      // hansleupdatevehiclestatus();
       handleCancel();
     }
   };
@@ -443,7 +466,7 @@ const TripParameters = () => {
       },
       start_time: "",
       end_time: "",
-      trip_type: "outbound",
+      trip_type: "",
     });
     setReturnTrip({
       vehicle_id: vehicle_id,
@@ -462,7 +485,12 @@ const TripParameters = () => {
       trip_type: "return",
     });
     setAvailableBusOnly(false);
-    setBusType("");
+    setStartDepo("")
+    setEndDepo("")
+    setsearchBus("")
+    setsearchConductor("")
+    setVehicle_id("")
+    setsearchDriver("")
   };
 
   const handlechangedriver = (id, searchvalue) => {
@@ -481,38 +509,36 @@ const TripParameters = () => {
     setReturnTrip({ ...returnTrip, vehicle_id: id });
   };
 
-  console.log(outboundTrip);
-  console.log(returnTrip);
 
-  const hansleupdatevehiclestatus = async () => {
-    try {
-      const timeinms =
-        checkTimeEntries(
-          outboundTrip.start_date,
-          outboundTrip.start_time,
-          returnTrip.end_date,
-          returnTrip.end_time
-        ) /
-        (1000 * 60 * 60 * 24);
+  // const hansleupdatevehiclestatus = async () => {
+  //   try {
+  //     const timeinms =
+  //       checkTimeEntries(
+  //         outboundTrip.start_date,
+  //         outboundTrip.start_time,
+  //         returnTrip.end_date,
+  //         returnTrip.end_time
+  //       ) /
+  //       (1000 * 60 * 60 * 24);
 
-      console.log(timeinms);
-      if (timeinms >= 1) {
-        console.log(outboundTrip.vehicle_id);
+  //     console.log(timeinms);
+  //     if (timeinms >= 1) {
+  //       console.log(outboundTrip.vehicle_id);
 
-        const vehiclestat = vehicles.find(
-          (item) => item._id == outboundTrip.vehicle_id
-        );
-        const newvehiclestat = { ...vehiclestat, status: "en_route" };
-        const result = await updateVehicleStatus(
-          outboundTrip.vehicle_id,
-          newvehiclestat
-        );
-        console.log(result);
-      }
-    } catch (err) {
-      console.log("error in updating vehicle status", err);
-    }
-  };
+  //       const vehiclestat = vehicles.find(
+  //         (item) => item._id == outboundTrip.vehicle_id
+  //       );
+  //       const newvehiclestat = { ...vehiclestat, status: "en_route" };
+  //       const result = await updateVehicleStatus(
+  //         outboundTrip.vehicle_id,
+  //         newvehiclestat
+  //       );
+  //       console.log(result);
+  //     }
+  //   } catch (err) {
+  //     console.log("error in updating vehicle status", err);
+  //   }
+  // };
 
   return (
     <div>
@@ -522,7 +548,15 @@ const TripParameters = () => {
         <Container fluid className="TripParameters">
           <Row>
             <Col xs={2}></Col>
-            <Col xs={6} className="mt-3">
+            {
+              (loadingCond || loadingDriv || loadingVeh)?
+              <Col xs={6} className="mt-3">
+                <Card className="shadow-sm border-0 d-flex justify-content-center align-items-center p-5 flex-row" style={{height:"600px"}}>
+                  <p><FontAwesomeIcon icon={faCircleNotch} className="fs-4" spin /></p>
+                </Card>
+              </Col>
+
+              :<Col xs={6} className="mt-3">
               <Card className="shadow-sm border-0">
                 <Card.Body>
                   <Card.Title className="d-flex align-items-center">
@@ -539,7 +573,7 @@ const TripParameters = () => {
                   <Form>
                     {/* Outbound Section */}
                     <Form.Group className="mt-4">
-                      <h6 className="mb-1">1. Outbound</h6>
+                      <h6 className="mb-1">1. Trip Details</h6>
 
                       {/* <Row className="mt-3">
                         <Col>
@@ -765,231 +799,251 @@ const TripParameters = () => {
                           />
                         </Col>
                       </Row>
-                    </Form.Group>
-
-                    {/* Return Section */}
-                    <Form.Group className="mt-4">
-                      <h6 className="mb-1">2. Return</h6>
-
-                      {/* <Row className="mt-3">
-                        <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Driver</Form.Label>
-                          <Form.Control as="select" value={returnTrip.driver_id} onChange={(e) => setReturnTrip({ ...returnTrip, driver_id: e.target.value })}>
-                            <option disabled value={""}>
-                              Select Driver
-                            </option>
-                            {
-                              drivers.length > 0 ?
-                                drivers.map((item, index) => (
-                                  <option key={index} value={item._id}>{item.PEN} {EmployeeName}</option>
-                                ))
-                                : <></>
-                            }
-                          </Form.Control>
-                        </Col>
-                        <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Conductor</Form.Label>
-                          <Form.Control as="select" value={returnTrip.conductor_id} onChange={(e) => setReturnTrip({ ...returnTrip, conductor_id: e.target.value })}>
-                            <option disabled value="">
-                              Select Conductor
-                            </option>
-                            {
-                              conductors.length > 0 ?
-                                conductors.map((item, index) => (
-                                  <option key={index} value={item._id}>{item.PEN} {item.EmployeeName}</option>
-                                ))
-                                : <></>
-                            }
-                          </Form.Control>
-                        </Col>
-                      </Row> */}
-
-                      {/* location  */}
-                      <Row className="mt-3">
-                        <Col>
-                          <Form.Label
-                            className="mb-1"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Start Depo
-                          </Form.Label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Filter By Start Depo"
-                            value={returnStartDepo}
-                            onChange={(e) => setRetStartDepo(e.target.value)}
-                          />
-                          <ul
-                            className="position-absolute"
-                            style={{ width: "45%" }}
-                          >
-                            {depoList
-                              .filter((item) =>
-                                !returnStartDepo
-                                  ? false
-                                  : item
-                                      .toLowerCase()
-                                      .includes(returnStartDepo.toLowerCase())
-                              )
-                              .slice(0, 5)
-                              .map((item, index) => (
-                                <li
-                                  key={index}
-                                  className="form-control"
-                                  style={{
-                                    opacity:
-                                      item === returnStartDepo ? "0" : "1",
-                                  }}
-                                  onClick={() => {
-                                    setRetStartDepo(item);
-                                    setReturnTrip({
-                                      ...returnTrip,
-                                      departure_location: {
-                                        ...returnTrip.departure_location,
-                                        depo: item,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  {item}
-                                </li>
-                              ))}
-                          </ul>
-                        </Col>
-                        <Col>
-                          <Form.Label
-                            className="mb-1"
-                            style={{ fontSize: "14px" }}
-                          >
-                            End Depo
-                          </Form.Label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Filter By End Depo"
-                            value={returnEndDepo}
-                            onChange={(e) => setReturnEndDepo(e.target.value)}
-                          />
-                          <ul
-                            className="position-absolute"
-                            style={{ width: "45%" }}
-                          >
-                            {depoList
-                              .filter((item) =>
-                                !returnEndDepo
-                                  ? false
-                                  : item
-                                      .toLowerCase()
-                                      .includes(returnEndDepo.toLowerCase())
-                              )
-                              .slice(0, 5)
-                              .map((item, index) => (
-                                <li
-                                  key={index}
-                                  className="form-control"
-                                  style={{
-                                    opacity: item === returnEndDepo ? "0" : "1",
-                                  }}
-                                  onClick={() => {
-                                    setReturnEndDepo(item);
-                                    setReturnTrip({
-                                      ...returnTrip,
-                                      arrival_location: {
-                                        ...returnTrip.arrival_location,
-                                        depo: item,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  {item}
-                                </li>
-                              ))}
-                          </ul>
-                        </Col>
-                      </Row>
-
-                      <Row className="mt-3">
-                        <Col>
-                          <Form.Label
-                            className="mb-1"
-                            style={{ fontSize: "14px" }}
-                          >
-                            Start Date
-                          </Form.Label>
-                          <Form.Control
-                            type="date"
-                            placeholder="Select Date"
-                            value={returnTrip.start_date}
-                            onChange={(e) =>
-                              setReturnTrip({
-                                ...returnTrip,
-                                start_date: e.target.value,
-                              })
-                            }
-                          />
-                        </Col>
-                        <Col>
-                          <Form.Label
-                            className="mb-1"
-                            style={{ fontSize: "14px" }}
-                          >
-                            End Date
-                          </Form.Label>
-                          <Form.Control
-                            type="date"
-                            placeholder="Select Date"
-                            value={returnTrip.end_date}
-                            onChange={(e) =>
-                              setReturnTrip({
-                                ...returnTrip,
-                                end_date: e.target.value,
-                              })
-                            }
-                          />
-                        </Col>
-                      </Row>
                       <Row className="mt-2">
                         <Col>
                           <Form.Label
                             className="mb-1"
                             style={{ fontSize: "14px" }}
                           >
-                            Start Time
+                            Outbound/Return Trip
                           </Form.Label>
-                          <input
-                            type="time"
-                            className="form-control"
-                            value={returnTrip.start_time}
-                            onChange={(e) =>
-                              setReturnTrip({
-                                ...returnTrip,
-                                start_time: e.target.value,
-                              })
-                            }
-                          />
+                          <select name="" id="" className="form-control" value={outboundTrip.trip_type} onChange={(e)=>setOutboundTrip({...outboundTrip,trip_type:e.target.value})}>
+                            <option value="" disabled className="form-control">Select Trip</option>
+                            <option value="outbound">Outbound Trip</option>
+                            <option value="return">Return Trip</option>
+                          </select>
                         </Col>
-                        <Col>
-                          <Form.Label
-                            className="mb-1"
-                            style={{ fontSize: "14px" }}
-                          >
-                            End Time
-                          </Form.Label>
-                          <input
-                            type="time"
-                            className="form-control"
-                            value={returnTrip.end_time}
-                            onChange={(e) =>
-                              setReturnTrip({
-                                ...returnTrip,
-                                end_time: e.target.value,
-                              })
-                            }
-                          />
-                        </Col>
+                        <Col></Col>
                       </Row>
                     </Form.Group>
+
+                    {
+
+                    // {/* Return Section */}
+                    // <Form.Group className="mt-4">
+                    //   <h6 className="mb-1">2. Return</h6>
+
+                    //   {/* <Row className="mt-3">
+                    //     <Col>
+                    //       <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Driver</Form.Label>
+                    //       <Form.Control as="select" value={returnTrip.driver_id} onChange={(e) => setReturnTrip({ ...returnTrip, driver_id: e.target.value })}>
+                    //         <option disabled value={""}>
+                    //           Select Driver
+                    //         </option>
+                    //         {
+                    //           drivers.length > 0 ?
+                    //             drivers.map((item, index) => (
+                    //               <option key={index} value={item._id}>{item.PEN} {EmployeeName}</option>
+                    //             ))
+                    //             : <></>
+                    //         }
+                    //       </Form.Control>
+                    //     </Col>
+                    //     <Col>
+                    //       <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Conductor</Form.Label>
+                    //       <Form.Control as="select" value={returnTrip.conductor_id} onChange={(e) => setReturnTrip({ ...returnTrip, conductor_id: e.target.value })}>
+                    //         <option disabled value="">
+                    //           Select Conductor
+                    //         </option>
+                    //         {
+                    //           conductors.length > 0 ?
+                    //             conductors.map((item, index) => (
+                    //               <option key={index} value={item._id}>{item.PEN} {item.EmployeeName}</option>
+                    //             ))
+                    //             : <></>
+                    //         }
+                    //       </Form.Control>
+                    //     </Col>
+                    //   </Row> */}
+
+                    //   {/* location  */}
+                    //   <Row className="mt-3">
+                    //     <Col>
+                    //       <Form.Label
+                    //         className="mb-1"
+                    //         style={{ fontSize: "14px" }}
+                    //       >
+                    //         Start Depo
+                    //       </Form.Label>
+                    //       <input
+                    //         type="text"
+                    //         className="form-control"
+                    //         placeholder="Filter By Start Depo"
+                    //         value={returnStartDepo}
+                    //         onChange={(e) => setRetStartDepo(e.target.value)}
+                    //       />
+                    //       <ul
+                    //         className="position-absolute"
+                    //         style={{ width: "45%" }}
+                    //       >
+                    //         {depoList
+                    //           .filter((item) =>
+                    //             !returnStartDepo
+                    //               ? false
+                    //               : item
+                    //                   .toLowerCase()
+                    //                   .includes(returnStartDepo.toLowerCase())
+                    //           )
+                    //           .slice(0, 5)
+                    //           .map((item, index) => (
+                    //             <li
+                    //               key={index}
+                    //               className="form-control"
+                    //               style={{
+                    //                 opacity:
+                    //                   item === returnStartDepo ? "0" : "1",
+                    //               }}
+                    //               onClick={() => {
+                    //                 setRetStartDepo(item);
+                    //                 setReturnTrip({
+                    //                   ...returnTrip,
+                    //                   departure_location: {
+                    //                     ...returnTrip.departure_location,
+                    //                     depo: item,
+                    //                   },
+                    //                 });
+                    //               }}
+                    //             >
+                    //               {item}
+                    //             </li>
+                    //           ))}
+                    //       </ul>
+                    //     </Col>
+                    //     <Col>
+                    //       <Form.Label
+                    //         className="mb-1"
+                    //         style={{ fontSize: "14px" }}
+                    //       >
+                    //         End Depo
+                    //       </Form.Label>
+                    //       <input
+                    //         type="text"
+                    //         className="form-control"
+                    //         placeholder="Filter By End Depo"
+                    //         value={returnEndDepo}
+                    //         onChange={(e) => setReturnEndDepo(e.target.value)}
+                    //       />
+                    //       <ul
+                    //         className="position-absolute"
+                    //         style={{ width: "45%" }}
+                    //       >
+                    //         {depoList
+                    //           .filter((item) =>
+                    //             !returnEndDepo
+                    //               ? false
+                    //               : item
+                    //                   .toLowerCase()
+                    //                   .includes(returnEndDepo.toLowerCase())
+                    //           )
+                    //           .slice(0, 5)
+                    //           .map((item, index) => (
+                    //             <li
+                    //               key={index}
+                    //               className="form-control"
+                    //               style={{
+                    //                 opacity: item === returnEndDepo ? "0" : "1",
+                    //               }}
+                    //               onClick={() => {
+                    //                 setReturnEndDepo(item);
+                    //                 setReturnTrip({
+                    //                   ...returnTrip,
+                    //                   arrival_location: {
+                    //                     ...returnTrip.arrival_location,
+                    //                     depo: item,
+                    //                   },
+                    //                 });
+                    //               }}
+                    //             >
+                    //               {item}
+                    //             </li>
+                    //           ))}
+                    //       </ul>
+                    //     </Col>
+                    //   </Row>
+
+                    //   <Row className="mt-3">
+                    //     <Col>
+                    //       <Form.Label
+                    //         className="mb-1"
+                    //         style={{ fontSize: "14px" }}
+                    //       >
+                    //         Start Date
+                    //       </Form.Label>
+                    //       <Form.Control
+                    //         type="date"
+                    //         placeholder="Select Date"
+                    //         value={returnTrip.start_date}
+                    //         onChange={(e) =>
+                    //           setReturnTrip({
+                    //             ...returnTrip,
+                    //             start_date: e.target.value,
+                    //           })
+                    //         }
+                    //       />
+                    //     </Col>
+                    //     <Col>
+                    //       <Form.Label
+                    //         className="mb-1"
+                    //         style={{ fontSize: "14px" }}
+                    //       >
+                    //         End Date
+                    //       </Form.Label>
+                    //       <Form.Control
+                    //         type="date"
+                    //         placeholder="Select Date"
+                    //         value={returnTrip.end_date}
+                    //         onChange={(e) =>
+                    //           setReturnTrip({
+                    //             ...returnTrip,
+                    //             end_date: e.target.value,
+                    //           })
+                    //         }
+                    //       />
+                    //     </Col>
+                    //   </Row>
+                    //   <Row className="mt-2">
+                    //     <Col>
+                    //       <Form.Label
+                    //         className="mb-1"
+                    //         style={{ fontSize: "14px" }}
+                    //       >
+                    //         Start Time
+                    //       </Form.Label>
+                    //       <input
+                    //         type="time"
+                    //         className="form-control"
+                    //         value={returnTrip.start_time}
+                    //         onChange={(e) =>
+                    //           setReturnTrip({
+                    //             ...returnTrip,
+                    //             start_time: e.target.value,
+                    //           })
+                    //         }
+                    //       />
+                    //     </Col>
+                    //     <Col>
+                    //       <Form.Label
+                    //         className="mb-1"
+                    //         style={{ fontSize: "14px" }}
+                    //       >
+                    //         End Time
+                    //       </Form.Label>
+                    //       <input
+                    //         type="time"
+                    //         className="form-control"
+                    //         value={returnTrip.end_time}
+                    //         onChange={(e) =>
+                    //           setReturnTrip({
+                    //             ...returnTrip,
+                    //             end_time: e.target.value,
+                    //           })
+                    //         }
+                    //       />
+                    //     </Col>
+                    //   </Row>
+                    // </Form.Group>
+
+                    }
 
                     {/* staff Section */}
                     <Form.Group className="mt-4">
@@ -1232,6 +1286,10 @@ const TripParameters = () => {
                 </Card.Body>
               </Card>
             </Col>
+            }
+
+
+
 
             {/* Trip Cost Sidebar */}
             <Col xs={3} className="mt-3">
@@ -1252,8 +1310,8 @@ const TripParameters = () => {
                     <strong>Dates:</strong>{" "}
                     {`${formatDate(outboundTrip.start_date)}`}{" "}
                     {`${formatTime(outboundTrip.start_time)}`} -{" "}
-                    {`${formatDate(returnTrip.end_date)}`}{" "}
-                    {`${formatTime(returnTrip.end_time)}`}
+                    {`${formatDate(outboundTrip.end_date)}`}{" "}
+                    {`${formatTime(outboundTrip.end_time)}`}
                   </p>
                   <p>
                     <FontAwesomeIcon icon={faClock} />{" "}

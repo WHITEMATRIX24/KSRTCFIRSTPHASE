@@ -18,6 +18,9 @@ import { dailyMaintenanceChecklist } from "../../assets/weeklyCheckLists";
 import { WeeklyMaintenanceChecklist } from "../../assets/dailyCheckLists";
 
 export default function Maintenance() {
+  const [maintenanceDepotName, setMaintenanceDepotName] = useState("");
+  const [userRole, setUserRole] = useState("");
+
   const [weeklyData, setWeeklyData] = useState([]);
   const [dailyData, setDailyData] = useState([]);
   const [searchBus, setSearchBus] = useState("");
@@ -83,19 +86,33 @@ export default function Maintenance() {
     }
   };
 
+
+  useEffect(() => {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (user) {
+      setUserRole(user.role); 
+      setMaintenanceDepotName(user.depoName); 
+    }
+  }, []);
+
   useEffect(() => {
     getAllWeaklyData();
     getAllDailyData();
   }, []);
 
-  useEffect(() => {
-    if (activeStatus == "Daily Maintenance") {
-      setFilteredVehicles(dailyData);
-    } else {
-      setFilteredVehicles(weeklyData);
-    }
-  }, [activeStatus, dailyData, weeklyData]);
 
+  useEffect(() => {
+    let vehiclesToFilter = activeStatus === "Daily Maintenance" ? dailyData : weeklyData;
+
+    if (userRole === "Admin") {
+      setFilteredVehicles(vehiclesToFilter);
+    } else if (userRole === "Maintenance") {
+      const filtered = vehiclesToFilter.filter(vehicle => vehicle.ALLOTEDDEPOT === maintenanceDepotName);
+      setFilteredVehicles(filtered);
+    }
+  }, [activeStatus, dailyData, weeklyData, userRole, maintenanceDepotName]);
+
+  
   const getAllWeaklyData = async () => {
     try {
       const result = await getAllWeeklyMaintenanceApi();
@@ -290,13 +307,13 @@ export default function Maintenance() {
                       <td>
                         {activeStatus == "Daily Maintenance"
                           ? vehicle.maintenance_data
-                              .dailyMaintenanceUpdateStatus
+                            .dailyMaintenanceUpdateStatus
                             ? "Maintained"
                             : "Require maintenance"
                           : vehicle.maintenance_data
-                              .weekleyMaintenanceUpdateStatus
-                          ? "Maintained"
-                          : "Require maintenance"}
+                            .weekleyMaintenanceUpdateStatus
+                            ? "Maintained"
+                            : "Require maintenance"}
                       </td>
                       <td>
                         {activeStatus == "Daily Maintenance" ? (
@@ -409,8 +426,8 @@ export default function Maintenance() {
                     !searchBus
                       ? false
                       : item.BUSNO?.toUpperCase().includes(
-                          searchBus.toUpperCase()
-                        )
+                        searchBus.toUpperCase()
+                      )
                   )
                   .slice(0, 5)
                   .map((item, index) =>
@@ -450,47 +467,47 @@ export default function Maintenance() {
           <div className="row j-center gap-1 mt-3">
             {activeStatus == "Daily Maintenance"
               ? Object.keys(dailyCheckList).map((item, index) => (
-                  <label
-                    key={index}
-                    htmlFor={item}
-                    className="col-4 d-flex j-between form-control w-30 text-greenish pointer a-center h-30"
-                  >
-                    <span>{item} :</span>
-                    <input
-                      className="checkBox"
-                      id={item}
-                      type="checkbox"
-                      checked={dailyCheckList[item]}
-                      onChange={(e) =>
-                        setDailyCheckList({
-                          ...dailyCheckList,
-                          [item]: e.target.checked,
-                        })
-                      }
-                    />
-                  </label>
-                ))
+                <label
+                  key={index}
+                  htmlFor={item}
+                  className="col-4 d-flex j-between form-control w-30 text-greenish pointer a-center h-30"
+                >
+                  <span>{item} :</span>
+                  <input
+                    className="checkBox"
+                    id={item}
+                    type="checkbox"
+                    checked={dailyCheckList[item]}
+                    onChange={(e) =>
+                      setDailyCheckList({
+                        ...dailyCheckList,
+                        [item]: e.target.checked,
+                      })
+                    }
+                  />
+                </label>
+              ))
               : Object.keys(weekCheckList).map((item, index) => (
-                  <label
-                    key={index}
-                    htmlFor={item}
-                    className="col-4 d-flex j-between align-items-center form-control w-30 text-greenish pointer"
-                  >
-                    <span>{item} </span>
-                    <input
-                      className="checkBox"
-                      id={item}
-                      type="checkbox"
-                      checked={weekCheckList[item]}
-                      onChange={(e) =>
-                        setWeekCheckList({
-                          ...weekCheckList,
-                          [item]: e.target.checked,
-                        })
-                      }
-                    />
-                  </label>
-                ))}
+                <label
+                  key={index}
+                  htmlFor={item}
+                  className="col-4 d-flex j-between align-items-center form-control w-30 text-greenish pointer"
+                >
+                  <span>{item} </span>
+                  <input
+                    className="checkBox"
+                    id={item}
+                    type="checkbox"
+                    checked={weekCheckList[item]}
+                    onChange={(e) =>
+                      setWeekCheckList({
+                        ...weekCheckList,
+                        [item]: e.target.checked,
+                      })
+                    }
+                  />
+                </label>
+              ))}
           </div>
         </Modal.Body>
         <Modal.Footer>

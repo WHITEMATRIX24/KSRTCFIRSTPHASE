@@ -17,7 +17,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { getAllTripApi, getAllVehiclesApi, updateTripApiNew, updateVehicleStatus } from "../../services/allAPI";
+import { getAllTripApi, getAllVehiclesApi, getTripOfDepotApi, updateTripApiNew, updateVehicleStatus } from "../../services/allAPI";
 import { depoList } from "../../assets/depoList";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -87,14 +87,25 @@ function TripOverviewComponent() {
   //   trips initial data
   const getTripInitialData = async () => {
     try {
-      const res = await getAllTripApi();
-      setTrips(res.data);
+      const user = JSON.parse(sessionStorage.getItem("user"))
+      
+      if(user.role=="Admin"){
+        const res = await getAllTripApi();
+        setTrips(res.data);
+      }else{
+        const res = await getTripOfDepotApi(user.depoName)
+        setTrips(res.data)
+        console.log(res);
+        
+      }
     } catch (error) {
       console.log(
         `error in fetching trip data in trips overview page error: ${error}`
       );
     }
   };
+  console.log(trips);
+  
 
   // // chnages trip based on filter by bus
   // const handleBusSearch = (e) => {
@@ -291,7 +302,7 @@ function TripOverviewComponent() {
                     <span className="fw-semibold">
                       {item.status.toUpperCase()}
                     </span>
-                    <span>{item?.trip_id}</span>
+                    <span>{item?.trip_type.toUpperCase()}</span>
                   </div>
                 </div>
                 <div
@@ -318,9 +329,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.arrival_location.depo} {depoList.find(item2=>item2.code==item?.arrival_location.depo)?.name}
                       </span>
-                      {/* <span>{`${item?.end_date.split("T")[0]} , ${
+                      <span>{`${item?.end_date?.split("T")[0]?item?.end_date?.split("T")[0]:""} , ${
                         item?.end_time
-                      }`}</span> */}
+                      }`}</span>
                     </div>
                   </div>
                 </div>
@@ -352,7 +363,7 @@ function TripOverviewComponent() {
                     <span className="fw-semibold">
                       {item.status.toUpperCase()}
                     </span>
-                    <span>{item?.trip_id}</span>
+                    <span>{item?.trip_type.toUpperCase()}</span>
                   </div>
                 </div>
                 <div
@@ -379,9 +390,9 @@ function TripOverviewComponent() {
                       <span className="fw-semibold">
                         {item?.arrival_location.depo} {depoList.find(item2=>item2.code==item?.arrival_location.depo)?.name}
                       </span>
-                      {/* <span>{`${item?.end_date.split("T")[0]} , ${
+                      <span>{`${item?.end_date?.split("T")[0]?item?.end_date?.split("T")[0]:""} , ${
                         item?.end_time
-                      }`}</span> */}
+                      }`}</span>
                     </div>
                   </div>
                 </div>

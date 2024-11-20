@@ -15,6 +15,23 @@ const AddVehicle = () => {
     maintenance_history: [],
   });
 
+   // Function to reset form fields and states
+   const handleCancel = () => {
+    // Reset vehicle data state to empty values
+    setVehicleData({
+      REGNO: '',
+      BUSNO: '',
+      ALLOTTEDDEPOT: '',
+      CLASS: '',
+      status: 'in_service',
+      maintenance_history: [],
+    });
+    // Reset search state to empty values
+    setSearch({ vehicleClass: '', depot: '' });
+    // Reset selected state to empty values
+    setSelected({ vehicleClass: '', depot: '' });
+  };
+
   const [search, setSearch] = useState({
     vehicleClass: '',
     depot: ''
@@ -261,7 +278,7 @@ const AddVehicle = () => {
 
                     <Row className="mt-4">
                       <Col className="d-flex justify-content-end">
-                        <Button variant="outline-secondary" size="sm" className="me-2">
+                        <Button variant="outline-secondary" onClick={handleCancel} size="sm" className="me-2">
                           <FontAwesomeIcon icon={faTimes} className="me-1" /> Cancel
                         </Button>
                         <Button type="submit" variant="success" size="sm">Add</Button>

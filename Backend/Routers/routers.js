@@ -54,6 +54,13 @@ import {
   getAllAdminDetails,
   Register,
 } from "../Controllers/AdminController.js";
+import {
+  addCollection,
+  getAllCollection,
+  getCollectionsOfDate,
+  getCollectionsOfDepot,
+  getCollectionsOfDepotAndDate,
+} from "../Controllers/TrpCollectionController.js";
 // Initialize router
 const router = express.Router();
 
@@ -78,9 +85,9 @@ router.get("/getVehicleById/:vehicle_id", getvehicleById);
 // Delete Vehicle By Id
 router.delete("/deleteVehicleById/:vehicle_id", deleteVehicleById);
 // Delete Selected Vehicles
-router.delete('/deleteSelectedVehicles',deleteSelectedVehicle);
+router.delete("/deleteSelectedVehicles", deleteSelectedVehicle);
 // get All vehicles By depoName;
-router.get("/getAllVehicleByDeponame/:depoName",getAllVehiclesByDepoName);
+router.get("/getAllVehicleByDeponame/:depoName", getAllVehiclesByDepoName);
 
 // <<<<<<<........Vehichel Maintanence Routes.........>>>>>>>
 
@@ -126,7 +133,7 @@ router.put("/editLeaveStatus/:driver_id", editLeaveStatus);
 // Delete Driver By driver_Id
 router.delete("/deleteDriverById/:driver_id", deleteDriverById);
 // Delete Selected Drivers
-router.delete('/deleteSelectedDrivers',deleteSelectedDriver);
+router.delete("/deleteSelectedDrivers", deleteSelectedDriver);
 // <<<<<<<.......ConductorRouter.......>>>>>>>
 
 // Adding new Conductor
@@ -140,7 +147,7 @@ router.put("/editLeaveStatusConductor/:conductor_id", editLeaveStatusConductor);
 // Delete Conductor By conductor_Id
 router.delete("/deleteConductorById/:conductor_id", deleteConductorById);
 // Delete Selected Conductors
-router.delete('/deleteSelectedConductors',deleteSelectedConductor);
+router.delete("/deleteSelectedConductors", deleteSelectedConductor);
 // <<<<<<<...........TripRouter.......>>>>>>>>
 
 // Adding new Trip info
@@ -157,11 +164,14 @@ router.put(
 // get All Completed Trips
 router.get("/getAllCompletedTripDetails", getAllCompletedTripDetails);
 // get Trip details in OverView arrival_Location || departure_location==depoName
-router.get("/getTripinOverView/:depoName",getAllTripByDepoName);
+router.get("/getTripinOverView/:depoName", getAllTripByDepoName);
 // get TripDetails By status==Upcoming && departure_location==deponame
-router.get("/getUpcomingTripByDeponame/:depoName",getTripdetailsUpcomingbyDepoName);
+router.get(
+  "/getUpcomingTripByDeponame/:depoName",
+  getTripdetailsUpcomingbyDepoName
+);
 // get Trip Details By live Status && departure_location||arrival_location==depoName
-router.get("/getLiveTripsBydepoName/:depoName",getTripLiveBydepoName)
+router.get("/getLiveTripsBydepoName/:depoName", getTripLiveBydepoName);
 
 // <<<<<<.......Admin Router.......>>>>>
 // Reigster New Admin
@@ -179,6 +189,23 @@ router.put("/editAdminDetails/:admin_id", editAdmindetailsById);
 router.post("/addNewLedgerData", newLedgerData);
 // Get all Ledger Data
 router.get("/getAllLedgerData", getAllLedgerData);
+
+// collection routes---------------------------------------------------------------
+
+// add collection
+router.post("/addCollection", addCollection);
+
+// get all collection
+router.get("/getAllCollection", getAllCollection);
+
+// get collection by depot
+router.get("/getCollectionByDepot/:depot", getCollectionsOfDepot);
+
+// get collection by date
+router.get("/getCollectionByDate/:date", getCollectionsOfDate);
+
+// get collection by date and depot
+router.get("/getFilteredCollection/:date/:depot", getCollectionsOfDepotAndDate);
 
 // Export the router
 export default router;

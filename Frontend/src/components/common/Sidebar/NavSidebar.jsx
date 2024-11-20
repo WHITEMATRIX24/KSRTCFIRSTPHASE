@@ -3,6 +3,7 @@ import {
   faAngleLeft,
   faBars,
   faBookOpen,
+  faCalculator,
   faChartPie,
   faDriversLicense,
   faGear,
@@ -227,6 +228,40 @@ function NavSidebar() {
               </a>
             </li>
             <Divider />
+          </ul>
+        )}
+      </li>
+      <li>
+        <a
+          href="#"
+          className="my-2"
+          id="collectionMenu"
+          onClick={() => toggleSubmenu("collectionMenu")}
+        >
+          <FontAwesomeIcon className="me-2" icon={faCalculator} /> Collection
+          {activeMenu !== "collectionMenu" && (
+            <FontAwesomeIcon className="ms-2" icon={faAngleDown} />
+          )}
+          {activeMenu === "collectionMenu" && (
+            <FontAwesomeIcon className="ms-2" icon={faAngleLeft} />
+          )}
+        </a>
+        <Divider />
+        {activeMenu === "collectionMenu" && (
+          <ul className="submenu">
+            <li>
+              <a
+                href="/collection"
+                id="Collection"
+                className="my-2"
+                onClick={() => toggelColor("Collection")}
+              >
+               Collection
+              </a>
+            </li>
+            <Divider />
+            {/* <li><a href="#" className='my-2' id='history' onClick={() => toggelColor('history')}>History</a></li>
+            <Divider /> */}
           </ul>
         )}
       </li>

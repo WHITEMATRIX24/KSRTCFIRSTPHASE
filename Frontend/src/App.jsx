@@ -15,6 +15,7 @@ import OnGoingTrips from "./Pages/OnGoingTrip/OnGoingTrips";
 import LoginPage from "./Pages/LoginPage/LoginPage";
 import ProtectRoutes from "./utils/protectRoutes";
 import Maintenance from "./Pages/Maintenance/Maintenance";
+import Collection from "./Pages/Collection/Collection";
 
 function App() {
   return (
@@ -34,7 +35,10 @@ function App() {
           <Route path="/add-trip" element={<TripParameters />}></Route>
           <Route path="/scheduled-trips" element={<ScheduleTrip />}></Route>
           <Route path="/ongoing-trips" element={<OnGoingTrips />}></Route>
-          <Route element={<ProtectRoutes allowedRoles={["Admin", "Maintenance"]} />}>
+          <Route path="/collection" element={<Collection />}></Route>
+          <Route
+            element={<ProtectRoutes allowedRoles={["Admin", "Maintenance"]} />}
+          >
             <Route path="/maintanance" element={<Maintenance />} />
           </Route>
         </Route>
