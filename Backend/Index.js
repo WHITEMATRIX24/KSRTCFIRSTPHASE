@@ -14,7 +14,7 @@ const server = express();
 // Middleware
 server.use(cors());
 server.use(express.json());
-server.use(router);
+server.use("/api", router);
 server.use("/Uploads", express.static("./Uploads"));
 
 // Define port

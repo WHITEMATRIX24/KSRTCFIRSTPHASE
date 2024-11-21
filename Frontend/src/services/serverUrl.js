@@ -1,3 +1,3 @@
-const SERVERURL = "http://13.232.231.203:3000";
+const SERVERURL = "https://ktrac.in/api";
 
 export default SERVERURL;
