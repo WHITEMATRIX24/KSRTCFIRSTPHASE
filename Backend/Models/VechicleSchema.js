@@ -16,7 +16,7 @@ const vehicleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    ALLOTTEDDEPOT: {
+    ALLOTEDDEPOT: {
       type: String,
       required: true,
     },

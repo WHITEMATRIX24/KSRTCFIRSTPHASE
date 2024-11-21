@@ -4,7 +4,7 @@ import Admins from "../Models/AdminSchema.js";
 export const Register = async (req, res) => {
     const { userName, depoName, password, role } = req.body;
     try {
-        const existingUser = await Admins.findOne({ depoName });
+        const existingUser = await Admins.findOne({ userName });
         if (existingUser) {
             res.status(406).json("User Already Existing::::")
         } else {
@@ -21,9 +21,9 @@ export const Register = async (req, res) => {
 }
 
 export const adminLogin = async (req, res) => {
-    const { depoName, password } = req.body;
+    const { userName, password } = req.body;
     try {
-        const findUser = await Admins.findOne({ depoName });
+        const findUser = await Admins.findOne({ userName });
         if (!findUser) {
             res.status(404).json("Not found Any Users::::");
         } else {

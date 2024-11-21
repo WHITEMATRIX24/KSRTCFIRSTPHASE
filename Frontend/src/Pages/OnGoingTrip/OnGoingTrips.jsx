@@ -22,6 +22,7 @@ import {
   getDriversListApi,
   updateTripApiNew,
   updateVehicleStatus,
+  getAllLiveTripApi,
 } from "../../services/allAPI";
 
 export default function OnGoingTrips() {
@@ -147,10 +148,12 @@ export default function OnGoingTrips() {
   const [tripFilter, setTripFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [filteredTrips, setFilteredTrips] = useState([]);
-  console.log(modifiedTrips);
+  const [depoName,setDepoName] = useState()
+  const [role, setRole] = useState("")
+  //console.log(depoName);
 
   useEffect(() => {
-    // Filtered trips based on vehicle number and date
+     // Filtered trips based on vehicle number and date
     if (!modifiedTrips) return;
     const filtered = modifiedTrips.filter((trip) => {
       const matchesVehicle =
@@ -160,17 +163,21 @@ export default function OnGoingTrips() {
       //   trip.trip_id &&
       //   trip.trip_id.toLowerCase().includes(tripFilter.toLowerCase());
       const matchesDate = dateFilter
-        ? trip.startDate && trip.startDate.startsWith(dateFilter)
+        ? trip.start_date && trip.start_date.startsWith(dateFilter)
         : true;
-      const liveVehicle =
-        trip.status && trip.status.toLowerCase().includes("live");
-      console.log({ matchesVehicle, matchesDate, liveVehicle });
-      return matchesVehicle && matchesDate && liveVehicle;
+     /*  const liveVehicle =
+        trip.status && trip.status.toLowerCase().includes("live"); */
+        //const tripsStartDepo = trip.departure_location.depo && (trip.departure_location.depo == depoName);
+       // const tripsEndDepo = trip.arrival_location.depo && (trip.arrival_location.depo == depoName || trip.departure_location.depo == depoName);
+
+      //console.log({ matchesVehicle, matchesDate, liveVehicle,tripsStartDepo });
+      return matchesVehicle && matchesDate ;
     });
     setFilteredTrips([...filtered]);
   }, [modifiedTrips]);
 
-  console.log(`filtered trips: ${filteredTrips}`);
+  //console.log(`filtered trips: ${filteredTrips}`);
+
 
   //modal
 
@@ -367,14 +374,38 @@ export default function OnGoingTrips() {
     }
   };
 
+  useEffect(()=>{
+    const userDetails=JSON.parse(sessionStorage.getItem("user"));
+    console.log("User",userDetails);
+   setDepoName(userDetails.depoName)
+   setRole(userDetails.role)
+  },[])
+
+  
   const getAllTrips = async () => {
-    const result = await getAllTripApi();
+    console.log(role);
+    
+    
+ if(role == 'Staff'){  
+  const result = await getAllLiveTripApi(depoName);
     console.log(result.data);
 
     if (result.status == 200) {
       setNewTripData(result.data);
     } else {
       console.log(result);
+    }
+  }
+    else if(role =="Admin"){
+      const result = await getAllTripApi();
+    console.log(result.data);
+
+    if (result.status == 200) {
+      setNewTripData(result.data);
+    } else {
+      console.log(result);
+    }
+
     }
   };
   const [busLoading,setBusLoading ] = useState(false)
@@ -443,7 +474,9 @@ export default function OnGoingTrips() {
     getAllTrips();
     getAllBuses();
     getAllDriversList();
-  }, []);
+  }, [depoName]);
+
+  
   useEffect(() => {
     if (tripData.length > 0 && vehicles.length > 0 && drivers.length > 0) {
       let arr = tripData.map((item) => ({
@@ -538,7 +571,8 @@ export default function OnGoingTrips() {
                             <th>VEHICLE</th>
                             <th>DRIVER</th>
                             <th>START DATE</th>
-                            <th>END DATE</th>
+{/*                             <th>END DATE</th>
+ */}                            <th>DEPO DETAILS</th>
                             <th></th>
                             <th></th>
                           </tr>
@@ -570,19 +604,27 @@ export default function OnGoingTrips() {
                                   icon={faUser}
                                   className="text-muted me-2"
                                 />
-                                {trip.EmployeeName}
-                              </td>
+                                {trip.EmployeeName}                             
+                                </td>
   
                               <td>
                               {new Date(trip.start_date).toLocaleDateString()}
                                 <br />
                                 <small className="text-muted">
-                                {formatTime(trip.start_time)}
+                                {trip.start_time}
                                 </small>
                               </td>
-                              <td>
+                             
+                           {/*  <td>
                              { trip.end_date &&<> {new Date(trip.start_date).toLocaleDateString()}</>}
                              { !trip.end_date &&<span className="mt-0"> ----</span>}
+                             <br />
+                             
+                             { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}
+                            </td> */}
+                            <td>
+                             { trip.departure_location.depo == depoName &&<> Ends in {trip.arrival_location.depo }</>}
+                             { trip.departure_location.depo != depoName &&<span className="mt-0"> Starts From {trip.departure_location.depo }</span>}
                              <br />
                              
                              { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}

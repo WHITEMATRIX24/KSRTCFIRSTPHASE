@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [loginCrededntials, setLoginCredentials] = useState({
-    depoName: "",
+    userName: "",
     password: "",
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -15,9 +15,9 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { depoName, password } = loginCrededntials;
+    const { userName, password } = loginCrededntials;
 
-    if (!password || !depoName) {
+    if (!password || !userName) {
       return alert("Fill the form completly");
     }
 
@@ -51,11 +51,11 @@ const LoginPage = () => {
             type="text"
             placeholder="depo name"
             className="loginpage-input rounded-3 px-3 py-2"
-            value={loginCrededntials.depoName}
+            value={loginCrededntials.userName}
             onChange={(e) =>
               setLoginCredentials({
                 ...loginCrededntials,
-                depoName: e.target.value,
+                userName: e.target.value,
               })
             }
           />

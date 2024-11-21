@@ -142,3 +142,71 @@ export const getAllCompletedTripDetails = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+
+// <<<<:::::Trip OverView:::::::>>>>
+
+export const getAllTripByDepoName=async(req,res)=>{
+    const {depoName}=req.params
+    try{
+      const tripOverview=await Trip.find({  $or: [
+        { "departure_location.depo": depoName },
+        { "arrival_location.depo": depoName }
+      ]});
+      if(tripOverview.length>0){
+        res.status(200).json(tripOverview);
+      }else{
+        res.status(404).json({ message: "No tripOverview details found for this depot name" });
+      }
+    }catch(err){
+        console.log("Error at catch in tripController/getAllTripByDepoName::::::", err);
+        res.status(500).json({ error: "Internal server error" });  
+    }
+}
+
+// <<<<<:::::tripUpcomming departure_location==depoName::::>>>>>>
+
+export const getTripdetailsUpcomingbyDepoName=async(req,res)=>{
+    const {depoName}=req.params;
+
+    try{
+     const tripDetails=await Trip.find({ $and:[
+        {status:"upcoming"},
+        {"departure_location.depo":depoName}
+     ]});
+     if(tripDetails.length>0){
+        res.status(200).json(tripDetails)
+     }else{
+        res.status(404).json({ message: "No Trip details found for this depot name and Upcoming Status" });
+     }
+    }catch(err){
+        console.log("Error at catch in tripController/getTripdetailsUpcomingbyDepoName::::::", err);
+        res.status(500).json({ error: "Internal server error" });  
+    }
+}
+
+// <<<<:::::get tripLive departure_location==depoName||arrival_location==deponame:::::>>>>
+
+export const getTripLiveBydepoName=async(req,res)=>{
+    const {depoName}=req.params;
+
+    try{
+        const tripDetails = await Trip.find({
+            $and: [
+              { status: "live" },
+              { $or: [
+                  { "departure_location.depo": depoName },
+                  { "arrival_location.depo": depoName }
+                ]}]
+          });
+          if(tripDetails.length>0){
+            res.status(200).json(tripDetails)
+          }else{
+            res.status(404).json({ message: "No Trip details found::getTripLiveBydepoName" });
+          }
+          
+    }catch(err){
+        console.log("Error at catch in tripController/getTripLiveBydepName::::::", err);
+        res.status(500).json({ error: "Internal server error" });    
+    }
+}

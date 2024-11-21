@@ -12,39 +12,30 @@ const AddConductor = () => {
     PEN: "",
     Designation: "",
     UNIT: "",
-    is_permanent: "",
+    is_permanent: "", // Employment Type
     contact_info: { phone: "" },
     on_leave: "Available", // default value
   });
 
   const handleAddnewConductor = async () => {
-    if (!conductorData) {
-      console.error("conductorData is undefined");
-      return;
-    }
-  
     const { EmployeeName, PEN, Designation, UNIT, is_permanent, contact_info: { phone }, on_leave } = conductorData;
-  
-    console.log("Data:", conductorData);
-  
+
     if (!EmployeeName || !PEN || !Designation || !UNIT || !phone || !is_permanent) {
       alert("Please fill the empty fields");
     } else {
       const newConductor = await addNewConductor(conductorData);
-      console.log("newConductor:", newConductor.data);
-  
       if (newConductor.status === 201) {
         alert("New Conductor Added Successfully");
-        // Reset conductorData after successful addition
-        setConductorData({
+        // Reset conductorData after successful addition, except is_permanent
+        setConductorData(prevState => ({
           EmployeeName: "",
           PEN: "",
           Designation: "",
           UNIT: "",
-          is_permanent: "",
+          is_permanent: prevState.is_permanent, // Keep Employment Type
           contact_info: { phone: "" },
           on_leave: "Available",
-        });
+        }));
       } else if (newConductor.status === 406) {
         alert("Conductor Already Exists");
       } else {
@@ -52,8 +43,20 @@ const AddConductor = () => {
       }
     }
   };
-  
 
+  const handleCancel = () => {
+    // Preserve is_permanent and reset other fields
+    setConductorData(prevState => ({
+      EmployeeName: "",
+      PEN: "",
+      Designation: "",
+      UNIT: "",
+      is_permanent: prevState.is_permanent, // Keep Employment Type
+      contact_info: { phone: "" },
+      on_leave: "Available",
+    }));
+  };
+  
   return (
     <>
       <Row>
@@ -81,6 +84,7 @@ const AddConductor = () => {
                           <Form.Control
                             type="text"
                             placeholder='Enter Name'
+                            value={conductorData.EmployeeName}
                             onChange={e => setConductorData({ ...conductorData, EmployeeName: e.target.value })}
                           />
                         </Col>
@@ -89,6 +93,7 @@ const AddConductor = () => {
                           <Form.Control
                             type="text"
                             placeholder='Enter PEN'
+                            value={conductorData.PEN}
                             onChange={e => setConductorData({ ...conductorData, PEN: e.target.value })}
                           />
                         </Col>
@@ -99,6 +104,7 @@ const AddConductor = () => {
                           <Form.Control
                             type="text"
                             placeholder='Enter Designation'
+                            value={conductorData.Designation}
                             onChange={e => setConductorData({ ...conductorData, Designation: e.target.value })}
                           />
                         </Col>
@@ -107,6 +113,7 @@ const AddConductor = () => {
                           <Form.Control
                             type="text"
                             placeholder='Enter UNIT'
+                            value={conductorData.UNIT}
                             onChange={e => setConductorData({ ...conductorData, UNIT: e.target.value })}
                           />
                         </Col>
@@ -121,9 +128,10 @@ const AddConductor = () => {
                         <Form.Control
                           type="text"
                           placeholder='Enter Mobile No'
+                          value={conductorData.contact_info.phone}
                           onChange={e => setConductorData({
                             ...conductorData,
-                            contact_info: { ...conductorData.contact_info, phone: e.target.value }
+                            contact_info: { phone: e.target.value }
                           })}
                         />
                       </Col>
@@ -131,7 +139,6 @@ const AddConductor = () => {
                         <Col>
                           <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Employment Type</Form.Label>
                           <Form.Control
-
                             as="select"
                             value={conductorData.is_permanent}
                             onChange={e => setConductorData({ ...conductorData, is_permanent: e.target.value })}
@@ -146,15 +153,15 @@ const AddConductor = () => {
 
                     {/* ----------------section 3-------------------- */}
                     <Row className="mt-2">
-
-
                     </Row>
 
                     <hr className='vehicle-horizontal-line' />
                     <div className="mt-4 text-end">
                       <Button
+                        type='button'
                         className='btn tbn rounded me-2'
                         style={{ backgroundColor: '#f8f9fa', color: 'black' }}
+                        onClick={handleCancel}  // Clears the form but keeps is_permanent
                       >
                         <FontAwesomeIcon className='me-2' icon={faXmark} />Cancel
                       </Button>

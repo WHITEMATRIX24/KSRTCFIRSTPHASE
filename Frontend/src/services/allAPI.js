@@ -262,3 +262,51 @@ export const updateDailyMaintenanceApi = async (date, vehicleId) => {
     ""
   );
 };
+
+// get trip data of depot
+export const getTripOfDepotApi = async (depot) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getTripinOverView/${depot}`,
+    "",
+    ""
+  );
+};
+
+export const getAllUpcomingTripApi = async (depo) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getUpcomingTripByDeponame/${depo}`,
+    "",
+    ""
+  );
+};
+
+export const getAllLiveTripApi = async (depo) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getLiveTripsBydepoName/${depo}`,
+    "",
+    ""
+  );
+};
+
+//save collectionDetails
+
+export const AddCollectionAPi = async (reqBody) => {
+  return await commonAPI("POST", `${SERVERURL}/addCollection`, reqBody, "");
+};
+
+//get collection by depo
+export const getCollectionByDepoAPi = async (depo) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getCollectionByDepot/${depo}`,
+    "",
+    ""
+  );
+};
+
+export const getAllCollectionAPi = async () => {
+  return await commonAPI("GET", `${SERVERURL}/getAllCollection`, "", "");
+};
