@@ -244,21 +244,29 @@ export const getAllDailyMaintenanceApi = async () => {
 };
 
 // update weekly maintenance data
-export const updateWeeklyMaintenanceApi = async (date, vehicleId) => {
+export const updateWeeklyMaintenanceApi = async (
+  date,
+  vehicleId,
+  weeklyCheckedBy
+) => {
   return await commonAPI(
     "PUT",
     `${SERVERURL}/update-vehicle-weekly-maintanence/${vehicleId}`,
-    { weeklyUpdateDate: date },
+    { weeklyUpdateDate: date, weeklyCheckedBy },
     ""
   );
 };
 
 // update daily maintenance data
-export const updateDailyMaintenanceApi = async (date, vehicleId) => {
+export const updateDailyMaintenanceApi = async (
+  date,
+  vehicleId,
+  dailyCheckedBY
+) => {
   return await commonAPI(
     "PUT",
     `${SERVERURL}/update-vehicle-daily-maintanence/${vehicleId}`,
-    { dailyUpdateDate: date },
+    { dailyUpdateDate: date, dailyCheckedBY },
     ""
   );
 };

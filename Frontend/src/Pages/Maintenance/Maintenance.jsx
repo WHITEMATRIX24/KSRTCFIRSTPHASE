@@ -18,9 +18,6 @@ import { dailyMaintenanceChecklist } from "../../assets/weeklyCheckLists";
 import { WeeklyMaintenanceChecklist } from "../../assets/dailyCheckLists";
 
 export default function Maintenance() {
-  const [maintenanceDepotName, setMaintenanceDepotName] = useState("");
-  const [userRole, setUserRole] = useState("");
-
   const [weeklyData, setWeeklyData] = useState([]);
   const [dailyData, setDailyData] = useState([]);
   const [searchBus, setSearchBus] = useState("");
@@ -32,6 +29,7 @@ export default function Maintenance() {
     dailyMaintenanceChecklist
   );
   const [currentPage, setCurrentPage] = useState(0);
+  const [checkedBy,setCheckedBy]=useState("")
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [filteredVehicles, setFilteredVehicles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,6 +44,7 @@ export default function Maintenance() {
     setShow(false);
     setDailyCheckList(dailyMaintenanceChecklist);
     setWeekCheckList(WeeklyMaintenanceChecklist);
+    setCheckedBy("")
   };
   const handleShow = () => setShow(true);
   // const [vehicleType, setVehicleType] = useState("All Types");
@@ -86,33 +85,19 @@ export default function Maintenance() {
     }
   };
 
-
-  useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    if (user) {
-      setUserRole(user.role); 
-      setMaintenanceDepotName(user.depoName); 
-    }
-  }, []);
-
   useEffect(() => {
     getAllWeaklyData();
     getAllDailyData();
   }, []);
 
-
   useEffect(() => {
-    let vehiclesToFilter = activeStatus === "Daily Maintenance" ? dailyData : weeklyData;
-
-    if (userRole === "Admin") {
-      setFilteredVehicles(vehiclesToFilter);
-    } else if (userRole === "Maintenance") {
-      const filtered = vehiclesToFilter.filter(vehicle => vehicle.ALLOTEDDEPOT === maintenanceDepotName);
-      setFilteredVehicles(filtered);
+    if (activeStatus == "Daily Maintenance") {
+      setFilteredVehicles(dailyData);
+    } else {
+      setFilteredVehicles(weeklyData);
     }
-  }, [activeStatus, dailyData, weeklyData, userRole, maintenanceDepotName]);
+  }, [activeStatus, dailyData, weeklyData]);
 
-  
   const getAllWeaklyData = async () => {
     try {
       const result = await getAllWeeklyMaintenanceApi();
@@ -145,17 +130,17 @@ export default function Maintenance() {
   };
 
   const handleSubmit = async () => {
-    if (!vehicle.BUSNO) {
-      alert("Please Choose Vehicle");
+    if (!vehicle.BUSNO || !checkedBy) {
+      alert("Please Choose Vehicle And Enter the Names of Mechanics");
     } else {
       try {
         const date = new Date().getTime() + 1000 * 60 * 60 * 5.5;
         const dateIst = new Date(date).toISOString();
         if (activeStatus == "Daily Maintenance") {
-          const result = await updateDailyMaintenanceApi(dateIst, vehicle._id);
+          const result = await updateDailyMaintenanceApi(dateIst, vehicle._id, checkedBy);
           getAllDailyData();
         } else {
-          const result = await updateWeeklyMaintenanceApi(dateIst, vehicle._id);
+          const result = await updateWeeklyMaintenanceApi(dateIst, vehicle._id, checkedBy);
           getAllWeaklyData();
         }
         handleClose();
@@ -277,6 +262,7 @@ export default function Maintenance() {
                     ) : (
                       <th>Due Date</th>
                     )}
+                    <th>Checked By</th>
                     <th> {/*for update */} </th>
                     {/* <th>REMARKS</th> */}
                     <th> {/*for delete option */}</th>
@@ -307,13 +293,13 @@ export default function Maintenance() {
                       <td>
                         {activeStatus == "Daily Maintenance"
                           ? vehicle.maintenance_data
-                            .dailyMaintenanceUpdateStatus
+                              .dailyMaintenanceUpdateStatus
                             ? "Maintained"
                             : "Require maintenance"
                           : vehicle.maintenance_data
-                            .weekleyMaintenanceUpdateStatus
-                            ? "Maintained"
-                            : "Require maintenance"}
+                              .weekleyMaintenanceUpdateStatus
+                          ? "Maintained"
+                          : "Require maintenance"}
                       </td>
                       <td>
                         {activeStatus == "Daily Maintenance" ? (
@@ -371,6 +357,19 @@ export default function Maintenance() {
                           )}
                         </td>
                       )}
+                      {activeStatus == "Daily Maintenance" ? (
+                        <td>
+                        {
+                          vehicle.maintenance_data?.dailyCheckedBY
+                        }
+                      </td>
+                      ) : (
+                        <td>
+                          {
+                            vehicle.maintenance_data.weeklyCheckedBy
+                          }
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -426,8 +425,8 @@ export default function Maintenance() {
                     !searchBus
                       ? false
                       : item.BUSNO?.toUpperCase().includes(
-                        searchBus.toUpperCase()
-                      )
+                          searchBus.toUpperCase()
+                        )
                   )
                   .slice(0, 5)
                   .map((item, index) =>
@@ -467,64 +466,68 @@ export default function Maintenance() {
           <div className="row j-center gap-1 mt-3">
             {activeStatus == "Daily Maintenance"
               ? Object.keys(dailyCheckList).map((item, index) => (
-                <label
-                  key={index}
-                  htmlFor={item}
-                  className="col-4 d-flex j-between form-control w-30 text-greenish pointer a-center h-30"
-                >
-                  <span>{item} :</span>
-                  <input
-                    className="checkBox"
-                    id={item}
-                    type="checkbox"
-                    checked={dailyCheckList[item]}
-                    onChange={(e) =>
-                      setDailyCheckList({
-                        ...dailyCheckList,
-                        [item]: e.target.checked,
-                      })
-                    }
-                  />
-                </label>
-              ))
+                  <label
+                    key={index}
+                    htmlFor={item}
+                    className="col-4 d-flex j-between form-control w-30 text-greenish pointer a-center h-30"
+                  >
+                    <span>{item} :</span>
+                    <input
+                      className="checkBox"
+                      id={item}
+                      type="checkbox"
+                      checked={dailyCheckList[item]}
+                      onChange={(e) =>
+                        setDailyCheckList({
+                          ...dailyCheckList,
+                          [item]: e.target.checked,
+                        })
+                      }
+                    />
+                  </label>
+                ))
               : Object.keys(weekCheckList).map((item, index) => (
-                <label
-                  key={index}
-                  htmlFor={item}
-                  className="col-4 d-flex j-between align-items-center form-control w-30 text-greenish pointer"
-                >
-                  <span>{item} </span>
-                  <input
-                    className="checkBox"
-                    id={item}
-                    type="checkbox"
-                    checked={weekCheckList[item]}
-                    onChange={(e) =>
-                      setWeekCheckList({
-                        ...weekCheckList,
-                        [item]: e.target.checked,
-                      })
-                    }
-                  />
-                </label>
-              ))}
+                  <label
+                    key={index}
+                    htmlFor={item}
+                    className="col-4 d-flex j-between align-items-center form-control w-30 text-greenish pointer"
+                  >
+                    <span>{item} </span>
+                    <input
+                      className="checkBox"
+                      id={item}
+                      type="checkbox"
+                      checked={weekCheckList[item]}
+                      onChange={(e) =>
+                        setWeekCheckList({
+                          ...weekCheckList,
+                          [item]: e.target.checked,
+                        })
+                      }
+                    />
+                  </label>
+                ))}
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleSubmit}
-            disabled={
-              activeStatus == "Daily Maintenance"
-                ? !Object.values(dailyCheckList).every((item) => item == true)
-                : !Object.values(weekCheckList).every((item) => item == true)
-            }
-          >
-            Update
-          </Button>
+        <Modal.Footer className="d-flex justify-content-between">
+          <input type="text" className="form-control w-50" placeholder="Checked By" value={checkedBy} onChange={(e)=>setCheckedBy(e.target.value)}/>
+          <div className="buttons">
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+            <Button
+              className="ms-3"
+              variant="primary"
+              onClick={handleSubmit}
+              disabled={
+                activeStatus == "Daily Maintenance"
+                  ? !Object.values(dailyCheckList).every((item) => item == true)
+                  : !Object.values(weekCheckList).every((item) => item == true)
+              }
+            >
+              Update
+            </Button>
+          </div>
         </Modal.Footer>
       </Modal>
     </>

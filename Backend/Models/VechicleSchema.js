@@ -59,6 +59,14 @@ const vehicleSchema = new mongoose.Schema(
         type: Date,
         default: null,
       },
+      weeklyCheckedBy: {
+        type: String,
+        default: null,
+      },
+      dailyCheckedBY: {
+        type: String,
+        default: null,
+      },
     },
   },
   { timestamps: true }
