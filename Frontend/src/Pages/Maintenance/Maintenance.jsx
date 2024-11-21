@@ -18,6 +18,8 @@ import { dailyMaintenanceChecklist } from "../../assets/weeklyCheckLists";
 import { WeeklyMaintenanceChecklist } from "../../assets/dailyCheckLists";
 
 export default function Maintenance() {
+  const [userRole, setUserRole] = useState("");
+  const [maintenanceDepotName, setMaintenanceDepotName] = useState("");
   const [weeklyData, setWeeklyData] = useState([]);
   const [dailyData, setDailyData] = useState([]);
   const [searchBus, setSearchBus] = useState("");
@@ -84,6 +86,13 @@ export default function Maintenance() {
       return <span>{`${days} days left`}</span>;
     }
   };
+  useEffect(() => {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (user) {
+      setUserRole(user.role); 
+      setMaintenanceDepotName(user.depoName); 
+    }
+  }, []);
 
   useEffect(() => {
     getAllWeaklyData();
@@ -91,12 +100,15 @@ export default function Maintenance() {
   }, []);
 
   useEffect(() => {
-    if (activeStatus == "Daily Maintenance") {
-      setFilteredVehicles(dailyData);
-    } else {
-      setFilteredVehicles(weeklyData);
+    let vehiclesToFilter = activeStatus === "Daily Maintenance" ? dailyData : weeklyData;
+
+    if (userRole === "Admin") {
+      setFilteredVehicles(vehiclesToFilter);
+    } else if (userRole === "Maintenance" || userRole==="Supervisor") {
+      const filtered = vehiclesToFilter.filter(vehicle => vehicle.ALLOTEDDEPOT === maintenanceDepotName);
+      setFilteredVehicles(filtered);
     }
-  }, [activeStatus, dailyData, weeklyData]);
+  }, [activeStatus, dailyData, weeklyData, userRole, maintenanceDepotName]);
 
   const getAllWeaklyData = async () => {
     try {

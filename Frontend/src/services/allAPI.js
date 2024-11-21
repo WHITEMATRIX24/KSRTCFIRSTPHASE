@@ -6,6 +6,11 @@ export const getAllVehicles = async () => {
   return await commonAPI("GET", `${SERVERURL}/getAllVehicles`, "");
 };
 
+//get all vehicle details based upon alloted depo
+export const getAllAlottedDepoVehicleApi = async (depoName) => {
+  return await commonAPI("GET", `${SERVERURL}/getAllVehicleByDeponame/${depoName}`, "", "");
+};
+
 //Edit VehicleStatus>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 export const editStatus = async (vehicle_id, reqbody) => {
   return await commonAPI(

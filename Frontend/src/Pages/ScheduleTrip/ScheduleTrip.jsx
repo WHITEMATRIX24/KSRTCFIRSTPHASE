@@ -34,7 +34,7 @@ export default function ScheduleTrip() {
 
   // get all trips
   const getTrips = async () => {
-   if(role == "Staff"){ try {
+   if(role == "Staff" || role==="Supervisor"){ try {
       const result = await getAllUpcomingTripApi(depoName);
       console.log(result);
       

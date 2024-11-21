@@ -7,13 +7,19 @@ import { faAngleRight, faBus, faIndianRupee, faCarBurst, faCarSide, faChevronRig
 import ChartPie from '../components/ChartPie'
 import ChartBar from '../components/ChartBar'
 import { faServicestack } from '@fortawesome/free-brands-svg-icons'
-import { getAllTripApi, getAllVehiclesApi, getOnRouteServicesApi, getAvilableServicesApi, getAllCompletedTripApi, getAllOutofServicesApi } from '../services/allAPI'
+import { getAllTripApi, getAllVehiclesApi, getOnRouteServicesApi, getAvilableServicesApi, getAllCompletedTripApi, getAllOutofServicesApi, getAllAlottedDepoVehicleApi, getTripOfDepotApi, getAllUpcomingTripApi, getAllLiveTripApi, getAllConductor, getAllDrivers } from '../services/allAPI'
 import ExcelExport from '../components/ExcelExport '
 
 
 
 function Dashboard() {
-  const [AllvehicleData, setAllVehicleData] = useState({})
+  const [AllvehicleData, setAllVehicleData] = useState([])
+  const [AllTripDetails, setAllTripDetails] = useState([])
+  const [AllUpcomingTDByDepo, setAllUpcomingTDByDepo] = useState([])
+  const [AllLiveTripdetails, setAllLiveTripDetails] = useState([])
+  // const [AllLiveTripdetailsbyDepo, setAllLiveTripDetailsbyDepo] = useState([])
+  const [ConductorDetails, setConductorDetails] = useState([])
+  const [DriverDetails, setDriverDetails] = useState([])
   const [AllTripDataCount, setAllTripDataCount] = useState(0)
   const [AllOnRouteBusesCount, setAllOnRouteBusesCount] = useState(0)
   const [AllBusesInServiceCount, setAllBusesInServiceCount] = useState(0)
@@ -22,21 +28,71 @@ function Dashboard() {
   const [outOfServicesCount, setOutOfServicesCount] = useState(0);
   const [CompletedTripDetails, setCompletedTripDetails] = useState({})
 
+
   // get all Vehicle details
   const getAllVehicleDetails = async () => {
-    const result = await getAllVehiclesApi()
-    // console.log(result.data);
-    setAllVehicleData(result.data)
-
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    if (userDetails.depoName == "Admin") {
+      // const name=userData.depoName
+      const result = await getAllVehiclesApi()
+      // console.log(result.data);
+      if (result.status == 200) {
+        setAllVehicleData(result.data)
+      }
+    }
+    else {
+      // get all Vehicle details by depoName
+      const result = await getAllAlottedDepoVehicleApi(userDetails.depoName)
+      console.log(result.data);
+      if (result.status == 200) {
+        setAllVehicleData(result.data)
+      }
+    }
   }
 
   // get all trip details
   const getAllTripDetails = async () => {
-    const result = await getAllTripApi()
-    // console.log(result);
-    const count = result.data.length;
-    setAllTripDataCount(count)
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    if (userDetails.depoName == "Admin") {
+      const result = await getAllTripApi()
+      console.log(result.data);
+      if (result.status == 200) {
+        setAllTripDetails(result.data);
+        const count = result.data.length;
+        setAllTripDataCount(count)
+      }
+    }
+    else {
+      //get all trip by DepoName
+      const result = await getTripOfDepotApi(userDetails.depoName)
+      // console.log(result);
+      if (result.status == 200) {
+        setAllTripDetails(result.data);
+      }
+    }
   }
+  console.log(AllTripDetails);
+
+  //trip Upcomming departure_location == depoName
+  const getUpComingTripDetailsByDepo = async () => {
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    const result = await getAllUpcomingTripApi(userDetails.depoName)
+    if (result.status == 200) {
+      setAllUpcomingTDByDepo(result.data);
+    }
+  }
+  // console.log(AllUpcomingTDByDepo);
+
+  // to get all live trip details based upon depo
+  const getAllLiveTripByDepo = async () => {
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    const result = await getAllLiveTripApi(userDetails.depoName)
+    if (result.status == 200) {
+      setAllLiveTripDetails(result.data);
+    }
+  }
+  // console.log(AllLiveTripdetails);
+
 
   //get total number of bussess in route
   const getAllOnRouteDetails = async () => {
@@ -75,6 +131,107 @@ function Dashboard() {
     setCompletedTripDetails(result.data);
   }
 
+  //get all conductor details
+  const getAllConductordetails = async () => {
+    const result = await getAllConductor()
+    // console.log(result.data);
+    setConductorDetails(result.data)
+  }
+
+  //get all driver details
+  const getAllDriverdetails = async () => {
+    const result = await getAllDrivers()
+    // console.log(result.data);
+    setDriverDetails(result.data)
+  }
+
+  // Function to map conductorId to conductorName
+  const getConductorName = (conductorId) => {
+    const conductor = ConductorDetails.find(conductor => conductor._id === conductorId);
+    return conductor ? conductor.EmployeeName : 'Unknown';
+  };
+
+  // Function to map driverId to DriverName
+  const getDriverName = (driverId) => {
+    const driver = DriverDetails.find(driver => driver._id === driverId);
+    return driver ? driver.EmployeeName : 'Unknown';
+  };
+
+  // // Function to map vehicleId to BusNumber
+  const getBusNumber = (vehicleId) => {
+    const vehicle = AllvehicleData.find(vehicle => vehicle._id === vehicleId);
+    return vehicle ? vehicle.BUSNO : 'Unknown';
+  };
+
+  // Function to map driverId to Driver Pen number
+  const getDriverPen = (driverId) => {
+    const driver = DriverDetails.find(driver => driver._id === driverId);
+    return driver ? driver.PEN : 'Unknown';
+  };
+
+  //Function to map driverId to Driver Pen number
+  const getConductorPen = (conductorId) => {
+    const conductor = ConductorDetails.find(conductor => conductor._id === conductorId);
+    return conductor ? conductor.PEN : 'Unknown';
+  };
+
+  // console.log(AllTripDetails);
+  // Update AllTripdetals by replacing conductorId with conductorName 
+ // Reusable transformation function
+function transformTripDetails(tripDetails) {
+  return tripDetails.map(trip => ({
+    ...trip,
+    // Replace IDs with corresponding values
+    conductorName: getConductorName(trip.conductor_id),
+    driverName: getDriverName(trip.driver_id),
+    BusNo: getBusNumber(trip.vehicle_id),
+    DriverPenNumber: getDriverPen(trip.driver_id),
+    ConductorPenNumber: getConductorPen(trip.conductor_id),
+    // Flatten location properties
+    'arrival_location.depo': trip.arrival_location.depo,
+    'departure_location.depo': trip.departure_location.depo,
+    departure_location: undefined, // Remove original location properties
+    arrival_location: undefined,   
+  }));
+}
+
+// Apply the transformation to AllTripDetails
+const updatedTripDetails = transformTripDetails(AllTripDetails);
+console.log(updatedTripDetails);
+
+// Apply the transformation to AllUpcomingTDByDepo
+const AllUpcomingTDByDepoUpdated = transformTripDetails(AllUpcomingTDByDepo);
+console.log(AllUpcomingTDByDepoUpdated);
+
+// Apply the transformation to AllLiveTripdetails
+const AllLiveTDByDepoUpdated = transformTripDetails(AllLiveTripdetails);
+console.log(AllLiveTDByDepoUpdated);
+
+  // console.log(AllLiveTDByDepoUpdatedflatten);
+
+  //Array of Objects flat() function
+  const AllvehicleDataFlatten = AllvehicleData.map(obj => ({
+    ...obj,           // Spread the original object properties
+    // Flatten the 'lastWeekelyMaintenanceUpdateDate' object, prefixing 'lastWeekelyMaintenanceUpdateDate.' to the keys
+    'lastWeekelyMaintenanceUpdateDate': obj.maintenance_data.lastWeekelyMaintenanceUpdateDate,
+    // Flatten the 'weeklyMaintenanceDueDate' object, prefixing 'weeklyMaintenanceDueDate.' to the keys
+    'weeklyMaintenanceDueDate': obj.maintenance_data.weeklyMaintenanceDueDate,
+
+    // Flatten the 'lastdailyMaintenanceUpdateDate' object, prefixing 'lastdailyMaintenanceUpdateDate.' to the keys
+    'lastdailyMaintenanceUpdateDate': obj.maintenance_data.lastdailyMaintenanceUpdateDate,
+
+    // Flatten the 'weekleyMaintenanceUpdateStatus' object, prefixing 'weekleyMaintenanceUpdateStatus' to the keys
+    'weekleyMaintenanceUpdateStatus': obj.maintenance_data.weekleyMaintenanceUpdateStatus,
+
+    // Flatten the 'dailyMaintenanceUpdateStatus' object, prefixing 'dailyMaintenanceUpdateStatus.' to the keys
+    'dailyMaintenanceUpdateStatus': obj.maintenance_data.dailyMaintenanceUpdateStatus,
+
+    maintenance_data: undefined, // Optionally remove the  maintenance_data  property
+
+  }));
+
+
+  // console.log(AllvehicleDataFlatten);
   useEffect(() => {
     getAllVehicleDetails()
     getAllTripDetails()
@@ -82,9 +239,14 @@ function Dashboard() {
     getAllBusesInServices()
     getAllCompletedTripDetails()
     getOutOfServicesCount()
+    getUpComingTripDetailsByDepo()
+    getAllLiveTripByDepo()
+    getAllConductordetails()
+    getAllDriverdetails()
   }, [])
 
   // console.log(TotalCollection,TotalFuelConsumption);
+
 
 
 
@@ -95,7 +257,7 @@ function Dashboard() {
         <div className="row">
           <div className="col-md-2"></div>
           <div className="col-md-10">
-            <ExcelExport data={CompletedTripDetails} data1={AllvehicleData} fileName="Report" />
+            <ExcelExport data={CompletedTripDetails} data1={AllvehicleDataFlatten} data2={updatedTripDetails} data3={AllUpcomingTDByDepoUpdated} data4={AllLiveTDByDepoUpdated} fileName="Report" />
             <RealTimeData />
 
             {/* section1 */}

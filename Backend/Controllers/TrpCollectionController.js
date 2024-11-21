@@ -29,7 +29,11 @@ export const getAllCollection = async (req,res) => {
 export const getCollectionsOfDepot = async (req,res) => {
     try{
         const {depot} = req.params
+        console.log(depot);
+        
         const depotCollections = await TripCollections.find({depot})
+        console.log("Data",depotCollections);
+        
         if(depotCollections.length>0){
             res.status(200).json(depotCollections)
         }else{

@@ -10,6 +10,7 @@ import {
   getCollectionByDepoAPi,
 } from "../../services/allAPI";
 import { all } from "axios";
+import { TextField } from "@mui/material";
 
 function Collection() {
   const [collectionDetails, setCollectionDetails] = useState({
@@ -30,15 +31,19 @@ function Collection() {
     setShowAddCollection(false);
     setCollectionDetails({
       date: "",
-      depot: "",
       Tripcollection: "",
       fuelCost: "",
       numOfPassengers: "",
     });
+    setInputPairs([])
+    setFuel([])
+    setFuelCost(0)
   };
 
   const handleSave = async () => {
-    setCollectionDetails({ ...collectionDetails, depot: depo });
+    console.log(depo);
+    
+   // setCollectionDetails({ ...collectionDetails, depot: depo });
     console.log(collectionDetails);
 
     if (
@@ -57,7 +62,7 @@ function Collection() {
         getCollection();
       } else {
         alert("Error in Adding Data");
-      }
+      } 
     }
   };
 
@@ -68,20 +73,29 @@ function Collection() {
   const [toatlCollection, setTotalCollection] = useState();
 
   const getCollection = async () => {
-    if (role == "Staff") {
+    if (role == "Staff" || role =="Supervisor") {
       setIsStaff(true);
 
       const result = await getCollectionByDepoAPi(depo);
-      console.log(result.data);
+      console.log(result);
 
       if (result.status == 200) {
         setLoading(true);
         setAllCollections(result.data);
-      } else {
+      }else if(result.status == 406){
+        alert('No Collectons Added')
+
+      } 
+      
+      else {
         alert("Failed to Load Collection Details");
       }
     } else if (role == "Admin") {
       const result = await getAllCollectionAPi();
+      console.log(result);
+      console.log('inside admin');
+      
+      
       if (result.status == 200) {
         setAllCollections(result.data);
         setLoading(true);
@@ -95,7 +109,9 @@ function Collection() {
     console.log("User", userDetails);
     setDepo(userDetails.depoName);
     setRole(userDetails.role);
-  }, []);
+    setCollectionDetails({...collectionDetails, depot:depo})
+    
+  }, [allCollections]);
 
   useEffect(() => {
     getCollection();
@@ -116,6 +132,36 @@ function Collection() {
       });
       setAllCollections([...filtered]);
     }
+  };
+
+/* <<<<<<< Fuel Cost Functionality>>>>> */
+
+  const [inputPairs, setInputPairs] = useState([]);
+  const [fuel, setFuel] = useState([]);
+  const [fuelCost, setFuelCost] = useState(0);
+
+  /* Function to add input boxes for entering fuel charge */
+  const handleButtonClick = () => {
+    // Add a new pair of input fields, each with its own state for the values
+    setInputPairs([...inputPairs, { liter: "", rate: "", total: "" }]);
+  };
+
+  /* Function to save fuel charge */
+  const handleInputChange = (index, field, event) => {
+    // Update the value of either input1 or input2 for a specific input pair
+    const newInputPairs = [...inputPairs];
+    let newFuel = fuel;
+    let fuelCharge = 0;
+    newInputPairs[index][field] = event.target.value;
+    newInputPairs[index]["total"] =
+      newInputPairs[index]["liter"] * newInputPairs[index]["rate"];
+    fuel[index] = newInputPairs[index]["total"];
+    setInputPairs(newInputPairs);
+    setFuel(newFuel);
+    fuelCharge = newFuel.reduce((a, b) => a + b);
+
+    setFuelCost(fuelCharge);
+    setCollectionDetails({ ...collectionDetails, fuelCost: fuelCharge });
   };
 
   useEffect(() => {
@@ -148,7 +194,7 @@ function Collection() {
           <div className="d-flex justify-content-between my-3 mx-3">
             <h4>Collection</h4>
 
-            <button
+           {isStaff && <button
               className="btn btn-success"
               onClick={handleShow}
               style={{ backgroundColor: "#0d8a72", color: "white" }}
@@ -156,7 +202,7 @@ function Collection() {
               {" "}
               <FontAwesomeIcon className="me-2" icon={faPlus} />
               ADD COLLECTION
-            </button>
+            </button>}
           </div>
           {/* Filters */}
           {!isStaff && (
@@ -293,22 +339,66 @@ function Collection() {
                 }
               />
             </div>
-            <div className="mt-2">
+           
+            <>
+                  <button
+                    className="btn btn-outline-warning m-3"
+                    onClick={handleButtonClick}
+                  >
+                    Add Fuel Cost
+                  </button>
+                  {/* Render each input pair */}
+                  {inputPairs.map((pair, index) => (
+                    <div
+                      key={index}
+                      className="d-flex"
+                      style={{ marginBottom: "10px" }}
+                    >
+                      <TextField
+                        required
+                        id="outlined-required"
+                        name="liter"
+                        label="Fuel in Liter "
+                        className="w-25     me-3"
+                        value={pair.input1}
+                        onChange={(e) => handleInputChange(index, "liter", e)}
+                        placeholder={`Liters`}
+                      />
+
+                      <TextField
+                        required
+                        id="outlined-required"
+                        name="liter"
+                        label="Fuel Rate "
+                        className="w-25     me-3"
+                        value={pair.input2}
+                        onChange={(e) => handleInputChange(index, "rate", e)}
+                        placeholder={`₹ 0`}
+                      />
+
+                      <TextField
+                        readOnly
+                        label="Total "
+                        id="outlined-required"
+                        name="Total"
+                        className=" form-control w-25"
+                        value={pair.total}
+                        placeholder={`₹ 0`}
+                      />
+                    </div>
+                  ))}
+                  <br/>
               <Form.Label className="mb-1" style={{ fontSize: "14px" }}>
                 Total Fuel Cost
-              </Form.Label>
+              </Form.Label>                  
               <input
-                type="text"
-                className="form-control"
-                value={collectionDetails.fuelCost}
-                onChange={(e) =>
-                  setCollectionDetails({
-                    ...collectionDetails,
-                    fuelCost: e.target.value,
-                  })
-                }
-              />
-            </div>
+                    className="form-control w-100 text-danger fs-5"
+                    type="text" readOnly
+                    value={`₹ ${fuelCost} `}
+                    placeholder="₹ 0"
+                  />{" "}
+                </>
+            
             <div className="mt-2">
               <Form.Label className="mb-1" style={{ fontSize: "14px" }}>
                 Total No. of Passengers

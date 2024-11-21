@@ -18,8 +18,7 @@ const adminSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Admin", "Depo", "Maintenance","Staff"],
-      default: "Depo",
+      enum: ["Admin", "Supervisor", "Maintenance","Staff"],
     },
   },
   { timestamps: true }

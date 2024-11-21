@@ -386,7 +386,7 @@ export default function OnGoingTrips() {
     console.log(role);
     
     
- if(role == 'Staff'){  
+ if(role == 'Staff'||role=="Supervisor"){  
   const result = await getAllLiveTripApi(depoName);
     console.log(result.data);
 
