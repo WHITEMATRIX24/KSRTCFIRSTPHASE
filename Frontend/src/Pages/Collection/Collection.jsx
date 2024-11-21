@@ -311,7 +311,7 @@ function Collection() {
             </div>
             <div className="mt-2">
               <Form.Label className="mb-1" style={{ fontSize: "14px" }}>
-                Toatl No. of Passengers
+                Total No. of Passengers
               </Form.Label>
               <input
                 type="text"
