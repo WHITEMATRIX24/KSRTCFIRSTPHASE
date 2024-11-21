@@ -46,30 +46,26 @@ function TripOverviewComponent() {
   
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [trip, setTrip] = useState(filteredTrips[chosenTrip]);
+  const safeTrips = trips || [];
   
 
   useEffect(() => {
     getTripInitialData();
   }, []);
-
+  
   useEffect(() => {
     setFilteredTrips(
-      trips
+      safeTrips
         .filter((item) => {
-          // Ensure `start_date` and `end_date` are not null or undefined
-          const startDate = item.start_date ? item.start_date.split("T")[0] : null;
-          // const endDate = item.end_date ? item.end_date.split("T")[0] : null;
-  
-          return startDate === datePick ;
+          const startDate = item?.start_date?.split("T")[0]; // Safe navigation
+          return startDate === datePick;
         })
         .filter((item) => {
           if (!depo) return true;
-  
           const depoKeyword = depo.split(" ")[0].toLowerCase();
-  
           return (
-            item.departure_location.depo.toLowerCase().includes(depoKeyword) ||
-            item.arrival_location.depo.toLowerCase().includes(depoKeyword)
+            item?.departure_location?.depo?.toLowerCase().includes(depoKeyword) ||
+            item?.arrival_location?.depo?.toLowerCase().includes(depoKeyword)
           );
         })
     );
