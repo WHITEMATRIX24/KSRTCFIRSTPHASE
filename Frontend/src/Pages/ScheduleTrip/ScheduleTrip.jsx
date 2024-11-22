@@ -32,16 +32,18 @@ export default function ScheduleTrip() {
   const [modifiedTrips, setModifiedTrips] = useState([]);
   const [isLoadingApi, setIsLoadingApi] = useState(false);
 
+  const [noData, setNoData] = useState(false);
+
   // get all trips
   const getTrips = async () => {
-   if(role == "Staff" || role==="Supervisor"){ try {
+   if(role == "Staff" || role=="Supervisor"){ try {
       const result = await getAllUpcomingTripApi(depoName);
-      console.log(result);
+      //console.log(result);
       
       if (result.status == 200) {        
         setTrips(result.data);
-      } else {
-       // alert("Failed to fetch Trips data");
+      } else if(result.status == 404) {
+        setNoData(true)
       }
     } catch (err) {
       alert(`Failed to load trips ${err}`);
@@ -53,8 +55,9 @@ export default function ScheduleTrip() {
         
         if (result.status == 200) {        
           setTrips(result.data);
-        } else {
-         // alert("Failed to fetch Trips data");
+        } else if(result.status == 404)  {
+          setNoData(true)
+
         }
       } catch (err) {
         alert(`Failed to load trips ${err}`);
@@ -62,14 +65,20 @@ export default function ScheduleTrip() {
     
   };
 
+  const [loading, setLoading] = useState(true)
+
   // get drivers list
   const getAllDriversList = async () => {
     try {
       const result = await getDriversListApi();
+      console.log(result.status);
+      
       if (result.status == 200) {
         setDrivers(result.data);
+        setLoading(false)
       } else {
-        alert("Failed to load Drivers Details");
+       console.log("Failed to load Driver & conductor");
+       
       }
     } catch (err) {
       alert(`Failed to load Drivers Details ${err}`);
@@ -102,7 +111,7 @@ export default function ScheduleTrip() {
     } finally {
       setIsLoadingApi(false);
     }
-  }, [depoName]);
+  }, [depoName,trips]);
 
   // mdofied trip data
   useEffect(() => {
@@ -128,7 +137,7 @@ export default function ScheduleTrip() {
   const formatTime = (timeInput) => {
     if (timeInput) {
       const date = new Date(`1970-01-01T${timeInput}:00`);
-      const options = { hour: "numeric", minute: "2-digit", hour12: true };
+      const options = { hour: "numeric", minute: "2-digit", hour12: false };
       return date.toLocaleTimeString("en-US", options);
     } else {
       return "";
@@ -167,7 +176,7 @@ export default function ScheduleTrip() {
 
   const handleLive = async (id) => {
     setCurrentDateTime(new Date());
-    const options = { hour: "numeric", minute: "2-digit", hour12: true };
+    const options = { hour: "numeric", minute: "2-digit", hour12: false };
   const time = currentDateTime.toLocaleTimeString("en-US", options); // e.g., '14:30:45'
 
     const trip = trips.find((item) => item._id == id);
@@ -244,153 +253,168 @@ export default function ScheduleTrip() {
 
             <hr className="my-3" />
 
-            {/* Toolbar with count of items */}
-            <Row className="align-items-center mb-3">
-              <Col xs="auto">
-                {/* <FontAwesomeIcon icon={faCog} className="text-muted me-3" />
-                <FontAwesomeIcon icon={faTrash} className="text-muted" /> */}
-              </Col>
-              <Col className="text-end">
-                {/* Displaying the count of filtered items */}
-                <span>Items in the table:</span>
-                <span className="text-info ms-2 me-5">
-                  {
-                    modifiedTrips
-                      .filter((item) =>
-                        !date
-                          ? true
-                          : date == item.start_date.split("T")[0] ||
-                            date == item.end_date.split("T")[0]
-                      )
-                      .filter((item) =>
-                        !vehicleSearch
-                          ? true
-                          : item.BusNo.search((vehicleSearch.toUpperCase())) == -1
-                          ? false
-                          : true
-                      )
-                      .filter((item) => item.status == "upcoming" && (item.departure_location.depo == depoName)).length
-            }
-                </span>
-              </Col>
-            </Row>
+            {!noData &&<>  
+  
+                {/* Toolbar with count of items */}
+                <Row className="align-items-center mb-3">
+                  <Col xs="auto">
+                    {/* <FontAwesomeIcon icon={faCog} className="text-muted me-3" />
+                    <FontAwesomeIcon icon={faTrash} className="text-muted" /> */}
+                  </Col>
+                  <Col className="text-end">
+                    {/* Displaying the count of filtered items */}
+                    <span>Items in the table:</span>
+                    <span className="text-info ms-2 me-5">
+                      {
+                        modifiedTrips
+                          .filter((item) =>
+                            !date
+                              ? true
+                              : date == item.start_date.split("T")[0] ||
+                                date == item.end_date.split("T")[0]
+                          )
+                          .filter((item) =>
+                            !vehicleSearch
+                              ? true
+                              : item.BusNo.search((vehicleSearch.toUpperCase())) == -1
+                              ? false
+                              : true
+                          )
+                          .filter((item) => item.status == "upcoming" && (item.departure_location.depo == depoName)).length
+                }
+                    </span>
+                  </Col>
+                </Row>
+    
+               {!loading ?<>
+                  {/* Table */}
+                  <Row>
+                    <Col>
 
-            {/* Table */}
-            <Row>
-              <Col>
-                <Table
-                  hover
-                  responsive
-                  className="align-middle"
-                  style={{ borderSpacing: "0 10px" }}
-                >
-                  <thead>
-                    <tr className="bg-light">
-                      <th></th>
-                      <th>TRIP</th>
-                      <th>VEHICLE</th>
-                      <th>DRIVER</th>
-                      <th>START DATE</th>
-                      <th>END DATE</th>
-                      <th>Status</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {!isLoadingApi && modifiedTrips.length > 0 ? (
-                      modifiedTrips
-                        .filter((item) =>
-                          !date
-                            ? true
-                            : date == item.start_date.split("T")[0] ||
-                              date == item.end_date.split("T")[0]
-                        )
-                        .filter((item) =>
-                          !vehicleSearch
-                            ? true
-                            : item.BusNo.search(vehicleSearch.toUpperCase()) == -1
-                            ? false
-                            : true
-                        )
-                        .filter((item) => item.status == "upcoming")
-                        .filter((item) => item.departure_location.depo == depoName)
-
-                        .map((item, index) => (
-                          <tr key={index} className="bg-white">
-                            <td>{/* <Form.Check type="checkbox" /> */}</td>
-                            <td>
-                              {item.trip_id}{" "}
-                              <span className="text-primary ms-1">
-                                {item?.trip_type.toUpperCase()}
-                              </span>
-                            </td>
-                            <td>
-                              <div className="d-flex align-items-center gap-2">
-                                <FontAwesomeIcon
-                                  icon={faBus}
-                                  className="text-muted me-2"
-                                />
-                                <div>
-                                  <div>{item.BusNo}</div>
-                                  <small className="text-muted">BUS</small>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              <FontAwesomeIcon
-                                icon={faUser}
-                                className="text-muted me-2"
-                              />
-                              {item.employeeName}
-                            </td>
-                            <td>
-                              {new Date(item.start_date).toLocaleDateString()}
-                              <br />
-                              <small className="text-muted">
-                                {formatTime(item.start_time)}
-                              </small>
-                            </td>
-                            <td>
-                             { item.end_date &&<> {new Date(item.start_date).toLocaleDateString()}</>}
-                             { !item.end_date &&<p className=""> ----</p>}
-                             <br />
-                             <small>
-                             { item.end_time &&<>  {formatTime(item.end_time)}</>}
-                              </small>
-                              
-                            </td>
-                            <td>
-                              {/* <FontAwesomeIcon icon={faClock} className="text-muted me-2" />
-                          {tripDuration(item.start_date,item.start_time,item.end_date,item.end_time)} */}
-                              <button
-                                className={
-                                  item.status == "live"
-                                    ? "text-success btn"
-                                    : "text-secondary btn"
-                                }
-                                onClick={() => handleLive(item._id)}
-                              >
-                                <FontAwesomeIcon icon={faCircleCheck} />
-                                <span className="ms-2">
-                                  {item.status == "live" ? "Live" : "Make Live"}
-                                </span>
-                              </button>
-                            </td>
-                            <td>
-                              {/* <Button variant="link" className="p-0">
-                            <FontAwesomeIcon icon={faEllipsisV} />
-                          </Button> */}
-                            </td>
+                      <Table
+                        hover
+                        responsive
+                        className="align-middle"
+                        style={{ borderSpacing: "0 10px" }}
+                      >
+                        <thead>
+                          <tr className="bg-light">
+                            <th></th>
+                            <th>TRIP</th>
+                            <th>VEHICLE</th>
+                            <th>DRIVER</th>
+                            <th>START DATE</th>
+                            <th>END DATE</th>
+                            <th>Status</th>
+                            <th></th>
                           </tr>
-                        ))
-                    ) : (
-                      <></>
-                    )}
-                  </tbody>
-                </Table>
-              </Col>
-            </Row>
+                        </thead>
+      
+                        <tbody>
+                          {!isLoadingApi &&
+                          
+                          <>
+                            
+                           { modifiedTrips.length > 0 && (
+                              modifiedTrips
+                                .filter((item) =>
+                                  !date
+                                    ? true
+                                    : date == item.start_date.split("T")[0] ||
+                                      date == item.end_date.split("T")[0]
+                                )
+                                .filter((item) =>
+                                  !vehicleSearch
+                                    ? true
+                                    : item.BusNo.search(vehicleSearch.toUpperCase()) == -1
+                                    ? false
+                                    : true
+                                )
+                                .filter((item) => item.status == "upcoming")
+                                .filter((item) => item.departure_location.depo == depoName)
+        
+                                .map((item, index) => (
+                                  <tr key={index} className="bg-white">
+                                    <td>{/* <Form.Check type="checkbox" /> */}</td>
+                                    <td>
+                                      {item.trip_id}{" "}
+                                      <span className="text-primary ms-1">
+                                        {item?.trip_type.toUpperCase()}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <div className="d-flex align-items-center gap-2">
+                                        <FontAwesomeIcon
+                                          icon={faBus}
+                                          className="text-muted me-2"
+                                        />
+                                        <div>
+                                          <div>{item.BusNo}</div>
+                                          <small className="text-muted">BUS</small>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <FontAwesomeIcon
+                                        icon={faUser}
+                                        className="text-muted me-2"
+                                      />
+                                      {item.employeeName}
+                                    </td>
+                                    <td>
+                                      {new Date(item.start_date).toLocaleDateString()}
+                                      <br />
+                                      <small className="text-muted">
+                                        {formatTime(item.start_time)}
+                                      </small>
+                                    </td>
+                                    <td>
+                                     { item.end_date &&<> {new Date(item.start_date).toLocaleDateString()}</>}
+                                     { !item.end_date &&<p className=""> ----</p>}
+                                     <br />
+                                     <small>
+                                     { item.end_time &&<>  {formatTime(item.end_time)}</>}
+                                      </small>
+                                      
+                                    </td>
+                                    <td>
+                                      {/* <FontAwesomeIcon icon={faClock} className="text-muted me-2" />
+                                  {tripDuration(item.start_date,item.start_time,item.end_date,item.end_time)} */}
+                                      <button
+                                        className={
+                                          item.status == "live"
+                                            ? "text-success btn"
+                                            : "text-secondary btn"
+                                        }
+                                        onClick={() => handleLive(item._id)}
+                                      >
+                                        <FontAwesomeIcon icon={faCircleCheck} />
+                                        <span className="ms-2">
+                                          {item.status == "live" ? "Live" : "Make Live"}
+                                        </span>
+                                      </button>
+                                    </td>
+                                    <td>
+                                      {/* <Button variant="link" className="p-0">
+                                    <FontAwesomeIcon icon={faEllipsisV} />
+                                  </Button> */}
+                                    </td>
+                                  </tr>
+                                ))
+                            ) }
+                          </>
+                          }
+                        </tbody>
+                      </Table>
+                    </Col>
+                  </Row>
+                  </>: <h6 className="text-danger ms-5">Loading Upcoming Trips...Please Wait</h6>}
+               </>
+            
+            }
+            {
+              noData && <h6 className="text-danger">No Upcoming Trips</h6>
+            }
           </Col>
 
           <Col md={1}></Col>

@@ -6,6 +6,7 @@ import Driver from "../Models/DiverSchema.js";
 // <<<<<<::::::::Adding New Trip Details::::::::>>>
 export const addNewTrip = async (req, res) => {
   const {
+    waybill_Number,
     start_date,
     end_date,
     start_time,
@@ -16,6 +17,7 @@ export const addNewTrip = async (req, res) => {
     trip_type,
   } = req.body;
   const { vehicle_id, driver_id, conductor_id } = req.params;
+console.log(req.body);
 
   try {
     const vehicle = await Vehicle.findById(vehicle_id);
@@ -30,6 +32,7 @@ export const addNewTrip = async (req, res) => {
     }
 
     const newTrip = new Trip({
+      waybill_Number,
       start_date,
       end_date,
       start_time,
@@ -77,6 +80,7 @@ export const getAllTripDetails = async (req, res) => {
 export const editTripDetails = async (req, res) => {
   // console.log('inside')
   const {
+    waybill_Number,
     start_date,
     end_date,
     start_time,
@@ -107,6 +111,7 @@ export const editTripDetails = async (req, res) => {
     const updatedTrip = await Trip.findByIdAndUpdate(
       _id,
       {
+        waybill_Number,
         start_date,
         end_date,
         start_time,
@@ -115,7 +120,7 @@ export const editTripDetails = async (req, res) => {
           depo: departure_location.depo,
         },
         arrival_location: {
-          depo: departure_location.depo,
+          depo: arrival_location.depo,
         },
         vehicle_id: vehicle_id,
         driver_id: driver_id,
@@ -141,6 +146,7 @@ export const editTripDetails = async (req, res) => {
 // editing trip by tripid , driverid, vehicleid, contuctorid
 export const editTripDetailsNew = async (req, res) => {
   const {
+    waybill_Number,
     start_date,
     end_date,
     start_time,
@@ -149,6 +155,7 @@ export const editTripDetailsNew = async (req, res) => {
     arrival_location,
     status,
   } = req.body;
+  
   const { vehicle_id, driver_id, conductor_id, trip_id } = req.params;
 
   try {
@@ -165,6 +172,7 @@ export const editTripDetailsNew = async (req, res) => {
     const updatedTrip = await Trip.findByIdAndUpdate(
       trip_id,
       {
+        waybill_Number,
         start_date,
         end_date,
         start_time,
@@ -174,7 +182,7 @@ export const editTripDetailsNew = async (req, res) => {
           depo: departure_location.depo,
         },
         arrival_location: {
-          depo: departure_location.depo,
+          depo: arrival_location.depo,
         },
         vehicle_id: vehicle_id,
         driver_id: driver_id,

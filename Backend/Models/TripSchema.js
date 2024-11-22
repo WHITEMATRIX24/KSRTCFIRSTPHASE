@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const tripSchema = new mongoose.Schema({
+  waybill_Number:{
+    type:String,
+    required:true,
+  },
   vehicle_id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

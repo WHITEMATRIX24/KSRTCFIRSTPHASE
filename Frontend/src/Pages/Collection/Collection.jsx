@@ -21,8 +21,22 @@ function Collection() {
     numOfPassengers: "",
   });
   const [showAddCollection, setShowAddCollection] = useState(false);
-
   const [allCollections, setAllCollections] = useState([]);
+  const [dateFilter, setDateFilter] = useState("");
+  const [originalCollections, setOriginalCollections] = useState([]);
+  const [depoFilter, setDepoFilter] = useState();
+  const [TotalFuel, setTotalFuel] = useState();
+  const [TotalPassenger, setTotalPassenger] = useState();
+  const [depo, setDepo] = useState("");
+  const [role, setRole] = useState("");
+  const [isStaff, setIsStaff] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toatlCollection, setTotalCollection] = useState();
+  const [inputPairs, setInputPairs] = useState([]);
+  const [fuel, setFuel] = useState([]);
+  const [fuelCost, setFuelCost] = useState(0);
+
+
 
   const handleShow = () => {
     setShowAddCollection(true);
@@ -66,44 +80,68 @@ function Collection() {
     }
   };
 
-  const [depo, setDepo] = useState("");
-  const [role, setRole] = useState("");
-  const [isStaff, setIsStaff] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [toatlCollection, setTotalCollection] = useState();
+  
 
   const getCollection = async () => {
-    if (role == "Staff" || role =="Supervisor") {
-      setIsStaff(true);
-
-      const result = await getCollectionByDepoAPi(depo);
-      console.log(result);
-
-      if (result.status == 200) {
-        setLoading(true);
-        setAllCollections(result.data);
-      }else if(result.status == 406){
-        alert('No Collectons Added')
-
-      } 
-      
-      else {
-        alert("Failed to Load Collection Details");
+    setLoading(true);
+    try {
+      let result;
+      if (role === "Staff" || role === "Supervisor") {
+        setIsStaff(true);
+        result = await getCollectionByDepoAPi(depo);
+      } else if (role === "Admin") {
+        result = await getAllCollectionAPi();
       }
-    } else if (role == "Admin") {
-      const result = await getAllCollectionAPi();
-      console.log(result);
-      console.log('inside admin');
-      
-      
-      if (result.status == 200) {
+
+      if (result?.status === 200) {
+        setOriginalCollections(result.data);
         setAllCollections(result.data);
-        setLoading(true);
       } else {
-        alert("Failed to Load Collection Details");
+        console.log("Failed to fetch");
       }
+    } catch (error) {
+      console.error("Error fetching collections:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const filterByDepo = () => {
+    if (!depoFilter) {
+      setAllCollections([...originalCollections]);
+    } else {
+      const filtered = originalCollections.filter((item) =>
+        item.depot?.toLowerCase().includes(depoFilter.toLowerCase())
+      );
+      setAllCollections(filtered);
+    }
+  };
+
+  const filterByDate = () => {
+    if (!dateFilter) {
+      setAllCollections([...originalCollections]);
+    } else {
+      const filtered = originalCollections.filter((item) => {
+        const dbDate = new Date(item.date).toISOString().slice(0, 10); // Normalize date to YYYY-MM-DD
+        const filterDate = new Date(dateFilter).toISOString().slice(0, 10); // Same normalization
+        return dbDate === filterDate; // Direct comparison
+      });
+      setAllCollections(filtered);
+    }
+  };
+
+  useEffect(() => {
+    filterByDepo();
+  }, [depoFilter]);
+
+  useEffect(() => {
+    filterByDate();
+  }, [dateFilter]);
+
+
+
+
+
   useEffect(() => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     console.log("User", userDetails);
@@ -116,29 +154,12 @@ function Collection() {
   useEffect(() => {
     getCollection();
   }, [depo]);
-  const [depoFilter, setDepoFilter] = useState();
-  const [TotalFuel, setTotalFuel] = useState();
-  const [TotalPassenger, setTotalPassenger] = useState();
+  
 
-  const filter = () => {
-    if (depoFilter == "") {
-      getCollection();
-    } else {
-      const filtered = allCollections.filter((item) => {
-        const matchesDepo =
-          item.depot &&
-          item.depot.toLowerCase().includes(depoFilter.toLowerCase());
-        return matchesDepo;
-      });
-      setAllCollections([...filtered]);
-    }
-  };
-
+ 
 /* <<<<<<< Fuel Cost Functionality>>>>> */
 
-  const [inputPairs, setInputPairs] = useState([]);
-  const [fuel, setFuel] = useState([]);
-  const [fuelCost, setFuelCost] = useState(0);
+  
 
   /* Function to add input boxes for entering fuel charge */
   const handleButtonClick = () => {
@@ -164,9 +185,7 @@ function Collection() {
     setCollectionDetails({ ...collectionDetails, fuelCost: fuelCharge });
   };
 
-  useEffect(() => {
-    filter();
-  }, [depoFilter]);
+  
 
   useEffect(() => {
     let TotalColl = 0;
@@ -205,8 +224,8 @@ function Collection() {
             </button>}
           </div>
           {/* Filters */}
-          {!isStaff && (
-            <Row className="mb-3 mx-3 align-items-center">
+          <Row className="mb-3 mx-3 align-items-center">
+            {!isStaff && (
               <Col md={3}>
                 <Form.Control
                   type="text"
@@ -215,20 +234,28 @@ function Collection() {
                   onChange={(e) => setDepoFilter(e.target.value)}
                 />
               </Col>
-              <Col md={2}></Col>
-              <Col md={6} className="text-end">
-                <Button
-                  variant="link"
-                  className="text-muted"
-                  onClick={() => {
-                    setDepoFilter("");
-                  }}
-                >
-                  CLEAR
-                </Button>
-              </Col>
-            </Row>
-          )}
+            )}
+            <Col md={3}>
+              <Form.Control
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+              />
+            </Col>
+            <Col md={6} className="text-end">
+              <Button
+                variant="link"
+                onClick={() => {
+                  setDepoFilter("");
+                  setDateFilter("");
+                }}
+              >
+                CLEAR
+              </Button>
+            </Col>
+          </Row>
+
+
           <hr className="my-3" />
           {/* Toolbar with count of items */}
           <Row className="mx-3 my-5" style={{ fontSize: "18px" }}>

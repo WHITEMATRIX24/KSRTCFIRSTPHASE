@@ -4,6 +4,8 @@ import TripCollections from "../Models/TripCollectionSchema.js"
 export const addCollection = async (req,res) => {
     try{
         const {depot,date,Tripcollection,numOfPassengers,fuelCost}=req.body
+        console.log("req",req.body);
+        
         const newCollection = new TripCollections({depot,date,Tripcollection,numOfPassengers,fuelCost})
         await newCollection.save()
         res.status(201).json(newCollection)

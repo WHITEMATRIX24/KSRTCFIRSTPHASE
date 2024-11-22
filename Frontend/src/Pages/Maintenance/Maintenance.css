@@ -31,5 +31,11 @@
     .checkBox{
         accent-color: #5f7743;      
     }
+    .bg-yellowM{
+        background-color: rgba(255, 255, 0, 0.5);
+    }
+    .bg-redM{
+        background-color: rgba(255, 0, 0, 0.5);
+    }
 
 }

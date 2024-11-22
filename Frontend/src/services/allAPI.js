@@ -11,6 +11,15 @@ export const getAllAlottedDepoVehicleApi = async (depoName) => {
   return await commonAPI("GET", `${SERVERURL}/getAllVehicleByDeponame/${depoName}`, "", "");
 };
 
+//get all outof services by depo
+export const getAllOutofServicesByDepoApi = async (depoName) => {
+  return await commonAPI("GET",`${SERVERURL}/getAllOutofServicesByDepo/${depoName}`,"","");
+};
+//get on route  services by depo
+export const getOnRouteServicesByDepoApi = async (depoName) => {
+  return await commonAPI("GET",`${SERVERURL}/getOnRouteServicesByDepo/${depoName}`,"","");
+};
+
 //Edit VehicleStatus>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 export const editStatus = async (vehicle_id, reqbody) => {
   return await commonAPI(

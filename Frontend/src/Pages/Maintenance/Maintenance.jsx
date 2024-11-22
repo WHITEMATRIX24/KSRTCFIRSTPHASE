@@ -2,7 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
-import { faCircleCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCircleInfo, faPlus, faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import {
   getAllDailyMaintenanceApi,
@@ -18,8 +18,6 @@ import { dailyMaintenanceChecklist } from "../../assets/weeklyCheckLists";
 import { WeeklyMaintenanceChecklist } from "../../assets/dailyCheckLists";
 
 export default function Maintenance() {
-  const [userRole, setUserRole] = useState("");
-  const [maintenanceDepotName, setMaintenanceDepotName] = useState("");
   const [weeklyData, setWeeklyData] = useState([]);
   const [dailyData, setDailyData] = useState([]);
   const [searchBus, setSearchBus] = useState("");
@@ -75,24 +73,20 @@ export default function Maintenance() {
     if (!inputDate) {
       return "";
     }
-    const targetDate = new Date(inputDate);
-    const currentDate = new Date();
-    const diffInMS = targetDate - currentDate;
-    if (diffInMS < 0) {
+    const today = new Date();
+    const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const targetDate = new Date(inputDate.split("T")[0])
+
+    const diffInMS = targetDate - currentDate
+        
+    if (diffInMS <= 0) {
       const days = Math.floor(diffInMS / (1000 * 60 * 60 * 24)) * -1;
-      return <span className="text-danger">{`${days} days overdue`}</span>;
+      return <span>{`${days} days overdue`}</span>;
     } else {
       const days = Math.floor(diffInMS / (1000 * 60 * 60 * 24));
       return <span>{`${days} days left`}</span>;
     }
   };
-  useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem("user"));
-    if (user) {
-      setUserRole(user.role); 
-      setMaintenanceDepotName(user.depoName); 
-    }
-  }, []);
 
   useEffect(() => {
     getAllWeaklyData();
@@ -100,15 +94,12 @@ export default function Maintenance() {
   }, []);
 
   useEffect(() => {
-    let vehiclesToFilter = activeStatus === "Daily Maintenance" ? dailyData : weeklyData;
-
-    if (userRole === "Admin") {
-      setFilteredVehicles(vehiclesToFilter);
-    } else if (userRole === "Maintenance" || userRole==="Supervisor") {
-      const filtered = vehiclesToFilter.filter(vehicle => vehicle.ALLOTEDDEPOT === maintenanceDepotName);
-      setFilteredVehicles(filtered);
+    if (activeStatus == "Daily Maintenance") {
+      setFilteredVehicles(dailyData);
+    } else {
+      setFilteredVehicles(weeklyData);
     }
-  }, [activeStatus, dailyData, weeklyData, userRole, maintenanceDepotName]);
+  }, [activeStatus, dailyData, weeklyData]);
 
   const getAllWeaklyData = async () => {
     try {
@@ -161,6 +152,24 @@ export default function Maintenance() {
       }
     }
   };
+
+  const ChangeBackgroundColor = (date,icon)=>{
+    if(!date){
+      return icon?"":"border-bottom"
+    }
+    const today = new Date();
+    const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const targetDate = new Date(date.split("T")[0])
+
+    const diffInMS = targetDate - currentDate
+    if (diffInMS < 0) {
+      return icon?<FontAwesomeIcon icon={faTriangleExclamation}/>:"bg-redM border-bottom"
+    } else if(diffInMS <= (1000*60*60*24*3)) {
+      return icon?<FontAwesomeIcon icon={faCircleInfo}/>:"bg-yellowM border-bottom"
+    }else{
+      return icon?"":"border-bottom"
+    }
+  }
 
   return (
     <>
@@ -255,38 +264,39 @@ export default function Maintenance() {
             <hr className="vehicle-horizontal-line mt-2" />
             {/* table */}
             <div>
-              <table className="vehicle-table table w-100 ">
+              <table className="vehicle-table  w-100 ">
                 <thead className="vehicle-thead ">
                   <tr>
                     <th>#</th>
                     <th> {/*image */}</th>
                     <th>VEHICLE</th>
                     <th>TYPE</th>
-                    {/* <th>STATUS</th> */}
                     <th>
                       {activeStatus == "Daily Maintenance"
                         ? `DAILY MAINTENANCE  SATUS`
                         : `WEEKLY MAINTENANCE SATUS`}
                     </th>
                     <th>Last Maintained On</th>
+                    <th>Checked By</th>
+                    
                     {activeStatus == "Daily Maintenance" ? (
                       <></>
                     ) : (
                       <th>Due Date</th>
                     )}
-                    <th>Checked By</th>
-                    <th> {/*for update */} </th>
-                    {/* <th>REMARKS</th> */}
-                    <th> {/*for delete option */}</th>
+                    {activeStatus == "Daily Maintenance" ? (
+                      <></>
+                    ) : (
+                      <th></th>
+                    )}
+
                   </tr>
                 </thead>
                 <tbody>
                   {displayedVehicles.map((vehicle, index) => (
-                    <tr key={vehicle._id}>
+                    <tr key={vehicle._id} className={activeStatus=="Daily Maintenance"?"border-bottom":ChangeBackgroundColor(vehicle?.maintenance_data?.weeklyMaintenanceDueDate)}>
                       <td>
                         {currentPage * itemsPerPage + index + 1}
-                        {/* {" "}
-                        <input type="checkbox" />{" "} */}
                       </td>
                       <td>
                         <img
@@ -360,15 +370,7 @@ export default function Maintenance() {
                           </div>
                         )}
                       </td>
-                      {activeStatus == "Daily Maintenance" ? (
-                        <></>
-                      ) : (
-                        <td>
-                          {dueOn(
-                            vehicle.maintenance_data.weeklyMaintenanceDueDate
-                          )}
-                        </td>
-                      )}
+                      
                       {activeStatus == "Daily Maintenance" ? (
                         <td>
                         {
@@ -382,6 +384,24 @@ export default function Maintenance() {
                           }
                         </td>
                       )}
+
+                      {activeStatus == "Daily Maintenance" ? (
+                        <></>
+                      ) : (
+                        <td>
+                          {dueOn(
+                            vehicle.maintenance_data.weeklyMaintenanceDueDate
+                          )}
+                        </td>
+                      )}
+
+                    {activeStatus == "Daily Maintenance" ? (
+                      <></>
+                    ) : (
+                      <td>{ChangeBackgroundColor(vehicle?.maintenance_data?.weeklyMaintenanceDueDate,true)}</td>
+                    )}
+
+
                     </tr>
                   ))}
                 </tbody>
@@ -531,11 +551,11 @@ export default function Maintenance() {
               className="ms-3"
               variant="primary"
               onClick={handleSubmit}
-              disabled={
-                activeStatus == "Daily Maintenance"
-                  ? !Object.values(dailyCheckList).every((item) => item == true)
-                  : !Object.values(weekCheckList).every((item) => item == true)
-              }
+              // disabled={
+              //   activeStatus == "Daily Maintenance"
+              //     ? !Object.values(dailyCheckList).every((item) => item == true)
+              //     : !Object.values(weekCheckList).every((item) => item == true)
+              // }
             >
               Update
             </Button>

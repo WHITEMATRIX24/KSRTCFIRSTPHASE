@@ -529,3 +529,45 @@ export const getAllVehiclesByDepoName = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// <<<<<:::::::::Getting All on route Vehicle Details by depo from Db :::::::::>>>>>>>>
+export const getAllOnRouteDetailsByDepo = async (req, res) => {
+  const { depoName } = req.params;
+  try {
+    const AllOnRouteDetailsDepo = await Vehicles.find(
+      { status: "en_route", ALLOTEDDEPOT: depoName } // Query with both conditions
+    );
+    if (AllOnRouteDetailsDepo) {
+      res.status(200).json(AllOnRouteDetailsDepo);
+    } else {
+      res.status(406).json("Can't find any vehicle Details:::: ");
+    }
+  } catch (err) {
+    console.log(
+      "Error at catch in vehicleController/getAllOnRouteDetails::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// <<<<<:::::::::Getting All on route Vehicle Details by depo from Db :::::::::>>>>>>>>
+export const getAllOutofServicesDetailsByDepo = async (req, res) => {
+  const { depoName } = req.params;
+  try {
+    const AllOutOfServicesDetailsDepo = await Vehicles.find(
+      { status: "dock", ALLOTEDDEPOT: depoName } // Query with both conditions
+    );
+    if (AllOutOfServicesDetailsDepo) {
+      res.status(200).json(AllOutOfServicesDetailsDepo);
+    } else {
+      res.status(406).json("Can't find any vehicle Details:::: ");
+    }
+  } catch (err) {
+    console.log(
+      "Error at catch in vehicleController/getAllOnRouteDetails::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

@@ -41,6 +41,7 @@ const TripParameters = () => {
 
   const [vehicle_id, setVehicle_id] = useState("");
   const [outboundTrip, setOutboundTrip] = useState({
+    waybill_Number:"",
     vehicle_id: vehicle_id,
     driver_id: "",
     conductor_id: "",
@@ -58,6 +59,7 @@ const TripParameters = () => {
   });
 
   const [returnTrip, setReturnTrip] = useState({
+    waybill_Number:"",
     vehicle_id: vehicle_id,
     driver_id: "",
     conductor_id: "",
@@ -175,7 +177,7 @@ const TripParameters = () => {
   function formatTime(timeInput) {
     if (timeInput) {
       const date = new Date(`1970-01-01T${timeInput}:00`);
-      const options = { hour: "numeric", minute: "2-digit", hour12: true };
+      const options = { hour: "numeric", minute: "2-digit", hour12: false };
       return date.toLocaleTimeString("en-US", options);
     } else {
       return "";
@@ -253,17 +255,19 @@ const TripParameters = () => {
 
   // add trips
   const handleSchedule = async () => {
+
     if (
+      !outboundTrip.waybill_Number ||
       !outboundTrip.vehicle_id ||
       !outboundTrip.driver_id ||
       !outboundTrip.conductor_id ||
       !outboundTrip.start_date ||
-      !outboundTrip.end_date ||
+      //!outboundTrip.end_date ||
       !outboundTrip.departure_location.depo ||
       !outboundTrip.arrival_location.depo ||
       !outboundTrip.start_time ||
-      !outboundTrip.trip_type ||
-      !outboundTrip.end_time
+      !outboundTrip.trip_type
+      //!outboundTrip.end_time
     ) {
       alert("Fill All Fields");
       return;
@@ -319,6 +323,10 @@ const TripParameters = () => {
         const randomIndex = Math.floor(Math.random() * numbers.length);
         trip_id += numbers[randomIndex];
       }
+      
+
+    
+
 
       addTripApiFunction({ ...outboundTrip, trip_id });
       // addTripApiFunction({ ...returnTrip, trip_id });
@@ -326,7 +334,7 @@ const TripParameters = () => {
       handleCancel();
     }
   };
-
+  //////////////////////////////////////////////////////////////////
   // add Trip Api call
   const addTripApiFunction = async (trip) => {
     try {
@@ -347,6 +355,11 @@ const TripParameters = () => {
       alert(`Failed to Schedule Trip ${err}`);
     }
   };
+
+
+  
+    
+    
 
   // depo collection
   const depoList = [
@@ -451,6 +464,7 @@ const TripParameters = () => {
   const handleCancel = () => {
     setVehicle_id("");
     setOutboundTrip({
+      waybill_Number:"",
       vehicle_id: vehicle_id,
       driver_id: "",
       conductor_id: "",
@@ -467,6 +481,7 @@ const TripParameters = () => {
       trip_type: "",
     });
     setReturnTrip({
+      waybill_Number:"",
       vehicle_id: vehicle_id,
       driver_id: "",
       conductor_id: "",
@@ -583,6 +598,27 @@ const TripParameters = () => {
 
                     {/* Form Section */}
                     <Form>
+
+
+                      {/* waybill */}
+                      <Form.Label className="mb-1" style={{ fontSize: "14px" }} > WayBill No </Form.Label>
+                      
+
+
+                      <Form.Control className="w-50"
+                              type="text"
+                              placeholder="Enter WayBill Number"
+                              value={outboundTrip.waybill_Number}
+                              onChange={(e) =>
+                                setOutboundTrip({
+                                  ...outboundTrip,
+                                  waybill_Number: e.target.value,
+                                })
+                              }
+                            />
+
+
+
                       {/* Outbound Section */}
                       <Form.Group className="mt-4">
                         <h6 className="mb-1">1. Trip Details</h6>
@@ -646,11 +682,11 @@ const TripParameters = () => {
                                     !startDepo
                                       ? false
                                       : item
-                                          .toLowerCase()
-                                          .search(startDepo.toLowerCase()) ===
+                                        .toLowerCase()
+                                        .search(startDepo.toLowerCase()) ===
                                         -1
-                                      ? false
-                                      : true
+                                        ? false
+                                        : true
                                   )
                                   .slice(0, 5)
                                   .map((item, index) => (
@@ -700,10 +736,10 @@ const TripParameters = () => {
                                   !endDepo
                                     ? false
                                     : item
-                                        .toLowerCase()
-                                        .search(endDepo.toLowerCase()) === -1
-                                    ? false
-                                    : true
+                                      .toLowerCase()
+                                      .search(endDepo.toLowerCase()) === -1
+                                      ? false
+                                      : true
                                 ) // Filter based on endDepo
                                 .slice(0, 5)
                                 .map((item, index) => (
@@ -1114,8 +1150,8 @@ const TripParameters = () => {
                                       !searchDriver
                                         ? false
                                         : item.PEN.toLowerCase().includes(
-                                            searchDriver.toLowerCase()
-                                          )
+                                          searchDriver.toLowerCase()
+                                        )
                                     )
                                     // .slice(0, 5)
                                     .map((item, index) => (
@@ -1178,9 +1214,9 @@ const TripParameters = () => {
                                     .filter((item) =>
                                       !searchConductor
                                         ? false
-                                        : item.PEN.toLowerCase().includes(
-                                            searchConductor.toLowerCase()
-                                          )
+                                        :item.PEN.toLowerCase().includes(
+                                          searchConductor.toLowerCase()
+                                        )
                                     )
                                     // .slice(0, 5)
                                     .map((item, index) => (
@@ -1254,16 +1290,16 @@ const TripParameters = () => {
                                     !availableBusOnly
                                       ? true
                                       : item.status == "in_service"
-                                      ? true
-                                      : false
+                                        ? true
+                                        : false
                                   )
                                   .filter((item) =>
                                     !searchBus
                                       ? false
                                       : item.BUSNO &&
-                                        item.BUSNO.toLowerCase().includes(
-                                          searchBus && searchBus.toLowerCase()
-                                        )
+                                      item.BUSNO.toLowerCase().includes(
+                                        searchBus && searchBus.toLowerCase()
+                                      )
                                   )
                                   .slice(0, 5)
                                   .map((item, index) => (

@@ -7,9 +7,8 @@ import { faAngleRight, faBus, faIndianRupee, faCarBurst, faCarSide, faChevronRig
 import ChartPie from '../components/ChartPie'
 import ChartBar from '../components/ChartBar'
 import { faServicestack } from '@fortawesome/free-brands-svg-icons'
-import { getAllTripApi, getAllVehiclesApi, getOnRouteServicesApi, getAvilableServicesApi, getAllCompletedTripApi, getAllOutofServicesApi, getAllAlottedDepoVehicleApi, getTripOfDepotApi, getAllUpcomingTripApi, getAllLiveTripApi, getAllConductor, getAllDrivers } from '../services/allAPI'
+import { getAllTripApi, getAllVehiclesApi, getOnRouteServicesApi, getAvilableServicesApi, getAllCollectionAPi, getAllOutofServicesApi, getAllAlottedDepoVehicleApi, getTripOfDepotApi, getAllUpcomingTripApi, getAllLiveTripApi, getAllConductor, getAllDrivers, getOnRouteServicesByDepoApi, getAllOutofServicesByDepoApi, getCollectionByDepoAPi } from '../services/allAPI'
 import ExcelExport from '../components/ExcelExport '
-
 
 
 function Dashboard() {
@@ -33,7 +32,6 @@ function Dashboard() {
   const getAllVehicleDetails = async () => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     if (userDetails.depoName == "Admin") {
-      // const name=userData.depoName
       const result = await getAllVehiclesApi()
       // console.log(result.data);
       if (result.status == 200) {
@@ -42,8 +40,9 @@ function Dashboard() {
     }
     else {
       // get all Vehicle details by depoName
+
       const result = await getAllAlottedDepoVehicleApi(userDetails.depoName)
-      console.log(result.data);
+      // console.log(result.data);
       if (result.status == 200) {
         setAllVehicleData(result.data)
       }
@@ -55,7 +54,7 @@ function Dashboard() {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     if (userDetails.depoName == "Admin") {
       const result = await getAllTripApi()
-      console.log(result.data);
+      // console.log(result.data);
       if (result.status == 200) {
         setAllTripDetails(result.data);
         const count = result.data.length;
@@ -68,10 +67,12 @@ function Dashboard() {
       // console.log(result);
       if (result.status == 200) {
         setAllTripDetails(result.data);
+        const count = result.data.length;
+        setAllTripDataCount(count)
       }
     }
   }
-  console.log(AllTripDetails);
+  // console.log(AllTripDetails);
 
   //trip Upcomming departure_location == depoName
   const getUpComingTripDetailsByDepo = async () => {
@@ -93,19 +94,50 @@ function Dashboard() {
   }
   // console.log(AllLiveTripdetails);
 
-
   //get total number of bussess in route
   const getAllOnRouteDetails = async () => {
-    const result = await getOnRouteServicesApi()
-    // console.log(result);
-    const count = result.data.length;
-    setAllOnRouteBusesCount(count)
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    if (userDetails.depoName == "Admin") {
+      const result = await getOnRouteServicesApi()
+      // console.log(result);
+      if (result.status == 200) {
+        const count = result.data.length;
+        setAllOnRouteBusesCount(count)
+      }
+
+    }
+    else {
+      //get total number of bussess in route by depo
+      const result = await getOnRouteServicesByDepoApi(userDetails.depoName)
+      console.log(result.data);
+      if (result.status == 200) {
+        const count = result.data.length;
+        setAllOnRouteBusesCount(count)
+      }
+
+    }
+
   }
+
+  //get total number of out of services bussess in route
   const getOutOfServicesCount = async () => {
-    const result = await getAllOutofServicesApi();
-    console.log(result);
-    const count = result.data.length;
-    setOutOfServicesCount(count);
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    if (userDetails.depoName == "Admin") {
+      const result = await getAllOutofServicesApi();
+      // console.log(result);
+      if (result.status == 200) {
+        const count = result.data.length;
+        setOutOfServicesCount(count);
+      }
+    }
+    else {
+      const result = await getAllOutofServicesByDepoApi(userDetails.depoName)
+      // console.log(result.data);
+      if (result.status == 200) {
+        const count = result.data.length;
+        setOutOfServicesCount(count);
+      }
+    }
   };
 
   //get All buses in servises
@@ -117,18 +149,46 @@ function Dashboard() {
 
   // get All completed Trip details
   const getAllCompletedTripDetails = async () => {
-    const result = await getAllCompletedTripApi()
-    // Fuel Consumption total
-    const ftotal = result.data.reduce((total, item) => {
-      return total + item.fuelCost;
-    }, 0)
-    setTotalFuelComsumption(ftotal)
-    // Total Collection total
-    const ctotal = result.data.reduce((total, item) => {
-      return total + item.collection_amount;
-    }, 0)
-    setTotalcollection(ctotal);
-    setCompletedTripDetails(result.data);
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+
+    if (userDetails.depoName == "Admin") {
+
+      const result = await getAllCollectionAPi()
+      // Fuel Consumption total
+      const ftotal = result.data.reduce((total, item) => {
+        return total + item.fuelCost;
+      }, 0)
+      setTotalFuelComsumption(ftotal)
+      // Total Collection total
+      const ctotal = result.data.reduce((total, item) => {
+        return total + item.Tripcollection;
+      }, 0)
+      setTotalcollection(ctotal);
+      console.log(ctotal);
+      setCompletedTripDetails(result.data);
+    }
+    else {
+
+      const result = await getCollectionByDepoAPi(userDetails.depoName)
+      // Fuel Consumption total
+      const ftotal = result.data.reduce((total, item) => {
+        return total + item.fuelCost;
+      }, 0)
+      setTotalFuelComsumption(ftotal)
+      console.log(ftotal);
+
+      // Total Collection total
+      const ctotal = result.data.reduce((total, item) => {
+        return total + item.Tripcollection;
+      }, 0)
+      setTotalcollection(ctotal);
+      console.log(ctotal);
+      setCompletedTripDetails(result.data);
+
+    }
+
+
+
   }
 
   //get all conductor details
@@ -177,35 +237,35 @@ function Dashboard() {
 
   // console.log(AllTripDetails);
   // Update AllTripdetals by replacing conductorId with conductorName 
- // Reusable transformation function
-function transformTripDetails(tripDetails) {
-  return tripDetails.map(trip => ({
-    ...trip,
-    // Replace IDs with corresponding values
-    conductorName: getConductorName(trip.conductor_id),
-    driverName: getDriverName(trip.driver_id),
-    BusNo: getBusNumber(trip.vehicle_id),
-    DriverPenNumber: getDriverPen(trip.driver_id),
-    ConductorPenNumber: getConductorPen(trip.conductor_id),
-    // Flatten location properties
-    'arrival_location.depo': trip.arrival_location.depo,
-    'departure_location.depo': trip.departure_location.depo,
-    departure_location: undefined, // Remove original location properties
-    arrival_location: undefined,   
-  }));
-}
+  // Reusable transformation function
+  function transformTripDetails(tripDetails) {
+    return tripDetails.map(trip => ({
+      ...trip,
+      // Replace IDs with corresponding values
+      conductorName: getConductorName(trip.conductor_id),
+      driverName: getDriverName(trip.driver_id),
+      BusNo: getBusNumber(trip.vehicle_id),
+      DriverPenNumber: getDriverPen(trip.driver_id),
+      ConductorPenNumber: getConductorPen(trip.conductor_id),
+      // Flatten location properties
+      'arrival_location.depo': trip.arrival_location.depo,
+      'departure_location.depo': trip.departure_location.depo,
+      departure_location: undefined, // Remove original location properties
+      arrival_location: undefined,
+    }));
+  }
 
-// Apply the transformation to AllTripDetails
-const updatedTripDetails = transformTripDetails(AllTripDetails);
-console.log(updatedTripDetails);
+  // Apply the transformation to AllTripDetails
+  const updatedTripDetails = transformTripDetails(AllTripDetails);
+  // console.log(updatedTripDetails);
 
-// Apply the transformation to AllUpcomingTDByDepo
-const AllUpcomingTDByDepoUpdated = transformTripDetails(AllUpcomingTDByDepo);
-console.log(AllUpcomingTDByDepoUpdated);
+  // Apply the transformation to AllUpcomingTDByDepo
+  const AllUpcomingTDByDepoUpdated = transformTripDetails(AllUpcomingTDByDepo);
+  // console.log(AllUpcomingTDByDepoUpdated);
 
-// Apply the transformation to AllLiveTripdetails
-const AllLiveTDByDepoUpdated = transformTripDetails(AllLiveTripdetails);
-console.log(AllLiveTDByDepoUpdated);
+  // Apply the transformation to AllLiveTripdetails
+  const AllLiveTDByDepoUpdated = transformTripDetails(AllLiveTripdetails);
+  // console.log(AllLiveTDByDepoUpdated);
 
   // console.log(AllLiveTDByDepoUpdatedflatten);
 

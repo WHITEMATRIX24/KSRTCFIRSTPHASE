@@ -17,6 +17,8 @@ import {
   getWeeklyVehicleMaintanenceDataController,
   deleteSelectedVehicle,
   getAllVehiclesByDepoName,
+  getAllOnRouteDetailsByDepo,
+  getAllOutofServicesDetailsByDepo,
 } from "../Controllers/VehicleController.js";
 import {
   addNewTrip,
@@ -88,6 +90,11 @@ router.delete("/deleteVehicleById/:vehicle_id", deleteVehicleById);
 router.delete("/deleteSelectedVehicles", deleteSelectedVehicle);
 // get All vehicles By depoName;
 router.get("/getAllVehicleByDeponame/:depoName", getAllVehiclesByDepoName);
+//Get All on route services Details by depo
+router.get("/getOnRouteServicesByDepo/:depoName", getAllOnRouteDetailsByDepo);
+// GET All Out Of Service Details by depo
+router.get("/getAllOutofServicesByDepo/:depoName", getAllOutofServicesDetailsByDepo);
+
 
 // <<<<<<<........Vehichel Maintanence Routes.........>>>>>>>
 
@@ -206,6 +213,7 @@ router.get("/getCollectionByDate/:date", getCollectionsOfDate);
 
 // get collection by date and depot
 router.get("/getFilteredCollection/:date/:depot", getCollectionsOfDepotAndDate);
+
 
 // Export the router
 export default router;
