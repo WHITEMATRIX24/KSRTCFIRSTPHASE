@@ -51,7 +51,7 @@ export default function ScheduleTrip() {
     else if(role == "Admin"){
       try {
         const result = await getAllTripApi();
-        console.log(result);
+        console.log("TRIP",result.data);
         
         if (result.status == 200) {        
           setTrips(result.data);
@@ -181,7 +181,7 @@ export default function ScheduleTrip() {
 
     const trip = trips.find((item) => item._id == id);
     if (trip.status != "live") {
-      let obj = { ...trip, status: "live", start_time:time  };
+      let obj = { ...trip, status: "live" };
       console.log(obj);
       const result = await updateTripApiNew(
         obj._id,
@@ -280,7 +280,7 @@ export default function ScheduleTrip() {
                               ? false
                               : true
                           )
-                          .filter((item) => item.status == "upcoming" && (item.departure_location.depo == depoName)).length
+                          .filter((item) => item.status == "upcoming" ).length
                 }
                     </span>
                   </Col>
@@ -331,7 +331,7 @@ export default function ScheduleTrip() {
                                     : true
                                 )
                                 .filter((item) => item.status == "upcoming")
-                                .filter((item) => item.departure_location.depo == depoName)
+                                
         
                                 .map((item, index) => (
                                   <tr key={index} className="bg-white">

@@ -710,7 +710,7 @@ export default function OnGoingTrips() {
                             End Time
                           </Form.Label>
                           <input
-                            type="time"
+                            type="text"
                             className="form-control"
                             value={tripData.end_time}
                             onChange={(e) =>
