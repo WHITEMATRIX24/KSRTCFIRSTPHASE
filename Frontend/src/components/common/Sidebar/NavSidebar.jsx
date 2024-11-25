@@ -7,17 +7,26 @@ import {
   faChartPie,
   faDriversLicense,
   faGear,
+  faPowerOff,
   faTruck,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import "./Sidebar.css";
 import Divider from "@mui/material/Divider";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function NavSidebar() {
   const [isOpen, setIsOpen] = useState(true);
+  const [role,setRole] = useState('')
+  const [isStaff, setIsStaff] = useState(false)
+  const [isMaintenance, setIsMaintenance] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [userData,setUserData]=useState({});
+
+  const navigate = useNavigate()
+
 
   const toggleNav = () => {
     setIsOpen(!isOpen);
@@ -44,9 +53,34 @@ function NavSidebar() {
     document.getElementById(submenu).style.color = "green";
     setActiveSubmenu(submenu);
   };
+
+  const handleLogOut=()=>{
+    sessionStorage.clear();
+    setUserData('');
+    navigate("/");
+  }
+
+  useEffect(()=>{
+    const userDetails=JSON.parse(sessionStorage.getItem("user"));
+    //console.log("User",userDetails);
+   setRole(userDetails.role)  
+  },[])
+  useEffect(()=>{
+      if(role =="Staff"){
+        setIsStaff(true)
+        setIsAdmin(false)
+      }
+      else if(role == "Maintenance"){
+        setIsMaintenance(true)
+        setIsAdmin(false)
+      }
+      else{
+        setIsAdmin(true)
+      }
+  },[role])
   return (
     <ul className="sidebar-menu  w-100">
-      <li>
+      {isAdmin && <li>
         <div className="d-flex ">
           <a
             href="#"
@@ -84,8 +118,8 @@ function NavSidebar() {
             <Divider /> */}
           </ul>
         )}
-      </li>
-      <li>
+      </li>}
+      {(isAdmin || isStaff) &&<li>
         <a
           href="#"
           id="vehicles"
@@ -122,8 +156,8 @@ function NavSidebar() {
             <Divider /> */}
           </ul>
         )}
-      </li>
-      <li>
+      </li>}
+      { (isAdmin || isStaff) &&<li>
         <a
           href="#"
           id="trips"
@@ -187,8 +221,8 @@ function NavSidebar() {
             <Divider />
           </ul>
         )}
-      </li>
-      <li>
+      </li>}
+     {(isAdmin || isStaff) && <li>
         <a
           href="#"
           className="my-2"
@@ -230,8 +264,8 @@ function NavSidebar() {
             <Divider />
           </ul>
         )}
-      </li>
-      <li>
+      </li>}
+      {(isAdmin || isStaff) &&<li>
         <a
           href="#"
           className="my-2"
@@ -264,9 +298,9 @@ function NavSidebar() {
             <Divider /> */}
           </ul>
         )}
-      </li>
+      </li>}
 
-      <li>
+      {(isAdmin || isMaintenance) &&<li>
         <a
           href="#"
           className="my-2"
@@ -299,13 +333,18 @@ function NavSidebar() {
             <Divider /> */}
           </ul>
         )}
-      </li>
+      </li>}
       {/* <li>
         <a href="#" className='my-2' id='analytics' onClick={() => toggleSubmenu('analytics')}>
           <FontAwesomeIcon className='me-2' icon={faChartPie} />Analytics
         </a>
         <Divider />
       </li> */}
+       <li className="" onClick={handleLogOut}>
+        <a href="#" className='my-2 text-danger' id='logout' onClick={() => toggleSubmenu('logout')}>
+          <FontAwesomeIcon className='me-2' icon={faPowerOff} />LogOut
+        </a>
+      </li>
     </ul>
   );
 }

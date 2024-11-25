@@ -9,6 +9,7 @@ const LoginPage = () => {
     password: "",
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [user,setUser] = useState({})
   const navigate = useNavigate();
 
   //   handle submit
@@ -28,7 +29,16 @@ const LoginPage = () => {
         return alert(response.response.data);
       }
       sessionStorage.setItem("user", JSON.stringify(response.data.user));
-      navigate("/dashboard", { replace: true });
+      setUser(response.data.user)
+      console.log(user);
+      if(response.data.user.role){
+      if(response.data.user.role == "Staff")
+      {navigate("/fleet", { replace: true });}
+      else if(response.data.user.role== "Maintenance")
+        {navigate("/maintanance", { replace: true });}
+      else 
+      {navigate("/dashboard", { replace: true });}}
+
     } catch (error) {
       console.log(`error in login error: ${error}`);
     }

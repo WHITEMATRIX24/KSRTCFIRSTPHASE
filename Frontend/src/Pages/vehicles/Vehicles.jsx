@@ -27,6 +27,7 @@ import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 
 const Vehicles = () => {
+  const [depotFilter, setDepotFilter] = useState("All Depot");
   const [depotName, setDepotName] = useState("");
   const [userRole, setUserRole] = useState("");
 
@@ -396,7 +397,11 @@ const Vehicles = () => {
             )) ||
           (vehicle.REGNO &&
             vehicle.REGNO.toLowerCase().includes(searchVehicle.toLowerCase()))
-      );
+      )
+      .filter(
+        (vehicle) =>
+          depotFilter === "All Depot" || vehicle.ALLOTEDDEPOT === depotFilter
+      )
     setFilteredVehicles(updatedFilteredVehicles);
     setCurrentPage(0);
   }, [
@@ -406,6 +411,7 @@ const Vehicles = () => {
     searchVehicle,
     userRole,
     depotName,
+    depotFilter
   ]);
 
   useEffect(() => {
@@ -503,6 +509,21 @@ const Vehicles = () => {
                   <option value="AC PREMIUM SF">AC PREMIUM SF</option>
                 </Form.Control>
 
+                {userRole === "Admin" && ( 
+                  <Form.Control
+                    as="select"
+                    value={depotFilter}
+                    onChange={(e) => setDepotFilter(e.target.value)}
+                  >
+                    <option value="All Depot">All Depot</option>
+                    {depotList.map((depot, index) => (
+                      <option key={index} value={depot}>
+                        {depot}
+                      </option>
+                    ))}
+                  </Form.Control>
+                )}
+
                 <div className="btn-group">
                   <input
                     type="text"
@@ -510,6 +531,7 @@ const Vehicles = () => {
                     placeholder="Search Vehicle"
                     value={searchVehicle}
                     onChange={(e) => setSearchVehicle(e.target.value)}
+                    style={{ width: '200px' }}
                   />
                 </div>
               </div>
@@ -519,6 +541,7 @@ const Vehicles = () => {
                   onClick={() => {
                     setActiveStatus("ALL STATUSES");
                     setVehicleType("All Types");
+                    setDepotFilter("All Depot")
                   }}
                 >
                   <FontAwesomeIcon className="me-2" icon={faXmark} />

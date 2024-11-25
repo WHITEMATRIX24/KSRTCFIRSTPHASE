@@ -22,8 +22,8 @@ import {
 } from "../../services/allAPI";
 
 export default function ScheduleTrip() {
-  const [depoName,setDepoName] = useState('')
-  const [role,setRole] = useState("")
+  const [depoName, setDepoName] = useState("");
+  const [role, setRole] = useState("");
   const [trips, setTrips] = useState([]);
   const [date, setDate] = useState("");
   const [vehicleSearch, setVehicleSearch] = useState("");
@@ -36,49 +36,48 @@ export default function ScheduleTrip() {
 
   // get all trips
   const getTrips = async () => {
-   if(role == "Staff" || role=="Supervisor"){ try {
-      const result = await getAllUpcomingTripApi(depoName);
-      //console.log(result);
-      
-      if (result.status == 200) {        
-        setTrips(result.data);
-      } else if(result.status == 404) {
-        setNoData(true)
-      }
-    } catch (err) {
-      alert(`Failed to load trips ${err}`);
-    }}
-    else if(role == "Admin"){
+    if (role == "Staff" || role == "Supervisor") {
       try {
-        const result = await getAllTripApi();
-        console.log("TRIP",result.data);
-        
-        if (result.status == 200) {        
-          setTrips(result.data);
-        } else if(result.status == 404)  {
-          setNoData(true)
+        const result = await getAllUpcomingTripApi(depoName);
+        //console.log(result);
 
+        if (result.status == 200) {
+          setTrips(result.data);
+        } else if (result.status == 404) {
+          setNoData(true);
         }
       } catch (err) {
         alert(`Failed to load trips ${err}`);
-      }}
-    
+      }
+    } else if (role == "Admin") {
+      try {
+        const result = await getAllTripApi();
+        console.log(result);
+
+        if (result.status == 200) {
+          setTrips(result.data);
+        } else if (result.status == 404) {
+          setNoData(true);
+        }
+      } catch (err) {
+        alert(`Failed to load trips ${err}`);
+      }
+    }
   };
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   // get drivers list
   const getAllDriversList = async () => {
     try {
       const result = await getDriversListApi();
       console.log(result.status);
-      
+
       if (result.status == 200) {
         setDrivers(result.data);
-        setLoading(false)
+        setLoading(false);
       } else {
-       console.log("Failed to load Driver & conductor");
-       
+        console.log("Failed to load Driver & conductor");
       }
     } catch (err) {
       alert(`Failed to load Drivers Details ${err}`);
@@ -111,28 +110,27 @@ export default function ScheduleTrip() {
     } finally {
       setIsLoadingApi(false);
     }
-  }, [depoName,trips]);
+  }, [depoName, trips]);
 
   // mdofied trip data
   useEffect(() => {
     if (trips.length > 0 && vehicles.length > 0 && drivers.length > 0) {
       let arr = trips.map((item) => ({
         ...item,
-        BusNo: vehicles.find((item2) => item2._id == item.vehicle_id)
-          ?.BUSNO,
-        employeeName:
-          drivers.find((item2) => item2._id == item.driver_id)?.EmployeeName
+        BusNo: vehicles.find((item2) => item2._id == item.vehicle_id)?.BUSNO,
+        employeeName: drivers.find((item2) => item2._id == item.driver_id)
+          ?.EmployeeName,
       }));
       setModifiedTrips(arr);
     }
   }, [trips, vehicles, drivers]);
 
-  useEffect(()=>{
-    const userDetails=JSON.parse(sessionStorage.getItem("user"));
-    console.log("User",userDetails);
-   setDepoName(userDetails.depoName)
-   setRole(userDetails.role)
-  },[])
+  useEffect(() => {
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
+    console.log("User", userDetails);
+    setDepoName(userDetails.depoName);
+    setRole(userDetails.role);
+  }, []);
   // formats time =>recieve time from time picker and returns formatted time
   const formatTime = (timeInput) => {
     if (timeInput) {
@@ -177,7 +175,7 @@ export default function ScheduleTrip() {
   const handleLive = async (id) => {
     setCurrentDateTime(new Date());
     const options = { hour: "numeric", minute: "2-digit", hour12: false };
-  const time = currentDateTime.toLocaleTimeString("en-US", options); // e.g., '14:30:45'
+    const time = currentDateTime.toLocaleTimeString("en-US", options); // e.g., '14:30:45'
 
     const trip = trips.find((item) => item._id == id);
     if (trip.status != "live") {
@@ -190,8 +188,8 @@ export default function ScheduleTrip() {
         obj.conductor_id,
         obj
       );
-     console.log(result);
-      
+      console.log(result);
+
       getTrips();
     }
   };
@@ -253,8 +251,8 @@ export default function ScheduleTrip() {
 
             <hr className="my-3" />
 
-            {!noData &&<>  
-  
+            {!noData && (
+              <>
                 {/* Toolbar with count of items */}
                 <Row className="align-items-center mb-3">
                   <Col xs="auto">
@@ -276,145 +274,169 @@ export default function ScheduleTrip() {
                           .filter((item) =>
                             !vehicleSearch
                               ? true
-                              : item.BusNo.search((vehicleSearch.toUpperCase())) == -1
+                              : item.BusNo.search(
+                                  vehicleSearch.toUpperCase()
+                                ) == -1
                               ? false
                               : true
                           )
-                          .filter((item) => item.status == "upcoming" ).length
-                }
+                          .filter((item) => item.status == "upcoming").length
+                      }
                     </span>
                   </Col>
                 </Row>
-    
-               {!loading ?<>
-                  {/* Table */}
-                  <Row>
-                    <Col>
 
-                      <Table
-                        hover
-                        responsive
-                        className="align-middle"
-                        style={{ borderSpacing: "0 10px" }}
-                      >
-                        <thead>
-                          <tr className="bg-light">
-                            <th></th>
-                            <th>TRIP</th>
-                            <th>VEHICLE</th>
-                            <th>DRIVER</th>
-                            <th>START DATE</th>
-                            <th>END DATE</th>
-                            <th>Status</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-      
-                        <tbody>
-                          {!isLoadingApi &&
-                          
-                          <>
-                            
-                           { modifiedTrips.length > 0 && (
-                              modifiedTrips
-                                .filter((item) =>
-                                  !date
-                                    ? true
-                                    : date == item.start_date.split("T")[0] ||
-                                      date == item.end_date.split("T")[0]
-                                )
-                                .filter((item) =>
-                                  !vehicleSearch
-                                    ? true
-                                    : item.BusNo.search(vehicleSearch.toUpperCase()) == -1
-                                    ? false
-                                    : true
-                                )
-                                .filter((item) => item.status == "upcoming")
-                                
-        
-                                .map((item, index) => (
-                                  <tr key={index} className="bg-white">
-                                    <td>{/* <Form.Check type="checkbox" /> */}</td>
-                                    <td>
-                                      {item.trip_id}{" "}
-                                      <span className="text-primary ms-1">
-                                        {item?.trip_type.toUpperCase()}
-                                      </span>
-                                    </td>
-                                    <td>
-                                      <div className="d-flex align-items-center gap-2">
-                                        <FontAwesomeIcon
-                                          icon={faBus}
-                                          className="text-muted me-2"
-                                        />
-                                        <div>
-                                          <div>{item.BusNo}</div>
-                                          <small className="text-muted">BUS</small>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <FontAwesomeIcon
-                                        icon={faUser}
-                                        className="text-muted me-2"
-                                      />
-                                      {item.employeeName}
-                                    </td>
-                                    <td>
-                                      {new Date(item.start_date).toLocaleDateString()}
-                                      <br />
-                                      <small className="text-muted">
-                                        {formatTime(item.start_time)}
-                                      </small>
-                                    </td>
-                                    <td>
-                                     { item.end_date &&<> {new Date(item.start_date).toLocaleDateString()}</>}
-                                     { !item.end_date &&<p className=""> ----</p>}
-                                     <br />
-                                     <small>
-                                     { item.end_time &&<>  {formatTime(item.end_time)}</>}
-                                      </small>
-                                      
-                                    </td>
-                                    <td>
-                                      {/* <FontAwesomeIcon icon={faClock} className="text-muted me-2" />
+                {!loading ? (
+                  <>
+                    {/* Table */}
+                    <Row>
+                      <Col>
+                        <Table
+                          hover
+                          responsive
+                          className="align-middle"
+                          style={{ borderSpacing: "0 10px" }}
+                        >
+                          <thead>
+                            <tr className="bg-light">
+                              <th></th>
+                              <th>WAYBILL NO</th>
+                              <th>TRIP TYPE</th>
+                              <th>VEHICLE</th>
+                              <th>DRIVER</th>
+                              <th>START DATE</th>
+                              <th>END DATE</th>
+                              <th>STATUS</th>
+                              <th></th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {!isLoadingApi && (
+                              <>
+                                {modifiedTrips.length > 0 &&
+                                  modifiedTrips
+                                    .filter((item) =>
+                                      !date
+                                        ? true
+                                        : date ==
+                                            item.start_date.split("T")[0] ||
+                                          date == item.end_date.split("T")[0]
+                                    )
+                                    .filter((item) =>
+                                      !vehicleSearch
+                                        ? true
+                                        : item.BusNo.search(
+                                            vehicleSearch.toUpperCase()
+                                          ) == -1
+                                        ? false
+                                        : true
+                                    )
+                                    .filter((item) => item.status == "upcoming")
+
+                                    .map((item, index) => (
+                                      <tr key={index} className="bg-white">
+                                        <td>
+                                          {/* <Form.Check type="checkbox" /> */}
+                                        </td>
+                                        <td>{item.waybill_Number}</td>
+                                        <td>
+                                          <span className="text-primary ms-1">
+                                            {item?.trip_type.toUpperCase()}
+                                          </span>
+                                        </td>
+                                        <td>
+                                          <div className="d-flex align-items-center gap-2">
+                                            <FontAwesomeIcon
+                                              icon={faBus}
+                                              className="text-muted me-2"
+                                            />
+                                            <div>
+                                              <div>{item.BusNo}</div>
+                                              <small className="text-muted">
+                                                BUS
+                                              </small>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <FontAwesomeIcon
+                                            icon={faUser}
+                                            className="text-muted me-2"
+                                          />
+                                          {item.employeeName}
+                                        </td>
+                                        <td>
+                                          {new Date(
+                                            item.start_date
+                                          ).toLocaleDateString()}
+                                          <br />
+                                          <small className="text-muted">
+                                            {formatTime(item.start_time)}
+                                          </small>
+                                        </td>
+                                        <td>
+                                          {item.end_date && (
+                                            <>
+                                              {" "}
+                                              {new Date(
+                                                item.start_date
+                                              ).toLocaleDateString()}
+                                            </>
+                                          )}
+                                          {!item.end_date && (
+                                            <p className=""> ----</p>
+                                          )}
+                                          <br />
+                                          <small>
+                                            {item.end_time && (
+                                              <> {formatTime(item.end_time)}</>
+                                            )}
+                                          </small>
+                                        </td>
+                                        <td>
+                                          {/* <FontAwesomeIcon icon={faClock} className="text-muted me-2" />
                                   {tripDuration(item.start_date,item.start_time,item.end_date,item.end_time)} */}
-                                      <button
-                                        className={
-                                          item.status == "live"
-                                            ? "text-success btn"
-                                            : "text-secondary btn"
-                                        }
-                                        onClick={() => handleLive(item._id)}
-                                      >
-                                        <FontAwesomeIcon icon={faCircleCheck} />
-                                        <span className="ms-2">
-                                          {item.status == "live" ? "Live" : "Make Live"}
-                                        </span>
-                                      </button>
-                                    </td>
-                                    <td>
-                                      {/* <Button variant="link" className="p-0">
+                                          <button
+                                            className={
+                                              item.status == "live"
+                                                ? "text-success btn"
+                                                : "text-secondary btn"
+                                            }
+                                            onClick={() => handleLive(item._id)}
+                                          >
+                                            <FontAwesomeIcon
+                                              icon={faCircleCheck}
+                                            />
+                                            <span className="ms-2">
+                                              {item.status == "live"
+                                                ? "Live"
+                                                : "Make Live"}
+                                            </span>
+                                          </button>
+                                        </td>
+                                        <td>
+                                          {/* <Button variant="link" className="p-0">
                                     <FontAwesomeIcon icon={faEllipsisV} />
                                   </Button> */}
-                                    </td>
-                                  </tr>
-                                ))
-                            ) }
-                          </>
-                          }
-                        </tbody>
-                      </Table>
-                    </Col>
-                  </Row>
-                  </>: <h6 className="text-danger ms-5">Loading Upcoming Trips...Please Wait</h6>}
-               </>
-            
-            }
-            {
-              noData && <h6 className="text-danger">No Upcoming Trips</h6>
-            }
+                                        </td>
+                                      </tr>
+                                    ))}
+                              </>
+                            )}
+                          </tbody>
+                        </Table>
+                      </Col>
+                    </Row>
+                  </>
+                ) : (
+                  <h6 className="text-danger ms-5">
+                    Loading Upcoming Trips...Please Wait
+                  </h6>
+                )}
+              </>
+            )}
+            {noData && <h6 className="text-danger">No Upcoming Trips</h6>}
           </Col>
 
           <Col md={1}></Col>

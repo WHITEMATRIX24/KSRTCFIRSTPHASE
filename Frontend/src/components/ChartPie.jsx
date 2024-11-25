@@ -9,7 +9,7 @@ import {
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function ChartPie({ data }) {
-  // console.log(data);
+  // console.log("data from pie", data);
   const [outOfServicesCount, setOutOfServicesCount] = useState(0);
   const [avilableCount, setAvilableCount] = useState(0);
   const [onRouteCount, setOnRouteCount] = useState(0);
@@ -37,15 +37,26 @@ function ChartPie({ data }) {
     setOnRouteCount(count);
   };
 
-  useEffect(() => {
-    getOutOfServicesCount();
-    getAvilableServicesCount();
-    getOnRouteServicesCount();
-  }, []);
+  // useEffect(() => {
+  //   getOutOfServicesCount();
+  //   getAvilableServicesCount();
+  //   getOnRouteServicesCount();
+  // }, []);
 
-  console.log(outOfServicesCount);
-  console.log(avilableCount);
-  console.log(onRouteCount);
+  useEffect(() => {
+    if (data) {
+      const inserviceCount = data.filter((val) => val.status === "in_service");
+      setAvilableCount(inserviceCount.length);
+      const dockCount = data.filter((val) => val.status === "dock");
+      setOutOfServicesCount(dockCount.length);
+      const enRouteCount = data.filter((val) => val.status === "en_route");
+      setOnRouteCount(enRouteCount.length);
+    }
+  }, [data]);
+
+  // console.log(outOfServicesCount);
+  // console.log(avilableCount);
+  // console.log(onRouteCount);
 
   return (
     <div className="m-5" style={{ width: "450px", height: "250px" }}>
@@ -82,7 +93,9 @@ function ChartPie({ data }) {
           responsive: true,
         }}
       />
-      <h6 className='mt-3' style={{ color: '#737373', fontWeight: "600" }}>Total Fleet Size: {data.length}</h6>
+      <h6 className="mt-3" style={{ color: "#737373", fontWeight: "600" }}>
+        Total Fleet Size: {data.length}
+      </h6>
     </div>
   );
 }

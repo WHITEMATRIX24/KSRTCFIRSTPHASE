@@ -54,6 +54,9 @@ function Header() {
             className="d-inline-block align-top"
           />{' '}
           <h4 className='text-light ps-3'>K-TRACK "Enroute Kerala"</h4>
+          <h6 className='brandMalayalm  text-light ms-auto me-3 mt-1'><i><b>എൻ  <span className='ms-1 fs-5 fw-5' style={{fontFamily:' font-family: "Work Sans", serif;'}}>  Route</span> കേരള ....</b> </i>
+          </h6>
+          
 {/*           <h4 className='ms-3 text-light'><FontAwesomeIcon icon={faBars} onClick={toggleNav} /></h4>
  */}        </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />

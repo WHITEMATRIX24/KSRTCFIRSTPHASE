@@ -1,13 +1,21 @@
 .dashboard-container {
-    min-height: 90vh;
-    background-color: rgb(246, 246, 246);
+  min-height: 90vh;
+  background-color: rgb(246, 246, 246);
 }
 
 .vehicle-data {
-    height: 90px;
+  height: 90px;
 }
 
 .vehicle-data-text {
-    /* width: 100%; */
-    height: 20px;
+  /* width: 100%; */
+  height: 20px;
+}
+
+/* filter css */
+.dashboard-filter-selectBox {
+  padding: 8px 1rem;
+  outline: none;
+  border-radius: 5px;
+  border: none;
 }

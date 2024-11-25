@@ -135,25 +135,23 @@ export default function OnGoingTrips() {
   const [tripCost, setTripCost] = useState({
     collection: 0,
     Cost: 0,
-    end_date:'',
-    end_time:''
+    end_date: "",
+    end_time: "",
   });
 
   //state to validate whether data entered is number
-  const [tripDateValidation, setTripDateValidation] = useState(
-     false
-  );
+  const [tripDateValidation, setTripDateValidation] = useState(false);
 
   const [vehicleFilter, setVehicleFilter] = useState("");
   const [tripFilter, setTripFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [filteredTrips, setFilteredTrips] = useState([]);
-  const [depoName,setDepoName] = useState()
-  const [role, setRole] = useState("")
+  const [depoName, setDepoName] = useState();
+  const [role, setRole] = useState("");
   //console.log(depoName);
 
   useEffect(() => {
-     // Filtered trips based on vehicle number and date
+    // Filtered trips based on vehicle number and date
     if (!modifiedTrips) return;
     const filtered = modifiedTrips.filter((trip) => {
       const matchesVehicle =
@@ -165,19 +163,18 @@ export default function OnGoingTrips() {
       const matchesDate = dateFilter
         ? trip.start_date && trip.start_date.startsWith(dateFilter)
         : true;
-     /*  const liveVehicle =
-        trip.status && trip.status.toLowerCase().includes("live"); */
-        //const tripsStartDepo = trip.departure_location.depo && (trip.departure_location.depo == depoName);
-       // const tripsEndDepo = trip.arrival_location.depo && (trip.arrival_location.depo == depoName || trip.departure_location.depo == depoName);
+      /*  const liveVehicle =
+         trip.status && trip.status.toLowerCase().includes("live"); */
+      //const tripsStartDepo = trip.departure_location.depo && (trip.departure_location.depo == depoName);
+      // const tripsEndDepo = trip.arrival_location.depo && (trip.arrival_location.depo == depoName || trip.departure_location.depo == depoName);
 
       //console.log({ matchesVehicle, matchesDate, liveVehicle,tripsStartDepo });
-      return matchesVehicle && matchesDate ;
+      return matchesVehicle && matchesDate;
     });
     setFilteredTrips([...filtered]);
   }, [modifiedTrips]);
 
   //console.log(`filtered trips: ${filteredTrips}`);
-
 
   //modal
 
@@ -250,16 +247,14 @@ export default function OnGoingTrips() {
     setTripDateValidation(true);
   };
 
-  const setEndTime = (time)=>{
+  const setEndTime = (time) => {
     setTripCost({ ...tripCost, end_time: time });
     seteditTrip({ ...editTrip, end_time: time });
-  }
-  const setEndDate = (date)=>{
-      setTripCost({ ...tripCost, end_date: date });
+  };
+  const setEndDate = (date) => {
+    setTripCost({ ...tripCost, end_date: date });
     seteditTrip({ ...editTrip, end_date: date });
-  
-  }
-  
+  };
 
   /* Function to add input boxes for entering fuel charge */
   const handleButtonClick = () => {
@@ -294,7 +289,6 @@ export default function OnGoingTrips() {
     setPassword("");
   };
 
-  
   const handleOpeneConfirmation = () => {
     //console.log(editTrip);
     setShowConfirmation(true);
@@ -303,7 +297,6 @@ export default function OnGoingTrips() {
   const ConfirmSave = () => {
     if (password === "1234") {
       UpdateTripDetails();
-
     } else {
       alert("Wrong Password");
     }
@@ -360,7 +353,7 @@ export default function OnGoingTrips() {
 
         if (result.status == 200 && result2.status == 200) {
           handleCloseCancelModal();
-          getAllTrips()
+          getAllTrips();
         } else {
           alert("Error in Updating Status");
         }
@@ -373,42 +366,40 @@ export default function OnGoingTrips() {
     }
   };
 
-  useEffect(()=>{
-    const userDetails=JSON.parse(sessionStorage.getItem("user"));
+  useEffect(() => {
+    const userDetails = JSON.parse(sessionStorage.getItem("user"));
     //console.log("User",userDetails);
-   setDepoName(userDetails.depoName)
-   setRole(userDetails.role)
-  },[])
+    setDepoName(userDetails.depoName);
+    setRole(userDetails.role);
+  }, []);
 
-  const [noData,setNoData] = useState(false)
+  const [noData, setNoData] = useState(false);
   const getAllTrips = async () => {
-   // console.log(role);
-    
-    
- if(role == 'Staff' || role=="Supervisor"){  
-  const result = await getAllLiveTripApi(depoName);
-    //console.log(result.data);
+    // console.log(role);
 
-    if (result.status == 200) {
-      setNewTripData(result.data);
-    } else if(result.status == 404){setNoData(true)
-    }
-  }
-    else if(role =="Admin"){
+    if (role == "Staff" || role == "Supervisor") {
+      const result = await getAllLiveTripApi(depoName);
+      //console.log(result.data);
+
+      if (result.status == 200) {
+        setNewTripData(result.data);
+      } else if (result.status == 404) {
+        setNoData(true);
+      }
+    } else if (role == "Admin") {
       const result = await getAllTripApi();
-    //console.log(result.data);
+      //console.log(result.data);
 
-    if (result.status == 200) {
-      setNewTripData(result.data);
-    } else if(result.status == 404){setNoData(true)
-    }
-
+      if (result.status == 200) {
+        setNewTripData(result.data);
+      } else if (result.status == 404) {
+        setNoData(true);
+      }
     }
   };
-  const [busLoading,setBusLoading ] = useState(false)
+  const [busLoading, setBusLoading] = useState(false);
   const getAllBuses = async () => {
     try {
-      
       const result = await getAllVehicles();
       //console.log(result.data);
 
@@ -416,15 +407,14 @@ export default function OnGoingTrips() {
         setBusLoading(true);
         setVehicles(result.data);
       } else {
-      console.log("FFailed to load::");
-      
+        console.log("FFailed to load::");
       }
     } catch (err) {
       alert(`Failed to load Bus Details ${err}`);
     }
   };
 
-  const UpdateTripDetails = async () => {    
+  const UpdateTripDetails = async () => {
     seteditTrip({ ...editTrip, collection_amount: tripCost.collection });
     seteditTrip({ ...editTrip, fuelCost: tripCost.Cost });
     seteditTrip({ ...editTrip, end_date: tripCost.end_date });
@@ -432,17 +422,17 @@ export default function OnGoingTrips() {
     seteditTrip({ ...editTrip, status: "completed" });
     //api to update trip details
     const result = await updateTripApi(editTrip, editTrip._id);
-   // console.log(result);
+    // console.log(result);
 
     if (result.status == 200) {
       handleCloseConfirmation();
       handleClose();
-      getAllTrips()
+      getAllTrips();
     } else {
       alert(result);
     }
   };
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const getAllDriversList = async () => {
     try {
@@ -450,7 +440,7 @@ export default function OnGoingTrips() {
       //console.log(result.data);
 
       if (result.status == 200) {
-        setLoading(true)
+        setLoading(true);
         setDrivers(result.data);
       } else {
         alert("Failed to load Drivers Details");
@@ -474,11 +464,10 @@ export default function OnGoingTrips() {
     getAllDriversList();
   }, [depoName]);
 
-  useEffect(()=>{
-    getAllTrips()
-  },[depoName, tripData])
+  useEffect(() => {
+    getAllTrips();
+  }, [depoName, tripData]);
 
-  
   useEffect(() => {
     if (tripData.length > 0 && vehicles.length > 0 && drivers.length > 0) {
       let arr = tripData.map((item) => ({
@@ -535,145 +524,176 @@ export default function OnGoingTrips() {
               </Row>
 
               <hr className="my-3" />
-{!noData ?<>
-  
-                {/* Toolbar with count of items */}
-                <Row className="align-items-center mb-3">
-                  {loading && <Col className="text-end">
-                    {/* Displaying the count of filtered items */}
-                    <span>Total Live Trips:</span>
-                    <span className="text-info ms-2 me-5">
-                      {filteredTrips.length}
-                    </span>
-                  </Col>}
-                  {!loading && <Col className="text-end">
-                    {/* Displaying the count of filtered items */}
-                    <span>Total Live Trips:</span>
-                    <span className="text-danger   ms-2 me-5">
-                      loading...
-                    </span>
-                  </Col>}
-  
-                </Row>
-  
-                {/* Table */}
-  
-                {loading && busLoading && <div>
-                  {filteredTrips?.length > 0 && (
-                    <Row>
-                      <Col>
-                        <Table
-                          hover
-                          responsive
-                          className="align-middle"
-                          style={{ borderSpacing: "0 10px" }}
-                        >
-                          <thead>
-                            <tr className="bg-light">
-                              <th>TRIPID</th>
-                              <th>VEHICLE</th>
-                              <th>DRIVER</th>
-                              <th>START DATE</th>
-  {/*                             <th>END DATE</th>
-   */}                            <th>DEPO DETAILS</th>
-                              <th></th>
-                              <th></th>
-                            </tr>
-                          </thead>
-    
-                          <tbody>
-                            {filteredTrips.map((trip) => (
-                              <tr key={trip.trip_id} className="bg-white">
-                                <td>
-                                  {trip.trip_id}{" "}
-                                  <span className="text-primary ms-1">
-                                    {trip?.trip_type.toUpperCase()}
-                                  </span>{" "}
-                                </td>
-                                <td>
-                                  <div className="d-flex align-items-center gap-2">
-                                    <FontAwesomeIcon
-                                      icon={faBus}
-                                      className="text-muted me-2"
-                                    />
-                                    <div>
-                                      <div>{trip.BUSNO}</div>
-                                      <small className="text-muted">BUS</small>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td>
-                                  <FontAwesomeIcon
-                                    icon={faUser}
-                                    className="text-muted me-2"
-                                  />
-                                  {trip.EmployeeName}                             
-                                  </td>
-    
-                                <td>
-                                {new Date(trip.start_date).toLocaleDateString()}
-                                  <br />
-                                  <small className="text-muted">
-                                  {trip.start_time}
-                                  </small>
-                                </td>
-                               
-                             {/*  <td>
+              {!noData ? (
+                <>
+                  {/* Toolbar with count of items */}
+                  <Row className="align-items-center mb-3">
+                    {loading && (
+                      <Col className="text-end">
+                        {/* Displaying the count of filtered items */}
+                        <span>Total Live Trips:</span>
+                        <span className="text-info ms-2 me-5">
+                          {filteredTrips.length}
+                        </span>
+                      </Col>
+                    )}
+                    {!loading && (
+                      <Col className="text-end">
+                        {/* Displaying the count of filtered items */}
+                        <span>Total Live Trips:</span>
+                        <span className="text-danger   ms-2 me-5">
+                          loading...
+                        </span>
+                      </Col>
+                    )}
+                  </Row>
+
+                  {/* Table */}
+
+                  {loading && busLoading && (
+                    <div>
+                      {filteredTrips?.length > 0 && (
+                        <Row>
+                          <Col>
+                            <Table
+                              hover
+                              responsive
+                              className="align-middle"
+                              style={{ borderSpacing: "0 10px" }}
+                            >
+                              <thead>
+                                <tr className="bg-light">
+                                  <th>WAYBILL NO</th>
+                                  <th>TRIP TYPE</th>
+                                  <th>VEHICLE</th>
+                                  <th>DRIVER</th>
+                                  <th>START DATE</th>
+                                  {/*                             <th>END DATE</th>
+                                   */}{" "}
+                                  <th>DEPO DETAILS</th>
+                                  <th></th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+
+                              <tbody>
+                                {filteredTrips.map((trip) => (
+                                  <tr key={trip.trip_id} className="bg-white">
+                                    <td>{trip.waybill_Number}</td>
+                                    <td>
+                                      <span className="text-primary ms-1">
+                                        {trip?.trip_type.toUpperCase()}
+                                      </span>
+                                    </td>
+
+                                    <td>
+                                      <div className="d-flex align-items-center gap-2">
+                                        <FontAwesomeIcon
+                                          icon={faBus}
+                                          className="text-muted me-2"
+                                        />
+                                        <div>
+                                          <div>{trip.BUSNO}</div>
+                                          <small className="text-muted">
+                                            BUS
+                                          </small>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <FontAwesomeIcon
+                                        icon={faUser}
+                                        className="text-muted me-2"
+                                      />
+                                      {trip.EmployeeName}
+                                    </td>
+
+                                    <td>
+                                      {new Date(
+                                        trip.start_date
+                                      ).toLocaleDateString()}
+                                      <br />
+                                      <small className="text-muted">
+                                        {trip.start_time}
+                                      </small>
+                                    </td>
+
+                                    {/*  <td>
                                { trip.end_date &&<> {new Date(trip.start_date).toLocaleDateString()}</>}
                                { !trip.end_date &&<span className="mt-0"> ----</span>}
                                <br />
                                
                                { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}
                               </td> */}
-                              <td>
-                               { trip.departure_location.depo == depoName &&<> Ends in {trip.arrival_location.depo }</>}
-                               { trip.departure_location.depo != depoName &&<span className="mt-0"> Starts From {trip.departure_location.depo }</span>}
-                               <br />
-                               
-                               { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}
-                              </td>
-    
-                                <td>
-                                  <button
-                                    className="btn btn-outline-success"
-                                    onClick={() => addCollectionModal(trip)}
-                                  >
-                                    End Trip
-                                  </button>
-                                </td>
-                                <td>
-                                  <button
-                                    className="btn btn-outline-danger"
-                                    onClick={() => {
-                                      cancelCollectionModal(trip);
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
-                                </td>
-                                {/* <td>
+                                    <td>
+                                      {trip.departure_location.depo ==
+                                        depoName && (
+                                        <>
+                                          {" "}
+                                          Ends in {trip.arrival_location.depo}
+                                        </>
+                                      )}
+                                      {trip.departure_location.depo !=
+                                        depoName && (
+                                        <span className="mt-0">
+                                          {" "}
+                                          Starts From{" "}
+                                          {trip.departure_location.depo}
+                                        </span>
+                                      )}
+                                      <br />
+
+                                      {trip.end_time && (
+                                        <small> {trip.end_time}</small>
+                                      )}
+                                    </td>
+
+                                    <td>
+                                      <button
+                                        className="btn btn-outline-success"
+                                        onClick={() => addCollectionModal(trip)}
+                                      >
+                                        End Trip
+                                      </button>
+                                    </td>
+                                    <td>
+                                      <button
+                                        className="btn btn-outline-danger"
+                                        onClick={() => {
+                                          cancelCollectionModal(trip);
+                                        }}
+                                      >
+                                        Cancel
+                                      </button>
+                                    </td>
+                                    {/* <td>
                                 <Button variant="link" className="p-0">
                                   <FontAwesomeIcon className='text-danger' onClick={() => showDeleteModal(trip.id)} icon={faTrash} />
                                 </Button>
                               </td> */}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      </Col>
-                    </Row>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Table>
+                          </Col>
+                        </Row>
+                      )}
+                      {filteredTrips?.length == 0 && (
+                        <h6 className="text-danger text-center m-3">
+                          No Live Trips
+                        </h6>
+                      )}
+                    </div>
                   )}
-                  { filteredTrips?.length == 0 && (
-                        <h6 className="text-danger text-center m-3">No Live Trips</h6>
-  
+                  {!loading && (
+                    <h6 className="text-danger text-center m-3">
+                      Loading Live Trips... Please Wait
+                    </h6>
                   )}
-                </div>}
-                {!loading   && (
-                  <h6 className="text-danger text-center m-3">Loading Live Trips... Please Wait</h6>
-                )}
-</>:                  <h6 className="text-danger text-center m-3">No Live Trips</h6>
-
-}
+                </>
+              ) : (
+                <h6 className="text-danger text-center m-3">No Live Trips</h6>
+              )}
             </Col>
 
             <Col md={1}></Col>
@@ -686,40 +706,28 @@ export default function OnGoingTrips() {
             <Modal.Title>End Trip</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-
             <div className="p-3">
-            <Form.Label
-                            className="mb-1"
-                            style={{ fontSize: "14px" }}
-                          >
-                            End Date
-                          </Form.Label>
-                          <Form.Control
-                            type="date"
-                            placeholder="Select Date"
-                            value={tripData.end_date}
-                            onChange={(e) =>
-                              setEndDate(e.target.value)
-                            }
-                          />
+              <Form.Label className="mb-1" style={{ fontSize: "14px" }}>
+                End Date
+              </Form.Label>
+              <Form.Control
+                type="date"
+                placeholder="Select Date"
+                value={tripData.end_date}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
 
-                          <Form.Label
-                            className="mb-1 mt-3"
-                            style={{ fontSize: "14px" }}
-                          >
-                            End Time
-                          </Form.Label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={tripData.end_time}
-                            onChange={(e) =>
-                             setEndTime(e.target.value)
-                            }
-                          />
-                
+              <Form.Label className="mb-1 mt-3" style={{ fontSize: "14px" }}>
+                End Time
+              </Form.Label>
+              <input
+                type="text"
+                className="form-control"
+                value={tripData.end_time}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
             </div>
-          {/*   {!outBound && (
+            {/*   {!outBound && (
               <Form className="m-3">
                 <TextField
                   required
@@ -812,15 +820,16 @@ export default function OnGoingTrips() {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-
-{/*             {!outBound && (
- */}              <div>
-                <Button variant="primary" onClick={handleOpeneConfirmation}>
-                  Save Changes
-                </Button>
-              </div>
-{/*             )}
- */}          </Modal.Footer>
+            {/*             {!outBound && (
+             */}{" "}
+            <div>
+              <Button variant="primary" onClick={handleOpeneConfirmation}>
+                Save Changes
+              </Button>
+            </div>
+            {/*             )}
+             */}{" "}
+          </Modal.Footer>
         </Modal>
 
         {/* Modal for confirm trip collection a trip */}
@@ -915,7 +924,6 @@ export default function OnGoingTrips() {
               Cancel Trip
             </Button>
           </Modal.Footer>
-                
         </Modal>
       </div>
     </div>
