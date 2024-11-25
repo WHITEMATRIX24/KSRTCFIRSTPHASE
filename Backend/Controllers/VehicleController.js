@@ -25,7 +25,7 @@ export const addNewVehicle = async (req, res) => {
         REGNO,
         BUSNO,
         CLASS,
-        ALLOTTEDDEPOT,
+        ALLOTEDDEPOT: ALLOTTEDDEPOT,
         status,
         dock_reason,
         dock_depot,
