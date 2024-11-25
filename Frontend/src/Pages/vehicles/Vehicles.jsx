@@ -615,6 +615,7 @@ const Vehicles = () => {
                       <th> {/*image */}</th>
                       <th>VEHICLE</th>
                       <th>TYPE</th>
+                      <th>HOME DEPOT</th>
                       <th>STATUS</th>
                       <th> {/*for update */} </th>
                       <th>REMARKS</th>
@@ -640,12 +641,16 @@ const Vehicles = () => {
                             width={"50px"}
                           />
                         </td>
+                        
                         <td>
                           <strong>{vehicle.BUSNO}</strong>
                           <br />
                           <span>{vehicle.REGNO}</span>
                         </td>
                         <td>{vehicle.CLASS}</td>
+                        <td>
+                        {vehicle.ALLOTEDDEPOT}
+                        </td>
                         <td>
                           <div
                             className="p-2 rounded"
