@@ -257,7 +257,7 @@ function Collection() {
                 <span>Total Fuel Cost:</span>
                 <span className="text-info ms-2 me-5">
                   {" "}
-                  {parseFloat(TotalFuel.toFixed(2))}
+                  {TotalFuel && parseFloat(TotalFuel.toFixed(2))}
                 </span>
               </Col>
             }
