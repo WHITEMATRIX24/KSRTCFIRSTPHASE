@@ -466,7 +466,7 @@ export default function OnGoingTrips() {
 
   useEffect(() => {
     getAllTrips();
-  }, [depoName, tripData]);
+  }, [depoName]);
 
   useEffect(() => {
     if (tripData.length > 0 && vehicles.length > 0 && drivers.length > 0) {

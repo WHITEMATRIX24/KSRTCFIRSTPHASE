@@ -108,9 +108,11 @@ export default function ScheduleTrip() {
     } catch (error) {
       console.log(`error in featching schedule trip data error: ${error}`);
     } finally {
+      console.log("working try catch");
+
       setIsLoadingApi(false);
     }
-  }, [depoName, trips]);
+  }, [depoName]);
 
   // mdofied trip data
   useEffect(() => {

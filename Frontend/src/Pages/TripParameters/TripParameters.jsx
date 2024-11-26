@@ -11,6 +11,7 @@ import {
   faGasPump,
   faL,
   faCircleNotch,
+  faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import {
@@ -257,20 +258,34 @@ const TripParameters = () => {
   const handleSchedule = async () => {
 
     if (
-      !outboundTrip.waybill_Number ||
-      !outboundTrip.vehicle_id ||
-      !outboundTrip.driver_id ||
-      !outboundTrip.conductor_id ||
-      !outboundTrip.start_date ||
-      //!outboundTrip.end_date ||
-      !outboundTrip.departure_location.depo ||
-      !outboundTrip.arrival_location.depo ||
-      !outboundTrip.start_time ||
-      !outboundTrip.trip_type
-      //!outboundTrip.end_time
+      !outboundTrip.waybill_Number
     ) {
-      alert("Fill All Fields");
+      alert("Enter Waybill Number");
       return;
+    }else if(!outboundTrip.vehicle_id){
+      alert("Choose Vehicle")
+      return
+    }else if(!outboundTrip.driver_id){
+      alert("Choose Driver")
+      return
+    }else if(!outboundTrip.conductor_id){
+      alert("Choose Conductor")
+      return
+    }else if(!outboundTrip.start_date){
+      alert("Select Trip Start Date")
+      return
+    }else if(!outboundTrip.departure_location.depo){
+      alert("Select Departure Depot")
+      return
+    }else if(!outboundTrip.arrival_location.depo){
+      alert("Select Arrival Depot")
+      return
+    }else if(!outboundTrip.start_time){
+      alert("Select Trip Start Time")
+      return
+    }else if(!outboundTrip.trip_type){
+      alert("Choose Trip Type Outbound/Return")
+      return
     }
     // else if (
     //   !returnTrip.vehicle_id ||
@@ -379,7 +394,6 @@ const TripParameters = () => {
     "CTR",
     "EDT",
     "EKM",
-    "EMLY",
     "EMY",
     "ETP",
     "GVR",
@@ -1141,6 +1155,13 @@ const TripParameters = () => {
                                   setsearchDriver(e.target.value)
                                 }
                               />
+
+
+                            {
+                              outboundTrip?.driver_id?
+                              <div className="mt-1"><FontAwesomeIcon icon={faCircleCheck} className="text-success"/>{drivers.find(item=>item._id==outboundTrip.driver_id).PEN} {drivers.find(item=>item._id==outboundTrip.driver_id).EmployeeName}</div>:
+                              <></>
+                            }
                               <ul
                                 className="position-absolute"
                                 style={{ width: "45%" }}
@@ -1161,7 +1182,7 @@ const TripParameters = () => {
                                         className="form-control"
                                         style={{
                                           opacity:
-                                            item.PEN === searchDriver
+                                            item.PEN === drivers.find(item=>item._id==outboundTrip.driver_id)?.PEN
                                               ? "0"
                                               : "1",
                                         }}
@@ -1206,6 +1227,15 @@ const TripParameters = () => {
                                   setsearchConductor(e.target.value)
                                 }
                               />
+
+                            {
+                              outboundTrip?.conductor_id?
+                              <div className="mt-1 position-absolute"><FontAwesomeIcon icon={faCircleCheck} className="text-success"/>{conductors.find(item=>item._id==outboundTrip.conductor_id).PEN} {conductors.find(item=>item._id==outboundTrip.conductor_id).EmployeeName}</div>:
+                              <></>
+                            }
+
+
+
                               <ul
                                 className="position-absolute"
                                 style={{ width: "45%" }}
@@ -1226,7 +1256,7 @@ const TripParameters = () => {
                                         className="form-control"
                                         style={{
                                           opacity:
-                                            item.PEN === searchConductor
+                                            item.PEN === conductors.find(item=>item._id==outboundTrip.conductor_id)?.PEN
                                               ? "0"
                                               : "1",
                                         }}
@@ -1281,6 +1311,13 @@ const TripParameters = () => {
                               value={searchBus}
                               onChange={(e) => setsearchBus(e.target.value)}
                             />
+
+                            {
+                              outboundTrip?.vehicle_id?
+                              <div className="mt-1"><FontAwesomeIcon icon={faCircleCheck} className="text-success"/>{vehicles.find(item=>item._id==outboundTrip.vehicle_id).BUSNO} {vehicles.find(item=>item._id==outboundTrip.vehicle_id).CLASS}</div>:
+                              <></>
+                            }
+                            
                             <ul
                               className="position-absolute"
                               style={{ width: "45%" }}
@@ -1309,9 +1346,9 @@ const TripParameters = () => {
                                       className="form-control"
                                       style={{
                                         opacity:
-                                          item.BUSNO === searchBus ? "0" : "1",
+                                          item.BUSNO === vehicles.find(item=>item._id==outboundTrip.vehicle_id)?.BUSNO ? "0" : "1",
                                         height:
-                                          item.BUSNO === searchBus ? "0" : "",
+                                          item.BUSNO === vehicles.find(item=>item._id==outboundTrip.vehicle_id)?.BUSNO ? "0" : "",
                                       }}
                                       onClick={() =>
                                         handlechangebus(item._id, item.BUSNO)
@@ -1325,7 +1362,7 @@ const TripParameters = () => {
                               )}
                             </ul>
 
-                            <Form.Check
+                            {/* <Form.Check
                               type="checkbox"
                               label="Only Available"
                               className="mt-2"
@@ -1333,7 +1370,7 @@ const TripParameters = () => {
                               onChange={(e) =>
                                 setAvailableBusOnly(e.target.checked)
                               }
-                            />
+                            /> */}
                           </Col>
                           <Col></Col>
                         </Row>
