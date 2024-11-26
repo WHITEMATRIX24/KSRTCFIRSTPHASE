@@ -629,7 +629,9 @@ function Dashboard() {
                   />
                   <div className="d-flex align-items-center justify-content-center flex-column vehicle-data-text ">
                     <p className="fw-bold fs-4 mt-3">
-                      {TotalCollection - TotalFuelConsumption}
+                      {parseFloat(
+                        TotalCollection - TotalFuelConsumption
+                      ).toFixed(2)}
                     </p>
                     <h6
                       className="text-secondary"

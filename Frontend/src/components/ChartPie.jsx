@@ -91,6 +91,17 @@ function ChartPie({ data }) {
         }}
         options={{
           responsive: true,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  let label = context.label || "";
+                  let value = context.raw || 0;
+                  return `${label}: ${value} vehicles`;
+                },
+              },
+            },
+          },
         }}
       />
       <h6 className="mt-3" style={{ color: "#737373", fontWeight: "600" }}>
