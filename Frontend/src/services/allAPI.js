@@ -134,6 +134,21 @@ export const getDriversListApi = async () => {
   return commonAPI("GET", `${SERVERURL}/getAllDriverDetails`, "", "");
 };
 
+// get All Driver Details By Pagination
+export const getDriverByPagination= async(page,limit,search,leaveStatus,employmentType)=>{
+  console.log("REQ:",page);
+  
+  return commonAPI("GET",`${SERVERURL}/getDriverByPagination?page=${page}&limit=${limit}&search=${search}&leaveStatus=${leaveStatus}&employmentType=${employmentType}`,
+    "","");
+}
+
+// get  filtered cionductors
+
+export const getFilteredConductorsListApi = async (pageNum,itemsPerPage,search,leaveStatus,employmentType) => {
+  return await commonAPI("GET",`${SERVERURL}/conductors/${pageNum}/${itemsPerPage}?search=${search}&leaveStatus=${leaveStatus}&employmentType=${employmentType}`,"","")
+}
+
+
 // get all conductors
 export const getConductorsListApi = async () => {
   return commonAPI("GET", `${SERVERURL}/getAllConductordetails`, "", "");
@@ -331,4 +346,14 @@ export const getCollectionByDepoAPi = async (depo) => {
 
 export const getAllCollectionAPi = async () => {
   return await commonAPI("GET", `${SERVERURL}/getAllCollection`, "", "");
+};
+
+// for all live trips api
+export const getAllLiveTripApiForAdmin = async () => {
+  return await commonAPI("GET", `${SERVERURL}/get-all-trip-live`, "", "");
+};
+
+// for all upcoming trips api
+export const getAllUpcomingTripApiForAdmin = async () => {
+  return await commonAPI("GET", `${SERVERURL}/get-all-upcoming-trips`, "", "");
 };

@@ -19,6 +19,7 @@ import {
   deleteSingleDriverAPI,
   editLeaveStatusDriver,
   getAllDrivers,
+  getDriverByPagination,
 } from "../../services/allAPI";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
@@ -32,13 +33,15 @@ const Drivers = () => {
   const [leaveStatus, setLeaveStatus] = useState("allstatus");
   const [searchDriver, setSearchDriver] = useState("");
   const [showDeleteId, setShowDeleteId] = useState(null);
-  const [activeStatus, setActiveStatus] = useState("ALL STATUSES");
-  const [employmentType, setEmploymentType] = useState("Employment Type");
-  const [status, setStatus] = useState("Status");
+  const [activeStatus, setActiveStatus] = useState();
+  const [employmentType, setEmploymentType] = useState("");
+  const [status, setStatus] = useState("");
   const [driverData, setDriverData] = useState([]);
   const [editleave, setEditLeave] = useState({ on_leave: "" });
   const [show, setShow] = useState(false);
   const [currentId, setCurrentId] = useState(null);
+  const [driverDetails,setDriverDetails]=useState([]);
+  const [totalPages,setTotalPages]=useState({});
 
   // console.log(activeStatus);
 
@@ -68,22 +71,23 @@ const Drivers = () => {
     }
   };
 
-  const handleAllDriverData = async () => {
-    setLoading(true);
-    try {
-      const allDriver = await getAllDrivers();
-      if (allDriver.status == 200) {
-        console.log(allDriver.data);
-        setDriverData(allDriver.data);
-      } else {
-        console.log("Error in fetching Driver Details:::::");
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleAllDriverData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const allDriver = await getAllDrivers();
+  //     if (allDriver.status == 200) {
+  //       console.log(allDriver.data);
+  //       setDriverData(allDriver.data);
+  //     } else {
+  //       console.log("Error in fetching Driver Details:::::");
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   // ------------------------------------------- Delete single driver -------------------------------------------
   const handleShowDeleteOptions = (id) => {
     setShowDeleteId((prevId) => (prevId === id ? null : id));
@@ -114,7 +118,7 @@ const Drivers = () => {
       }
     });
   };
-  console.log(checked);
+  // console.log(checked);
 
   // apicall to delete checked drivers
   const handleDeleteSelectedDrivers = async () => {
@@ -147,57 +151,56 @@ const Drivers = () => {
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
-
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(0);
   };
 
   const handlePageClick = (data) => {
-    // console.log(data.selected);
+    console.log("aer",data.selected);
     setCurrentPage(data.selected);
   };
 
-  useEffect(() => {
-    const updatedFilteredDrivers = driverData
-      .filter((driver) => {
-        const statusMatch =
-          activeStatus === "ALL STATUSES" ||
-          (activeStatus === "LEAVE STATUS" && driver.on_leave === status) ||
-          (activeStatus === "PERMANENT" &&
-            driver.is_Permanent === "Permanent") ||
-          (activeStatus === "BADALI" && driver.is_Permanent === "Badali");
+  // useEffect(() => {
+  //   const updatedFilteredDrivers = driverData
+  //     .filter((driver) => {
+  //       const statusMatch =
+  //         activeStatus === "ALL STATUSES" ||
+  //         (activeStatus === "LEAVE STATUS" && driver.on_leave === status) ||
+  //         (activeStatus === "PERMANENT" &&
+  //           driver.is_Permanent === "Permanent") ||
+  //         (activeStatus === "BADALI" && driver.is_Permanent === "Badali");
 
-        const employmentMatch =
-          employmentType === "Employment Type" ||
-          driver.is_Permanent === employmentType;
-        const leaveStatusMatch =
-          status === "Status" || driver.on_leave === status;
+  //       const employmentMatch =
+  //         employmentType === "Employment Type" ||
+  //         driver.is_Permanent === employmentType;
+  //       const leaveStatusMatch =
+  //         status === "Status" || driver.on_leave === status;
 
-        return statusMatch && employmentMatch && leaveStatusMatch;
-      })
-      .filter((driver) =>
-        leaveStatus === "allstatus" ? true : leaveStatus === driver.on_leave
-      )
-      .filter(
-        (driver) =>
-          driver.EmployeeName.toLowerCase().includes(
-            searchDriver.toLowerCase()
-          ) || driver.PEN.toLowerCase().includes(searchDriver.toLowerCase())
-      );
-    setFilteredDrivers(updatedFilteredDrivers);
-  }, [
-    driverData,
-    activeStatus,
-    employmentType,
-    status,
-    leaveStatus,
-    searchDriver,
-  ]);
+  //       return statusMatch && employmentMatch && leaveStatusMatch;
+  //     })
+  //     .filter((driver) =>
+  //       leaveStatus === "allstatus" ? true : leaveStatus === driver.on_leave
+  //     )
+  //     .filter(
+  //       (driver) =>
+  //         driver.EmployeeName.toLowerCase().includes(
+  //           searchDriver.toLowerCase()
+  //         ) || driver.PEN.toLowerCase().includes(searchDriver.toLowerCase())
+  //     );
+  //   setFilteredDrivers(updatedFilteredDrivers);
+  // }, [
+  //   driverData,
+  //   activeStatus,
+  //   employmentType,
+  //   status,
+  //   leaveStatus,
+  //   searchDriver,
+  // ]);
 
-  useEffect(() => {
-    handleAllDriverData();
-  }, []);
+  // useEffect(() => {
+  //   handleAllDriverData();
+  // }, []);
 
   const navigate = useNavigate();
   const handleAddDriver = () => {
@@ -212,6 +215,35 @@ const Drivers = () => {
       setLeaveStatus("allstatus");
     }
   };
+
+  // <<<:::Api call for Driver Details By Pagination::>>>
+
+  const driverByPagination=async(req,res)=>{
+    setLoading(true);
+    try{
+      const Details= await getDriverByPagination(currentPage,itemsPerPage,searchDriver,status,employmentType);
+      // console.log("DATA",Details.data);
+        if(Details.status==200){
+          setTotalPages(Details.data.meta);
+          setDriverDetails(Details.data.data);
+        }else{
+          console.log(Details.status);  
+        }
+    }catch(err){
+      console.log(err);
+    }finally {
+      setLoading(false);
+    }
+  }
+// console.log("DA",driverDetails);
+// console.log("employ:",employmentType);
+// console.log("Status:",status);
+// console.log("Meta:",totalPages);
+
+  useEffect(()=>{
+    driverByPagination();
+  },[currentPage,itemsPerPage,searchDriver,status,employmentType])
+
   return (
     <>
       <Header />
@@ -232,22 +264,12 @@ const Drivers = () => {
             </button>
           </div>
 
-          <hr className="vehicle-horizontal-line" />
+          {/* <hr className="vehicle-horizontal-line" /> */}
 
           <div className="d-flex">
-            {["ALL STATUSES", "PERMANENT", "BADALI"].map((status, index) => (
-              <button
-                key={index}
-                className="btn me-md-2"
-                style={{
-                  borderBottom:
-                    activeStatus === status ? "3px solid green" : "none",
-                }}
-                onClick={() => filter(status)}
-              >
-                {status}
-              </button>
-            ))}
+            <button className="btn me-md-2" style={{borderBottom:employmentType==""?"3px solid green" : "none"}} onClick={()=>setEmploymentType("")}>ALL STATUSES</button>
+            <button className="btn me-md-2" style={{borderBottom:employmentType=="Permanent"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Permanent")}>PERMANENT</button>
+            <button className="btn me-md-2" style={{borderBottom:employmentType=="Badali"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Badali")}>BADALI</button>
           </div>
 
           <hr className="vehicle-horizontal-line" />
@@ -268,7 +290,7 @@ const Drivers = () => {
                   />
                 </div>
 
-                <Form.Control
+                {/* <Form.Control
                   as="select"
                   value={employmentType}
                   onChange={(e) => setEmploymentType(e.target.value)}
@@ -279,7 +301,7 @@ const Drivers = () => {
                   <option value="Employment Type">Employment Type</option>
                   <option value="Permanent">Permanent</option>
                   <option value="Badali">Badali</option>
-                </Form.Control>
+                </Form.Control> */}
 
                 <Form.Control
                   as="select"
@@ -289,7 +311,7 @@ const Drivers = () => {
                   <option disabled value="">
                     Select Status
                   </option>
-                  <option value="Status">All Status</option>
+                  {/* <option value="Status">All Status</option> */}
                   <option value="Available">Available</option>
                   <option value="Leave">On Leave</option>
                 </Form.Control>
@@ -383,7 +405,7 @@ const Drivers = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedDrivers.map((driver, index) => (
+                    {driverDetails.map((driver, index) => (
                       <tr key={driver._id}>
                         <td>
                           <input
@@ -534,7 +556,7 @@ const Drivers = () => {
                   previousLabel={"Previous"}
                   nextLabel={"Next"}
                   breakLabel={"..."}
-                  pageCount={Math.ceil(filteredDrivers.length / itemsPerPage)}
+                  pageCount={totalPages?.totalPages || 0} 
                   marginPagesDisplayed={3}
                   pageRangeDisplayed={3}
                   onPageChange={handlePageClick}
@@ -548,6 +570,7 @@ const Drivers = () => {
                   breakClassName={"page-item"}
                   breakLinkClassName={"page-link"}
                   activeClassName={"active"}
+                   forcePage={currentPage}
                 />
               </div>
             )}

@@ -16,6 +16,8 @@ import LoginPage from "./Pages/LoginPage/LoginPage";
 import ProtectRoutes from "./utils/protectRoutes";
 import Maintenance from "./Pages/Maintenance/Maintenance";
 import Collection from "./Pages/Collection/Collection";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -23,7 +25,11 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route element={<ProtectRoutes allowedRoles={["Admin", "Staff", "Supervisor"]} />}>
+        <Route
+          element={
+            <ProtectRoutes allowedRoles={["Admin", "Staff", "Supervisor"]} />
+          }
+        >
           <Route path="/fleet" element={<Vehicles />}></Route>
           <Route path="/vehicle-details" element={<VehicleDetails />}></Route>
           <Route path="/add-vehicle" element={<AddVehicle />}></Route>
@@ -36,11 +42,18 @@ function App() {
           <Route path="/scheduled-trips" element={<ScheduleTrip />}></Route>
           <Route path="/ongoing-trips" element={<OnGoingTrips />}></Route>
           <Route path="/collection" element={<Collection />}></Route>
-          </Route>
-          <Route element={<ProtectRoutes allowedRoles={["Admin", "Maintenance", "Supervisor"]} />}>
-            <Route path="/maintanance" element={<Maintenance />} />
+        </Route>
+        <Route
+          element={
+            <ProtectRoutes
+              allowedRoles={["Admin", "Maintenance", "Supervisor"]}
+            />
+          }
+        >
+          <Route path="/maintanance" element={<Maintenance />} />
         </Route>
       </Routes>
+      <ToastContainer />
     </>
   );
 }

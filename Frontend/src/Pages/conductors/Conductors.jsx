@@ -19,6 +19,7 @@ import {
   deleteSingleConductorAPI,
   editLeaveStatusConductor,
   getAllConductor,
+  getFilteredConductorsListApi,
 } from "../../services/allAPI";
 import { Button, Form, Modal, Spinner } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
@@ -33,8 +34,8 @@ const Conductors = () => {
   const [searchConductor, setSearchConductor] = useState("");
   const [showDeleteId, setShowDeleteId] = useState(null);
   const [activeStatus, setActiveStatus] = useState("ALL STATUSES");
-  const [employmentType, setEmploymentType] = useState("Employment Type");
-  const [status, setStatus] = useState("Status");
+  const [employmentType, setEmploymentType] = useState("");
+  const [status, setStatus] = useState("");
   const [conductorData, setConductorData] = useState([]);
   const [editleave, setEditLeave] = useState({ on_leave: "" });
   const [show, setShow] = useState(false);
@@ -68,22 +69,7 @@ const Conductors = () => {
     }
   };
 
-  const handleAllConductorData = async () => {
-    setLoading(true);
-    try {
-      const allConductor = await getAllConductor();
-      if (allConductor.status == 200) {
-        console.log(allConductor.data);
-        setConductorData(allConductor.data);
-      } else {
-        console.log("Error in fetching Conductor Details:::::");
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
   // ------------------------------------------- Delete single Conductor -------------------------------------------
   const handleShowDeleteOptions = (id) => {
     setShowDeleteId((prevId) => (prevId === id ? null : id));
@@ -113,7 +99,6 @@ const Conductors = () => {
       }
     });
   };
-  console.log(checked);
 
   // apicall to delete checked conductors
   const handleDeleteSelectedConductors = async () => {
@@ -142,11 +127,6 @@ const Conductors = () => {
     }
   };
 
-  // ---------------------- pagination ----------------------
-  const displayedConductors = filteredConductors.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
@@ -158,56 +138,31 @@ const Conductors = () => {
     setCurrentPage(data.selected);
   };
 
-  useEffect(() => {
-    const updatedFilteredConductors = conductorData
-      .filter((conductor) => {
-        const statusMatch =
-          activeStatus === "ALL STATUSES" ||
-          (activeStatus === "LEAVE STATUS" && conductor.on_leave === status) ||
-          (activeStatus === "PERMANENT" &&
-            conductor.is_Permanent === "Permanent") ||
-          (activeStatus === "BADALI" && conductor.is_Permanent === "Badali");
-
-        const employmentMatch =
-          employmentType === "Employment Type" ||
-          conductor.is_Permanent === employmentType;
-        const leaveStatusMatch =
-          status === "Status" || conductor.on_leave === status;
-
-        return statusMatch && employmentMatch && leaveStatusMatch;
-      })
-      .filter((conductor) =>
-        leaveStatus === "allstatus" ? true : leaveStatus === conductor.on_leave
-      )
-      .filter(
-        (conductor) =>
-          conductor.EmployeeName.toLowerCase().includes(
-            searchConductor.toLowerCase()
-          ) ||
-          conductor.PEN.toLowerCase().includes(searchConductor.toLowerCase())
-      );
-    setFilteredConductors(updatedFilteredConductors);
-  }, [
-    conductorData,
-    activeStatus,
-    employmentType,
-    status,
-    leaveStatus,
-    searchConductor,
-  ]);
-
-  useEffect(() => {
-    handleAllConductorData();
-  }, []);
 
   const navigate = useNavigate();
   const handleAddConductor = () => {
     navigate("/add-conductor");
   };
-  const filter = (status) => {
-    setActiveStatus(status);
-    setLeaveStatus("allstatus");
-  };
+
+  const[data,setData]=useState({conductors:[],length:0})
+
+  useEffect(()=>{
+    getFilteredConductors()
+  },[currentPage,itemsPerPage,searchConductor,employmentType,status])
+
+  // api call
+  const getFilteredConductors = async()=>{
+    setLoading(true)
+    try{
+      const result = await getFilteredConductorsListApi(currentPage,itemsPerPage,searchConductor,status,employmentType)
+      setData({conductors:result.data.conductors,length:result.data.length})
+    }catch(err){
+      console.log("failed to feth filtered conductors",err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       <Header />
@@ -231,19 +186,9 @@ const Conductors = () => {
           <hr className="vehicle-horizontal-line" />
 
           <div className="d-flex">
-            {["ALL STATUSES", "PERMANENT", "BADALI"].map((status, index) => (
-              <button
-                key={index}
-                className="btn me-md-2"
-                style={{
-                  borderBottom:
-                    activeStatus === status ? "3px solid green" : "none",
-                }}
-                onClick={() => filter(status)}
-              >
-                {status.toUpperCase()}
-              </button>
-            ))}
+            <button className="btn me-md-2" style={{borderBottom:employmentType==""?"3px solid green" : "none"}} onClick={()=>setEmploymentType("")}>ALL STATUSES</button>
+            <button className="btn me-md-2" style={{borderBottom:employmentType=="Permanent"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Permanent")}>PERMANENT</button>
+            <button className="btn me-md-2" style={{borderBottom:employmentType=="Badali"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Badali")}>BADALI</button>
           </div>
           <hr className="vehicle-horizontal-line" />
 
@@ -264,7 +209,7 @@ const Conductors = () => {
                 </div>
 
                 {/* All conductor search by entering no or name */}
-                <Form.Control
+                {/* <Form.Control
                   as="select"
                   value={employmentType}
                   onChange={(e) => setEmploymentType(e.target.value)}
@@ -275,7 +220,7 @@ const Conductors = () => {
                   <option value="Employment Type">Employment Type</option>
                   <option value="Permanent">Permanent</option>
                   <option value="Badali">Badali</option>
-                </Form.Control>
+                </Form.Control> */}
 
                 <Form.Control
                   as="select"
@@ -285,7 +230,7 @@ const Conductors = () => {
                   <option disabled value="">
                     Select Status
                   </option>
-                  <option value="Status">All Status</option>
+                  <option value="">All Status</option>
                   <option value="Available">Available</option>
                   <option value="Leave">On Leave</option>
                 </Form.Control>
@@ -295,8 +240,8 @@ const Conductors = () => {
                   className="btn btn-light border-dark rounded"
                   onClick={() => {
                     setActiveStatus("ALL STATUSES");
-                    setEmploymentType("Employment Type");
-                    setStatus("Status");
+                    setEmploymentType("");
+                    setStatus("");
                     // setSelectedConductor("All Conductors");
                   }}
                 >
@@ -377,7 +322,7 @@ const Conductors = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedConductors.map((conductor, index) => (
+                    {data.conductors.map((conductor, index) => (
                       <tr key={conductor._id}>
                         <td>
                           <input
@@ -530,7 +475,7 @@ const Conductors = () => {
                   nextLabel={"Next"}
                   breakLabel={"..."}
                   pageCount={Math.ceil(
-                    filteredConductors.length / itemsPerPage
+                    data.length / itemsPerPage
                   )}
                   marginPagesDisplayed={3}
                   pageRangeDisplayed={3}
@@ -545,6 +490,7 @@ const Conductors = () => {
                   breakClassName={"page-item"}
                   breakLinkClassName={"page-link"}
                   activeClassName={"active"}
+                  forcePage={currentPage}
                 />
               </div>
             )}

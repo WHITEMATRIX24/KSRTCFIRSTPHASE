@@ -3,7 +3,7 @@ import Driver from '../Models/DiverSchema.js';
 // <<<<<<::::::::Adding New Driver Details::::::::>>>
 
 export const addNewDriver = async (req, res) => {
-    const { EmployeeName, PEN, Designation, UNIT, is_permanent, phone } = req.body;
+    const { EmployeeName, PEN, Designation, UNIT, is_Permanent, phone } = req.body;
     // const image = req.file ? req.file.filename : null;
     try {
         const existingDriver = await Driver.findOne({ PEN });
@@ -11,7 +11,7 @@ export const addNewDriver = async (req, res) => {
             res.status(406).json("Driver is Already Existing:::::");
         } else {
             const newDriver = new Driver({
-                EmployeeName, PEN, Designation, UNIT, is_permanent, phone
+                EmployeeName, PEN, Designation, UNIT, is_Permanent, phone
             });
             await newDriver.save();
             res.status(201).json(newDriver);
@@ -39,11 +39,11 @@ export const getAllDriverDetails = async (req, res) => {
 
 // <<<<<:::::::::Editing Driver Details By driver_id:::::::::>>>>>>>>>
 export const editDriverDetails = async (req, res) => {
-    const { EmployeeName, PEN, Designation, UNIT, is_permanent, phone, on_leave } = req.body;
+    const { EmployeeName, PEN, Designation, UNIT, is_Permanent, phone, on_leave } = req.body;
     const { driver_id } = req.params;
     try {
         const updatedDriver = await Driver.findByIdAndUpdate(driver_id, {
-            EmployeeName, PEN, Designation, UNIT, is_permanent, phone, on_leave
+            EmployeeName, PEN, Designation, UNIT, is_Permanent, phone, on_leave
         }, { new: true });
 
         if (updatedDriver) {
@@ -130,3 +130,58 @@ export const deleteSelectedDriver = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+// <<<<::::::get Driver Details By filtering in Pagination::::>>>>>
+
+export const getDriverByPagination = async (req, res) => {
+    const { page,limit,search,leaveStatus,employmentType } = req.query;
+    console.log(req.query);
+    // console.log(page);
+    
+    try {
+        const parsedPage = parseInt(page, 10);
+        const parsedLimit = parseInt(limit, 10) || 50;
+        
+        const filter = {};
+
+        if (search) {
+            filter.$or = [
+                { EmployeeName: { $regex: search, $options: "i" } },
+                { PEN: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        if (leaveStatus) {
+            filter.on_leave = leaveStatus;
+        }
+
+        if (employmentType) {
+            filter.is_Permanent = employmentType;
+        }
+
+        const offset = parsedPage*parsedLimit;
+        const drDetails = await Driver.find(filter)
+            .skip(offset)
+            .limit(parsedLimit)
+            .exec();
+
+        const totalDrivers = await Driver.countDocuments(filter);
+        const totalPages = Math.ceil(totalDrivers / parsedLimit);
+
+        res.status(200).json({
+            success: true,
+            data: drDetails,
+            meta: {
+                totalItems: totalDrivers,
+                totalPages: totalPages,
+                currentPage: parsedPage,
+                limit: parsedLimit,
+            },
+        });
+
+    } catch (err) {
+        console.log("Error at catch in DriverController/getDriverByPagination::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+

@@ -17,7 +17,7 @@ export const addNewTrip = async (req, res) => {
     trip_type,
   } = req.body;
   const { vehicle_id, driver_id, conductor_id } = req.params;
-console.log(req.body);
+  console.log(req.body);
 
   try {
     const vehicle = await Vehicle.findById(vehicle_id);
@@ -155,7 +155,7 @@ export const editTripDetailsNew = async (req, res) => {
     arrival_location,
     status,
   } = req.body;
-  
+
   const { vehicle_id, driver_id, conductor_id, trip_id } = req.params;
 
   try {
@@ -253,18 +253,86 @@ export const getTripdetailsUpcomingbyDepoName = async (req, res) => {
   const { depoName } = req.params;
 
   try {
-    const tripDetails = await Trip.find({
-      $and: [{ status: "upcoming" }, { "departure_location.depo": depoName }],
-    });
+    const tripDetails = await Trip.aggregate([
+      {
+        $match: {
+          status: "upcoming",
+        },
+      },
+      {
+        $match: {
+          "departure_location.depo": depoName,
+        },
+      },
+      {
+        $lookup: {
+          from: "vehicles",
+          localField: "vehicle_id",
+          foreignField: "_id",
+          as: "vechileDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                BUSNO: 1,
+                REGNO: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$vechileDetails",
+      },
+      {
+        $lookup: {
+          from: "conductors",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "conductorDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$conductorDetails",
+      },
+      {
+        $lookup: {
+          from: "drivers",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "driverDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$driverDetails",
+      },
+    ]);
+
     if (tripDetails.length > 0) {
       res.status(200).json(tripDetails);
     } else {
-      res
-        .status(404)
-        .json({
-          message:
-            "No Trip details found for this depot name and Upcoming Status",
-        });
+      res.status(404).json({
+        message:
+          "No Trip details found for this depot name and Upcoming Status",
+      });
     }
   } catch (err) {
     console.log(
@@ -281,17 +349,253 @@ export const getTripLiveBydepoName = async (req, res) => {
   const { depoName } = req.params;
 
   try {
-    const tripDetails = await Trip.find({
-      $and: [
-        { status: "live" },
-        {
+    const tripDetails = await Trip.aggregate([
+      {
+        $match: {
+          status: "live",
+        },
+      },
+      {
+        $match: {
           $or: [
             { "departure_location.depo": depoName },
             { "arrival_location.depo": depoName },
           ],
         },
-      ],
-    });
+      },
+      {
+        $lookup: {
+          from: "vehicles",
+          localField: "vehicle_id",
+          foreignField: "_id",
+          as: "vechileDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                BUSNO: 1,
+                REGNO: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$vechileDetails",
+      },
+      {
+        $lookup: {
+          from: "conductors",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "conductorDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$conductorDetails",
+      },
+      {
+        $lookup: {
+          from: "drivers",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "driverDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$driverDetails",
+      },
+    ]);
+    if (tripDetails.length > 0) {
+      res.status(200).json(tripDetails);
+    } else {
+      res
+        .status(404)
+        .json({ message: "No Trip details found::getTripLiveBydepoName" });
+    }
+  } catch (err) {
+    console.log(
+      "Error at catch in tripController/getTripLiveBydepName::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// <<<<<:::::get all trip live::::>>>>>>
+export const getAllTripLive = async (req, res) => {
+  try {
+    const tripDetails = await Trip.aggregate([
+      {
+        $match: {
+          status: "live",
+        },
+      },
+      {
+        $lookup: {
+          from: "vehicles",
+          localField: "vehicle_id",
+          foreignField: "_id",
+          as: "vechileDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                BUSNO: 1,
+                REGNO: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$vechileDetails",
+      },
+      {
+        $lookup: {
+          from: "conductors",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "conductorDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$conductorDetails",
+      },
+      {
+        $lookup: {
+          from: "drivers",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "driverDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$driverDetails",
+      },
+    ]);
+    if (tripDetails.length > 0) {
+      res.status(200).json(tripDetails);
+    } else {
+      res
+        .status(404)
+        .json({ message: "No Trip details found::getTripLiveBydepoName" });
+    }
+  } catch (err) {
+    console.log(
+      "Error at catch in tripController/getTripLiveBydepName::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// <<<<<:::::get all upcoming trip::::>>>>>>
+export const getAllUpcomingTrip = async (req, res) => {
+  try {
+    const tripDetails = await Trip.aggregate([
+      {
+        $match: {
+          status: "upcoming",
+        },
+      },
+      {
+        $lookup: {
+          from: "vehicles",
+          localField: "vehicle_id",
+          foreignField: "_id",
+          as: "vechileDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                BUSNO: 1,
+                REGNO: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$vechileDetails",
+      },
+      {
+        $lookup: {
+          from: "conductors",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "conductorDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$conductorDetails",
+      },
+      {
+        $lookup: {
+          from: "drivers",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "driverDetails",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $unwind: "$driverDetails",
+      },
+    ]);
     if (tripDetails.length > 0) {
       res.status(200).json(tripDetails);
     } else {

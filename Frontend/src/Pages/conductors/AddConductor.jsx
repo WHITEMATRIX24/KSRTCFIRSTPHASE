@@ -12,27 +12,27 @@ const AddConductor = () => {
     PEN: "",
     Designation: "",
     UNIT: "",
-    is_permanent: "", // Employment Type
+    is_Permanent: "", // Employment Type
     contact_info: { phone: "" },
     on_leave: "Available", // default value
   });
 
   const handleAddnewConductor = async () => {
-    const { EmployeeName, PEN, Designation, UNIT, is_permanent, contact_info: { phone }, on_leave } = conductorData;
+    const { EmployeeName, PEN, Designation, UNIT, is_Permanent, contact_info: { phone }, on_leave } = conductorData;
 
-    if (!EmployeeName || !PEN || !Designation || !UNIT || !phone || !is_permanent) {
+    if (!EmployeeName || !PEN || !Designation || !UNIT || !phone || !is_Permanent) {
       alert("Please fill the empty fields");
     } else {
       const newConductor = await addNewConductor(conductorData);
       if (newConductor.status === 201) {
         alert("New Conductor Added Successfully");
-        // Reset conductorData after successful addition, except is_permanent
+        // Reset conductorData after successful addition, except is_Permanent
         setConductorData(prevState => ({
           EmployeeName: "",
           PEN: "",
           Designation: "",
           UNIT: "",
-          is_permanent: prevState.is_permanent, // Keep Employment Type
+          is_Permanent: prevState.is_Permanent, // Keep Employment Type
           contact_info: { phone: "" },
           on_leave: "Available",
         }));
@@ -45,13 +45,13 @@ const AddConductor = () => {
   };
 
   const handleCancel = () => {
-    // Preserve is_permanent and reset other fields
+    // Preserve is_Permanent and reset other fields
     setConductorData(prevState => ({
       EmployeeName: "",
       PEN: "",
       Designation: "",
       UNIT: "",
-      is_permanent: prevState.is_permanent, // Keep Employment Type
+      is_Permanent: prevState.is_Permanent, // Keep Employment Type
       contact_info: { phone: "" },
       on_leave: "Available",
     }));
@@ -140,8 +140,8 @@ const AddConductor = () => {
                           <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Employment Type</Form.Label>
                           <Form.Control
                             as="select"
-                            value={conductorData.is_permanent}
-                            onChange={e => setConductorData({ ...conductorData, is_permanent: e.target.value })}
+                            value={conductorData.is_Permanent}
+                            onChange={e => setConductorData({ ...conductorData, is_Permanent: e.target.value })}
                           >
                             <option value="" disabled>Select Employment Type</option>
                             <option value="Permanent">Permanent</option>
@@ -161,7 +161,7 @@ const AddConductor = () => {
                         type='button'
                         className='btn tbn rounded me-2'
                         style={{ backgroundColor: '#f8f9fa', color: 'black' }}
-                        onClick={handleCancel}  // Clears the form but keeps is_permanent
+                        onClick={handleCancel}  // Clears the form but keeps is_Permanent
                       >
                         <FontAwesomeIcon className='me-2' icon={faXmark} />Cancel
                       </Button>

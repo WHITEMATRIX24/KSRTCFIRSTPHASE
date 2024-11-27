@@ -23,6 +23,7 @@ import {
   updateTripApiNew,
   updateVehicleStatus,
   getAllLiveTripApi,
+  getAllLiveTripApiForAdmin,
 } from "../../services/allAPI";
 
 export default function OnGoingTrips() {
@@ -130,6 +131,7 @@ export default function OnGoingTrips() {
   const [vehicles, setVehicles] = useState([]);
   const [modifiedTrips, setModifiedTrips] = useState([]);
   const [drivers, setDrivers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   //state to store trip colleftion and fuel cost
   const [tripCost, setTripCost] = useState({
@@ -150,29 +152,31 @@ export default function OnGoingTrips() {
   const [role, setRole] = useState("");
   //console.log(depoName);
 
-  useEffect(() => {
-    // Filtered trips based on vehicle number and date
-    if (!modifiedTrips) return;
-    const filtered = modifiedTrips.filter((trip) => {
-      const matchesVehicle =
-        trip.BUSNO &&
-        trip.BUSNO.toLowerCase().includes(vehicleFilter.toLowerCase());
-      // const matchesTrips =
-      //   trip.trip_id &&
-      //   trip.trip_id.toLowerCase().includes(tripFilter.toLowerCase());
-      const matchesDate = dateFilter
-        ? trip.start_date && trip.start_date.startsWith(dateFilter)
-        : true;
-      /*  const liveVehicle =
-         trip.status && trip.status.toLowerCase().includes("live"); */
-      //const tripsStartDepo = trip.departure_location.depo && (trip.departure_location.depo == depoName);
-      // const tripsEndDepo = trip.arrival_location.depo && (trip.arrival_location.depo == depoName || trip.departure_location.depo == depoName);
+  // useEffect(() => {
+  //   // Filtered trips based on vehicle number and date
+  //   if (!modifiedTrips) return;
+  //   const filtered = modifiedTrips.filter((trip) => {
+  //     const matchesVehicle =
+  //       item.vechileDetails.BUSNO &&
+  //       item.vechileDetails.BUSNO.toLowerCase().includes(
+  //         vehicleFilter.toLowerCase()
+  //       );
+  //     // const matchesTrips =
+  //     //   trip.trip_id &&
+  //     //   trip.trip_id.toLowerCase().includes(tripFilter.toLowerCase());
+  //     const matchesDate = dateFilter
+  //       ? trip.start_date && trip.start_date.startsWith(dateFilter)
+  //       : true;
+  //     /*  const liveVehicle =
+  //        trip.status && trip.status.toLowerCase().includes("live"); */
+  //     //const tripsStartDepo = trip.departure_location.depo && (trip.departure_location.depo == depoName);
+  //     // const tripsEndDepo = trip.arrival_location.depo && (trip.arrival_location.depo == depoName || trip.departure_location.depo == depoName);
 
-      //console.log({ matchesVehicle, matchesDate, liveVehicle,tripsStartDepo });
-      return matchesVehicle && matchesDate;
-    });
-    setFilteredTrips([...filtered]);
-  }, [modifiedTrips]);
+  //     //console.log({ matchesVehicle, matchesDate, liveVehicle,tripsStartDepo });
+  //     return matchesVehicle && matchesDate;
+  //   });
+  //   setFilteredTrips([...filtered]);
+  // }, [modifiedTrips]);
 
   //console.log(`filtered trips: ${filteredTrips}`);
 
@@ -184,7 +188,7 @@ export default function OnGoingTrips() {
   const [inputPairs, setInputPairs] = useState([]);
   const [fuel, setFuel] = useState([]);
   const [fuelCost, setFuelCost] = useState(0);
-  const [outBound, setOutBound] = useState(false);
+  const [outBound, setOutBound] = useState(true);
 
   /* Function to close modal */
   const handleClose = () => {
@@ -376,25 +380,32 @@ export default function OnGoingTrips() {
   const [noData, setNoData] = useState(false);
   const getAllTrips = async () => {
     // console.log(role);
+    try {
+      if (role == "Staff" || role == "Supervisor") {
+        const result = await getAllLiveTripApi(depoName);
+        //console.log(result.data);
 
-    if (role == "Staff" || role == "Supervisor") {
-      const result = await getAllLiveTripApi(depoName);
-      //console.log(result.data);
+        if (result.status == 200) {
+          setNewTripData(result.data);
+          setModifiedTrips(result.data);
+        } else if (result.status == 404) {
+          setNoData(true);
+        }
+      } else if (role == "Admin") {
+        const result = await getAllLiveTripApiForAdmin();
+        //console.log(result.data);
 
-      if (result.status == 200) {
-        setNewTripData(result.data);
-      } else if (result.status == 404) {
-        setNoData(true);
+        if (result.status == 200) {
+          setNewTripData(result.data);
+          setModifiedTrips(result.data);
+        } else if (result.status == 404) {
+          setNoData(true);
+        }
       }
-    } else if (role == "Admin") {
-      const result = await getAllTripApi();
-      //console.log(result.data);
-
-      if (result.status == 200) {
-        setNewTripData(result.data);
-      } else if (result.status == 404) {
-        setNoData(true);
-      }
+    } catch (error) {
+      console.log(`error in fetching trip data error: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
   const [busLoading, setBusLoading] = useState(false);
@@ -432,7 +443,6 @@ export default function OnGoingTrips() {
       alert(result);
     }
   };
-  const [loading, setLoading] = useState(false);
 
   const getAllDriversList = async () => {
     try {
@@ -459,26 +469,34 @@ export default function OnGoingTrips() {
       return "";
     }
   };
-  useEffect(() => {
-    getAllBuses();
-    getAllDriversList();
-  }, [depoName]);
+  // useEffect(() => {
+  //   getAllBuses();
+  //   getAllDriversList();
+  // }, [depoName]);
 
   useEffect(() => {
     getAllTrips();
   }, [depoName]);
 
   useEffect(() => {
-    if (tripData.length > 0 && vehicles.length > 0 && drivers.length > 0) {
-      let arr = tripData.map((item) => ({
-        ...item,
-        BUSNO: vehicles.find((item2) => item2._id == item.vehicle_id)?.BUSNO,
-        EmployeeName: drivers.find((item2) => item2._id == item.driver_id)
-          ?.EmployeeName,
-      }));
-      setModifiedTrips(arr);
+    if (tripData.length > 0) {
+      let filteredData = tripData
+        .filter((item) => {
+          return !dateFilter
+            ? true
+            : dateFilter == item.start_date.split("T")[0];
+        })
+        .filter((item) =>
+          !vehicleFilter
+            ? true
+            : item.vechileDetails.BUSNO.search(vehicleFilter.toUpperCase()) ==
+              -1
+            ? false
+            : true
+        );
+      setModifiedTrips(filteredData);
     }
-  }, [tripData, vehicles, vehicleFilter, dateFilter, tripFilter, drivers]);
+  }, [vehicleFilter, dateFilter]);
 
   return (
     <div>
@@ -528,16 +546,16 @@ export default function OnGoingTrips() {
                 <>
                   {/* Toolbar with count of items */}
                   <Row className="align-items-center mb-3">
-                    {loading && (
+                    {!loading && (
                       <Col className="text-end">
                         {/* Displaying the count of filtered items */}
                         <span>Total Live Trips:</span>
                         <span className="text-info ms-2 me-5">
-                          {filteredTrips.length}
+                          {modifiedTrips.length}
                         </span>
                       </Col>
                     )}
-                    {!loading && (
+                    {loading && (
                       <Col className="text-end">
                         {/* Displaying the count of filtered items */}
                         <span>Total Live Trips:</span>
@@ -550,9 +568,9 @@ export default function OnGoingTrips() {
 
                   {/* Table */}
 
-                  {loading && busLoading && (
+                  {!loading && (
                     <div>
-                      {filteredTrips?.length > 0 && (
+                      {modifiedTrips?.length > 0 && (
                         <Row>
                           <Col>
                             <Table
@@ -577,7 +595,7 @@ export default function OnGoingTrips() {
                               </thead>
 
                               <tbody>
-                                {filteredTrips.map((trip) => (
+                                {modifiedTrips.map((trip) => (
                                   <tr key={trip.trip_id} className="bg-white">
                                     <td>{trip.waybill_Number}</td>
                                     <td>
@@ -593,7 +611,7 @@ export default function OnGoingTrips() {
                                           className="text-muted me-2"
                                         />
                                         <div>
-                                          <div>{trip.BUSNO}</div>
+                                          <div>{trip.vechileDetails.BUSNO}</div>
                                           <small className="text-muted">
                                             BUS
                                           </small>
@@ -605,7 +623,7 @@ export default function OnGoingTrips() {
                                         icon={faUser}
                                         className="text-muted me-2"
                                       />
-                                      {trip.EmployeeName}
+                                      {trip.driverDetails.EmployeeName}
                                     </td>
 
                                     <td>
@@ -678,14 +696,14 @@ export default function OnGoingTrips() {
                           </Col>
                         </Row>
                       )}
-                      {filteredTrips?.length == 0 && (
+                      {modifiedTrips?.length == 0 && (
                         <h6 className="text-danger text-center m-3">
                           No Live Trips
                         </h6>
                       )}
                     </div>
                   )}
-                  {!loading && (
+                  {loading && (
                     <h6 className="text-danger text-center m-3">
                       Loading Live Trips... Please Wait
                     </h6>

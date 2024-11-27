@@ -257,12 +257,7 @@ const TripParameters = () => {
   // add trips
   const handleSchedule = async () => {
 
-    if (
-      !outboundTrip.waybill_Number
-    ) {
-      alert("Enter Waybill Number");
-      return;
-    }else if(!outboundTrip.vehicle_id){
+     if(!outboundTrip.vehicle_id){
       alert("Choose Vehicle")
       return
     }else if(!outboundTrip.driver_id){

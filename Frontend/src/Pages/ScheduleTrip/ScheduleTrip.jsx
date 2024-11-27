@@ -16,10 +16,12 @@ import { useNavigate } from "react-router-dom";
 import {
   getAllTripApi,
   getAllUpcomingTripApi,
+  getAllUpcomingTripApiForAdmin,
   getAllVehicles,
   getDriversListApi,
   updateTripApiNew,
 } from "../../services/allAPI";
+import { toast } from "react-toastify";
 
 export default function ScheduleTrip() {
   const [depoName, setDepoName] = useState("");
@@ -31,6 +33,7 @@ export default function ScheduleTrip() {
   const [drivers, setDrivers] = useState([]);
   const [modifiedTrips, setModifiedTrips] = useState([]);
   const [isLoadingApi, setIsLoadingApi] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [noData, setNoData] = useState(false);
 
@@ -51,7 +54,7 @@ export default function ScheduleTrip() {
       }
     } else if (role == "Admin") {
       try {
-        const result = await getAllTripApi();
+        const result = await getAllUpcomingTripApiForAdmin();
         console.log(result);
 
         if (result.status == 200) {
@@ -65,67 +68,62 @@ export default function ScheduleTrip() {
     }
   };
 
-  const [loading, setLoading] = useState(true);
-
   // get drivers list
-  const getAllDriversList = async () => {
-    try {
-      const result = await getDriversListApi();
-      console.log(result.status);
+  // const getAllDriversList = async () => {
+  //   try {
+  //     const result = await getDriversListApi();
+  //     console.log(result.status);
 
-      if (result.status == 200) {
-        setDrivers(result.data);
-        setLoading(false);
-      } else {
-        console.log("Failed to load Driver & conductor");
-      }
-    } catch (err) {
-      alert(`Failed to load Drivers Details ${err}`);
-    }
-  };
+  //     if (result.status == 200) {
+  //       setDrivers(result.data);
+  //       setLoading(false);
+  //     } else {
+  //       console.log("Failed to load Driver & conductor");
+  //     }
+  //   } catch (err) {
+  //     alert(`Failed to load Drivers Details ${err}`);
+  //   }
+  // };
 
   // get all buses
-  const getAllBuses = async () => {
-    try {
-      const result = await getAllVehicles();
-      if (result.status == 200) {
-        setVehicles(result.data);
-      } else {
-        alert("Failed to load Bus Details");
-      }
-    } catch (err) {
-      alert(`Failed to load Bus Details ${err}`);
-    }
-  };
+  // const getAllBuses = async () => {
+  //   try {
+  //     const result = await getAllVehicles();
+  //     if (result.status == 200) {
+  //       setVehicles(result.data);
+  //     } else {
+  //       alert("Failed to load Bus Details");
+  //     }
+  //   } catch (err) {
+  //     alert(`Failed to load Bus Details ${err}`);
+  //   }
+  // };
 
   // api call
   useEffect(() => {
     try {
-      setIsLoadingApi(true);
       getTrips();
       getAllDriversList();
       getAllBuses();
     } catch (error) {
       console.log(`error in featching schedule trip data error: ${error}`);
     } finally {
-      console.log("working try catch");
-
-      setIsLoadingApi(false);
+      setLoading(false);
     }
   }, [depoName]);
 
   // mdofied trip data
-  useEffect(() => {
-    if (trips.length > 0 && vehicles.length > 0 && drivers.length > 0) {
-      let arr = trips.map((item) => ({
-        ...item,
-        BusNo: vehicles.find((item2) => item2._id == item.vehicle_id)?.BUSNO,
-        employeeName: drivers.find((item2) => item2._id == item.driver_id)
-          ?.EmployeeName,
-      }));
-      setModifiedTrips(arr);
-    }
-  }, [trips, vehicles, drivers]);
+  // useEffect(() => {
+  //   if (trips.length > 0 && vehicles.length > 0 && drivers.length > 0) {
+  //     let arr = trips.map((item) => ({
+  //       ...item,
+  //       BusNo: vehicles.find((item2) => item2._id == item.vehicle_id)?.BUSNO,
+  //       employeeName: drivers.find((item2) => item2._id == item.driver_id)
+  //         ?.EmployeeName,
+  //     }));
+  //     setModifiedTrips(arr);
+  //   }
+  // }, [trips, vehicles, drivers]);
 
   useEffect(() => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
@@ -190,6 +188,9 @@ export default function ScheduleTrip() {
         obj.conductor_id,
         obj
       );
+      if (result.status === 200) {
+        toast.success("Trip is Live");
+      }
       console.log(result);
 
       getTrips();
@@ -266,23 +267,19 @@ export default function ScheduleTrip() {
                     <span>Items in the table:</span>
                     <span className="text-info ms-2 me-5">
                       {
-                        modifiedTrips
+                        trips
                           .filter((item) =>
-                            !date
-                              ? true
-                              : date == item.start_date.split("T")[0] ||
-                                date == item.end_date.split("T")[0]
+                            !date ? true : date == item.start_date.split("T")[0]
                           )
                           .filter((item) =>
                             !vehicleSearch
                               ? true
-                              : item.BusNo.search(
+                              : item.vechileDetails.BUSNO.search(
                                   vehicleSearch.toUpperCase()
                                 ) == -1
                               ? false
                               : true
-                          )
-                          .filter((item) => item.status == "upcoming").length
+                          ).length
                       }
                     </span>
                   </Col>
@@ -316,25 +313,22 @@ export default function ScheduleTrip() {
                           <tbody>
                             {!isLoadingApi && (
                               <>
-                                {modifiedTrips.length > 0 &&
-                                  modifiedTrips
+                                {trips.length > 0 &&
+                                  trips
                                     .filter((item) =>
                                       !date
                                         ? true
-                                        : date ==
-                                            item.start_date.split("T")[0] ||
-                                          date == item.end_date.split("T")[0]
+                                        : date == item.start_date.split("T")[0]
                                     )
                                     .filter((item) =>
                                       !vehicleSearch
                                         ? true
-                                        : item.BusNo.search(
+                                        : item.vechileDetails.BUSNO.search(
                                             vehicleSearch.toUpperCase()
                                           ) == -1
                                         ? false
                                         : true
                                     )
-                                    .filter((item) => item.status == "upcoming")
 
                                     .map((item, index) => (
                                       <tr key={index} className="bg-white">
@@ -354,7 +348,9 @@ export default function ScheduleTrip() {
                                               className="text-muted me-2"
                                             />
                                             <div>
-                                              <div>{item.BusNo}</div>
+                                              <div>
+                                                {item.vechileDetails.BUSNO}
+                                              </div>
                                               <small className="text-muted">
                                                 BUS
                                               </small>
@@ -366,7 +362,7 @@ export default function ScheduleTrip() {
                                             icon={faUser}
                                             className="text-muted me-2"
                                           />
-                                          {item.employeeName}
+                                          {item.driverDetails.EmployeeName}
                                         </td>
                                         <td>
                                           {new Date(

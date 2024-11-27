@@ -934,7 +934,7 @@ const Vehicles = () => {
                             )}
                         </td>
                         <td>
-                          <div style={{ position: "relative", width: "100px" }}>
+                          <div style={{ position:"absolute", width: "100px" }}>
                             <FontAwesomeIcon
                               icon={faEllipsisVertical}
                               style={{ cursor: "pointer" }}

@@ -10,7 +10,8 @@ const commonAPI = async (httpMethod, url, reqBody, reqHeader) => {
     return await axios(reqConfig).then(res => {
         return res
     }).catch(err => {
-        return err
+        console.error(err.response ? err.response.data : err.message); 
+        return { error: err.response ? err.response.data : err.message };
     })
 }
 

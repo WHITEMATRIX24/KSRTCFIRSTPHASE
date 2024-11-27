@@ -18,7 +18,7 @@ const driverSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  is_permanent: {
+  is_Permanent: {
     type: String,
     enum: ["Badali", "Permanent"],
   },

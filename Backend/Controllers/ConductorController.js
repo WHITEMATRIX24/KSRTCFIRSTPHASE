@@ -2,7 +2,7 @@ import Conductor from '../Models/ConductorSchema.js';
 
 // <<<<<<::::::::Adding New Conductor Details::::::::>>>
 export const addNewConductor = async (req, res) => {
-    const {EmployeeName, PEN, Designation, UNIT, is_permanent,phone } = req.body;
+    const {EmployeeName, PEN, Designation, UNIT, is_Permanent,phone } = req.body;
 
     try {
         const existingConducter = await Conductor.findOne({PEN});
@@ -11,7 +11,7 @@ export const addNewConductor = async (req, res) => {
             res.status(406).json("Conductor is Already Existing:::::");
         } else {
             const newConductor = new Conductor({
-                EmployeeName, PEN, Designation, UNIT, is_permanent, phone,
+                EmployeeName, PEN, Designation, UNIT, is_Permanent, phone,
             });
             await newConductor.save();
             res.status(201).json(newConductor);
@@ -39,11 +39,11 @@ export const getAllConductorDetails = async (req, res) => {
 
 // <<<<<:::::::::Editing Conductor Details By conductor_id:::::::::>>>>>>>>>
 export const editConductorDetails = async (req, res) => {
-    const {EmployeeName,PEN,Designation,UNIT,is_permanent,phone,on_leave} = req.body;
+    const {EmployeeName,PEN,Designation,UNIT,is_Permanent,phone,on_leave} = req.body;
     const { conductor_id } = req.params;
     try {
         const updatedConductor = await Conductor.findByIdAndUpdate(conductor_id, {
-            EmployeeName,PEN,Designation,UNIT,is_permanent,phone,on_leave
+            EmployeeName,PEN,Designation,UNIT,is_Permanent,phone,on_leave
         }, { new: true });
         if (updatedConductor) {
             res.status(200).json(updatedConductor);
@@ -121,6 +121,41 @@ export const deleteSelectedConductor = async (req, res) => {
         }
     } catch (err) {
         console.log("Error at catch in DriverController/deleteSelectedConductor::::::", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
+// getting paginated conductors list 
+
+export const getFilteredConductorsList = async (req,res)=>{
+    try{
+        const {pageNum,itemsPerPage}=req.params
+        const { search, leaveStatus, employmentType} = req.query;
+
+        const filter = {};
+
+        if (search) {
+            filter.$or = [
+              { EmployeeName: { $regex: search, $options: "i" } },
+              { PEN: { $regex: search, $options: "i" } },
+            ];
+        }
+
+        if (leaveStatus) {
+            filter.on_leave = leaveStatus;
+        }
+
+        if (employmentType) {
+            filter.is_Permanent = employmentType;
+        }
+
+        const totalConductors = await Conductor.countDocuments(filter);
+
+        const conductors = await Conductor.find(filter).skip(pageNum*itemsPerPage).limit(itemsPerPage)
+
+        res.status(200).json({conductors,length:totalConductors})
+    } catch (err) {
+        console.log("Error at catch in ConductorController/getFilteredConductorsList::::::", err);
         res.status(500).json({ error: "Internal server error" });
     }
 }

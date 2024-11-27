@@ -98,12 +98,12 @@ function ChartBar({ collection, fuelconsumtion, revenew }) {
   // console.log(totalDepoCollect, totalDepoFuel);
   // console.log(depoName);
 
-  useEffect(() => {
-    if (collection || fuelconsumtion || revenew) {
-      setTotalDepoCollection(collection);
-      setTotalDepoFuel(fuelconsumtion);
-    }
-  }, [collection, fuelconsumtion, revenew]);
+  // useEffect(() => {
+  //   if (collection || fuelconsumtion || revenew) {
+  //     setTotalDepoCollection(collection);
+  //     setTotalDepoFuel(fuelconsumtion);
+  //   }
+  // }, [collection, fuelconsumtion, revenew]);
 
   return (
     <div className="m-5" style={{ width: "450px", height: "250px" }}>
@@ -115,7 +115,7 @@ function ChartBar({ collection, fuelconsumtion, revenew }) {
           datasets: [
             {
               label: "Expense",
-              data: [totalDepoFuel],
+              data: [fuelconsumtion && fuelconsumtion],
               // data:fuelconsumtion,
               backgroundColor: "#0d8a72",
               borderColor: "rgba(255, 99, 132, 1)",
@@ -139,7 +139,7 @@ function ChartBar({ collection, fuelconsumtion, revenew }) {
             },
             {
               label: "Collection",
-              data: [totalDepoCollect],
+              data: [collection && collection],
               backgroundColor: " #37bc7f",
               borderColor: "rgba(54, 162, 235, 1)",
             },

@@ -29,6 +29,8 @@ import {
   getAllTripByDepoName,
   getTripdetailsUpcomingbyDepoName,
   getTripLiveBydepoName,
+  getAllUpcomingTrip,
+  getAllTripLive,
 } from "../Controllers/TripController.js";
 import {
   addNewDriver,
@@ -37,6 +39,7 @@ import {
   editDriverDetails,
   editLeaveStatus,
   getAllDriverDetails,
+  getDriverByPagination,
 } from "../Controllers/DriverController.js";
 import {
   addNewConductor,
@@ -45,6 +48,7 @@ import {
   editConductorDetails,
   editLeaveStatusConductor,
   getAllConductorDetails,
+  getFilteredConductorsList,
 } from "../Controllers/ConductorController.js";
 import {
   getAllLedgerData,
@@ -141,6 +145,9 @@ router.put("/editLeaveStatus/:driver_id", editLeaveStatus);
 router.delete("/deleteDriverById/:driver_id", deleteDriverById);
 // Delete Selected Drivers
 router.delete("/deleteSelectedDrivers", deleteSelectedDriver);
+// get Driver Details By Pagination
+router.get("/getDriverByPagination", getDriverByPagination)
+
 // <<<<<<<.......ConductorRouter.......>>>>>>>
 
 // Adding new Conductor
@@ -155,6 +162,8 @@ router.put("/editLeaveStatusConductor/:conductor_id", editLeaveStatusConductor);
 router.delete("/deleteConductorById/:conductor_id", deleteConductorById);
 // Delete Selected Conductors
 router.delete("/deleteSelectedConductors", deleteSelectedConductor);
+// get filtered conductors list
+router.get('/conductors/:pageNum/:itemsPerPage', getFilteredConductorsList);
 // <<<<<<<...........TripRouter.......>>>>>>>>
 
 // Adding new Trip info
@@ -179,6 +188,10 @@ router.get(
 );
 // get Trip Details By live Status && departure_location||arrival_location==depoName
 router.get("/getLiveTripsBydepoName/:depoName", getTripLiveBydepoName);
+// get all upcoming trips
+router.get("/get-all-upcoming-trips", getAllUpcomingTrip);
+// get all trip live
+router.get("/get-all-trip-live", getAllTripLive);
 
 // <<<<<<.......Admin Router.......>>>>>
 // Reigster New Admin

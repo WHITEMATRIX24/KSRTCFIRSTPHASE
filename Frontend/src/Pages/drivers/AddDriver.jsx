@@ -12,7 +12,7 @@ const AddDriver = () => {
     PEN: "",
     Designation: "",
     UNIT: "",
-    is_permanent: "",
+    is_Permanent: "",
     on_leave: "Available", // Default value
     phone: "",
   });
@@ -24,7 +24,7 @@ const AddDriver = () => {
       PEN: "",
       Designation: "",
       UNIT: "",
-      is_permanent: "",
+      is_Permanent: "",
       on_leave: "Available",
       phone: "",
     });
@@ -36,9 +36,9 @@ const AddDriver = () => {
       return;
     }
 
-    const { EmployeeName, PEN, Designation, UNIT, is_permanent, on_leave, phone } = driverData;
+    const { EmployeeName, PEN, Designation, UNIT, is_Permanent, on_leave, phone } = driverData;
 
-    if (!EmployeeName || !PEN || !Designation || !UNIT || !is_permanent || !phone) {
+    if (!EmployeeName || !PEN || !Designation || !UNIT || !is_Permanent || !phone) {
       alert("Please fill all required fields");
     } else {
       try {
@@ -52,7 +52,7 @@ const AddDriver = () => {
             PEN: "",
             Designation: "",
             UNIT: "",
-            is_permanent: "",
+            is_Permanent: "",
             on_leave: "Available",
             phone: "",
           })
@@ -140,8 +140,8 @@ const AddDriver = () => {
                           <Form.Label className="mb-1" style={{ fontSize: "14px" }}>Employment Type</Form.Label>
                           <Form.Control
                             as="select"
-                            onChange={e => setDriverData({ ...driverData, is_permanent: e.target.value })}
-                            value={driverData.is_permanent}>
+                            onChange={e => setDriverData({ ...driverData, is_Permanent: e.target.value })}
+                            value={driverData.is_Permanent}>
                             <option disabled value="">Select Employment Type</option>
                             <option value="Permanent">Permanent</option>
                             <option value="Badli">Badli</option>

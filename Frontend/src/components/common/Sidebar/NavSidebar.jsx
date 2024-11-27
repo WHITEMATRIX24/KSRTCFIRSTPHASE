@@ -176,16 +176,17 @@ function NavSidebar() {
         <Divider />
         {activeMenu === "trips" && (
           <ul className="submenu">
-            <li>
-              <Link
-                to="/trip-overview"
+             <li>
+              <a
+                href="/add-trip"
                 className="my-2"
-                id="vehiclesoverview"
-                onClick={() => toggelColor("vehiclesoverview")}
+                id="Scheduled"
+                onClick={() => toggelColor("Scheduled")}
               >
-                Overview
-              </Link>
-            </li>
+                Schedule
+              </a>
+            </li>{" "}
+            <Divider />
             <li>
               <a
                 href="/scheduled-trips"
@@ -194,17 +195,6 @@ function NavSidebar() {
                 onClick={() => toggelColor("Upcoming")}
               >
                 Upcoming
-              </a>
-            </li>{" "}
-            <Divider />
-            <li>
-              <a
-                href="/add-trip"
-                className="my-2"
-                id="Scheduled"
-                onClick={() => toggelColor("Scheduled")}
-              >
-                Schedule
               </a>
             </li>{" "}
             <Divider />
@@ -219,6 +209,19 @@ function NavSidebar() {
               </a>
             </li>{" "}
             <Divider />
+            <li>
+              <Link
+                to="/trip-overview"
+                className="my-2"
+                id="vehiclesoverview"
+                onClick={() => toggelColor("vehiclesoverview")}
+              >
+                Overview
+              </Link>
+            </li>
+        
+           
+         
           </ul>
         )}
       </li>}
