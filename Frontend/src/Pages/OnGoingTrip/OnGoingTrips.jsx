@@ -491,8 +491,8 @@ export default function OnGoingTrips() {
             ? true
             : item.vechileDetails.BUSNO.search(vehicleFilter.toUpperCase()) ==
               -1
-            ? false
-            : true
+              ? false
+              : true
         );
       setModifiedTrips(filteredData);
     }
@@ -582,6 +582,7 @@ export default function OnGoingTrips() {
                               <thead>
                                 <tr className="bg-light">
                                   <th>WAYBILL NO</th>
+                                  <th>DUTY NO</th>
                                   <th>TRIP TYPE</th>
                                   <th>VEHICLE</th>
                                   <th>DRIVER</th>
@@ -598,6 +599,7 @@ export default function OnGoingTrips() {
                                 {modifiedTrips.map((trip) => (
                                   <tr key={trip.trip_id} className="bg-white">
                                     <td>{trip.waybill_Number}</td>
+                                    <td>{trip.duty_Number}</td>
                                     <td>
                                       <span className="text-primary ms-1">
                                         {trip?.trip_type.toUpperCase()}
@@ -646,19 +648,19 @@ export default function OnGoingTrips() {
                                     <td>
                                       {trip.departure_location.depo ==
                                         depoName && (
-                                        <>
-                                          {" "}
-                                          Ends in {trip.arrival_location.depo}
-                                        </>
-                                      )}
+                                          <>
+                                            {" "}
+                                            Ends in {trip.arrival_location.depo}
+                                          </>
+                                        )}
                                       {trip.departure_location.depo !=
                                         depoName && (
-                                        <span className="mt-0">
-                                          {" "}
-                                          Starts From{" "}
-                                          {trip.departure_location.depo}
-                                        </span>
-                                      )}
+                                          <span className="mt-0">
+                                            {" "}
+                                            Starts From{" "}
+                                            {trip.departure_location.depo}
+                                          </span>
+                                        )}
                                       <br />
 
                                       {trip.end_time && (

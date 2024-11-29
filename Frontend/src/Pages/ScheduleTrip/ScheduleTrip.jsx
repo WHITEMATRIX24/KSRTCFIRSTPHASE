@@ -10,6 +10,7 @@ import {
   faUser,
   faEllipsisV,
   faCircleCheck,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import { useNavigate } from "react-router-dom";
@@ -310,12 +311,14 @@ export default function ScheduleTrip() {
                             <tr className="bg-light">
                               <th></th>
                               <th>WAYBILL NO</th>
+                              <th>DUTY NO</th>
                               <th>TRIP TYPE</th>
                               <th>VEHICLE</th>
                               <th>DRIVER</th>
                               <th>START DATE</th>
                               <th>END DATE</th>
                               <th>STATUS</th>
+                              <th></th>
                               <th></th>
                             </tr>
                           </thead>
@@ -346,16 +349,13 @@ export default function ScheduleTrip() {
                                           {/* <Form.Check type="checkbox" /> */}
                                         </td>
                                         <td>{item.waybill_Number}</td>
-                                        <td
-                                          onClick={() =>
-                                            handleEditModalOpen(item)
-                                          }
-                                          style={{ cursor: "pointer" }}
-                                        >
+                                        <td>{item.duty_Number}</td>
+                                        <td>
                                           <span className="text-primary ms-1">
                                             {item?.trip_type.toUpperCase()}
                                           </span>
                                         </td>
+
                                         <td>
                                           <div className="d-flex align-items-center gap-2">
                                             <FontAwesomeIcon
@@ -429,9 +429,16 @@ export default function ScheduleTrip() {
                                           </button>
                                         </td>
                                         <td>
-                                          {/* <Button variant="link" className="p-0">
-                                    <FontAwesomeIcon icon={faEllipsisV} />
-                                  </Button> */}
+                                          <Button
+                                            variant="link"
+                                            className="p-0"
+                                            onClick={() =>
+                                              handleEditModalOpen(item)
+                                            }
+                                            style={{ cursor: "pointer" }}
+                                          >
+                                            <FontAwesomeIcon icon={faEdit} />
+                                          </Button>
                                         </td>
                                       </tr>
                                     ))}
@@ -461,7 +468,7 @@ export default function ScheduleTrip() {
           show={isTripEditModalData.isModalOpen}
           tripData={isTripEditModalData.data}
           handleClose={handleEditModalClose}
-          refreshApi={getTrips()}
+          refreshApi={getTrips}
         />
       )}
     </div>

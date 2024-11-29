@@ -84,9 +84,9 @@ function Collection() {
       let result;
       if (role === "Staff" || role === "Supervisor") {
         setIsStaff(true);
-        result = await getCollectionByDepoAPi(depo);
+        result = await getCollectionByDepoAPi(depo, "");
       } else if (role === "Admin") {
-        result = await getAllCollectionAPi();
+        result = await getAllCollectionAPi("");
       }
 
       if (result?.status === 200) {
