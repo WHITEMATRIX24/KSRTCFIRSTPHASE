@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 
 const tripSchema = new mongoose.Schema({
-  waybill_Number:{
-    type:String,
+  waybill_Number: {
+    type: String,
+  },
+  duty_Number: {
+    type: String,
   },
   vehicle_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -11,12 +14,12 @@ const tripSchema = new mongoose.Schema({
   },
   driver_id: {
     type: mongoose.Schema.Types.ObjectId,
-    // required: true,
+    required: true,
     ref: "Drivers",
   },
   conductor_id: {
     type: mongoose.Schema.Types.ObjectId,
-    // required: true,
+    required: true,
     ref: "Conductors",
   },
   start_date: {

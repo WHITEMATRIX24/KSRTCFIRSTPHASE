@@ -22,6 +22,7 @@ import {
   updateTripApiNew,
 } from "../../services/allAPI";
 import { toast } from "react-toastify";
+import ScheduleTripEditModal from "../../components/ScheduleTripEditModal";
 
 export default function ScheduleTrip() {
   const [depoName, setDepoName] = useState("");
@@ -34,8 +35,17 @@ export default function ScheduleTrip() {
   const [modifiedTrips, setModifiedTrips] = useState([]);
   const [isLoadingApi, setIsLoadingApi] = useState(false);
   const [loading, setLoading] = useState(true);
-
   const [noData, setNoData] = useState(false);
+  const [isTripEditModalData, setIsTripEditModalData] = useState({
+    isModalOpen: false,
+    data: null,
+  });
+
+  // edit modal open handler
+  const handleEditModalOpen = (tripData) =>
+    setIsTripEditModalData({ isModalOpen: true, data: tripData });
+  const handleEditModalClose = () =>
+    setIsTripEditModalData({ isModalOpen: false, data: null });
 
   // get all trips
   const getTrips = async () => {
@@ -103,8 +113,8 @@ export default function ScheduleTrip() {
   useEffect(() => {
     try {
       getTrips();
-      getAllDriversList();
-      getAllBuses();
+      // getAllDriversList();
+      // getAllBuses();
     } catch (error) {
       console.log(`error in featching schedule trip data error: ${error}`);
     } finally {
@@ -336,7 +346,12 @@ export default function ScheduleTrip() {
                                           {/* <Form.Check type="checkbox" /> */}
                                         </td>
                                         <td>{item.waybill_Number}</td>
-                                        <td>
+                                        <td
+                                          onClick={() =>
+                                            handleEditModalOpen(item)
+                                          }
+                                          style={{ cursor: "pointer" }}
+                                        >
                                           <span className="text-primary ms-1">
                                             {item?.trip_type.toUpperCase()}
                                           </span>
@@ -378,7 +393,7 @@ export default function ScheduleTrip() {
                                             <>
                                               {" "}
                                               {new Date(
-                                                item.start_date
+                                                item.end_date
                                               ).toLocaleDateString()}
                                             </>
                                           )}
@@ -440,6 +455,15 @@ export default function ScheduleTrip() {
           <Col md={1}></Col>
         </Row>
       </Container>
+      {/* edit modal */}
+      {isTripEditModalData.isModalOpen && (
+        <ScheduleTripEditModal
+          show={isTripEditModalData.isModalOpen}
+          tripData={isTripEditModalData.data}
+          handleClose={handleEditModalClose}
+          refreshApi={getTrips()}
+        />
+      )}
     </div>
   );
 }

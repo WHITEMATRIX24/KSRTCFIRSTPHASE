@@ -8,16 +8,31 @@ export const getAllVehicles = async () => {
 
 //get all vehicle details based upon alloted depo
 export const getAllAlottedDepoVehicleApi = async (depoName) => {
-  return await commonAPI("GET", `${SERVERURL}/getAllVehicleByDeponame/${depoName}`, "", "");
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getAllVehicleByDeponame/${depoName}`,
+    "",
+    ""
+  );
 };
 
 //get all outof services by depo
 export const getAllOutofServicesByDepoApi = async (depoName) => {
-  return await commonAPI("GET",`${SERVERURL}/getAllOutofServicesByDepo/${depoName}`,"","");
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getAllOutofServicesByDepo/${depoName}`,
+    "",
+    ""
+  );
 };
 //get on route  services by depo
 export const getOnRouteServicesByDepoApi = async (depoName) => {
-  return await commonAPI("GET",`${SERVERURL}/getOnRouteServicesByDepo/${depoName}`,"","");
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getOnRouteServicesByDepo/${depoName}`,
+    "",
+    ""
+  );
 };
 
 //Edit VehicleStatus>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -73,8 +88,13 @@ export const addvehicleAPI = async (reqBody) => {
   return await commonAPI("POST", `${SERVERURL}/addNewVehichle`, reqBody, "");
 };
 
-export const getAllTripApi = async () => {
-  return await commonAPI("GET", `${SERVERURL}/getAllTripDetails`, "", "");
+export const getAllTripApi = async (dateForFilter) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getAllTripDetails?date=${dateForFilter}`,
+    "",
+    ""
+  );
 };
 
 export const updateTripApi = async (reqBody, trip_id) => {
@@ -135,19 +155,39 @@ export const getDriversListApi = async () => {
 };
 
 // get All Driver Details By Pagination
-export const getDriverByPagination= async(page,limit,search,leaveStatus,employmentType)=>{
-  console.log("REQ:",page);
-  
-  return commonAPI("GET",`${SERVERURL}/getDriverByPagination?page=${page}&limit=${limit}&search=${search}&leaveStatus=${leaveStatus}&employmentType=${employmentType}`,
-    "","");
-}
+export const getDriverByPagination = async (
+  page,
+  limit,
+  search,
+  leaveStatus,
+  employmentType
+) => {
+  console.log("REQ:", page);
+
+  return commonAPI(
+    "GET",
+    `${SERVERURL}/getDriverByPagination?page=${page}&limit=${limit}&search=${search}&leaveStatus=${leaveStatus}&employmentType=${employmentType}`,
+    "",
+    ""
+  );
+};
 
 // get  filtered cionductors
 
-export const getFilteredConductorsListApi = async (pageNum,itemsPerPage,search,leaveStatus,employmentType) => {
-  return await commonAPI("GET",`${SERVERURL}/conductors/${pageNum}/${itemsPerPage}?search=${search}&leaveStatus=${leaveStatus}&employmentType=${employmentType}`,"","")
-}
-
+export const getFilteredConductorsListApi = async (
+  pageNum,
+  itemsPerPage,
+  search,
+  leaveStatus,
+  employmentType
+) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/conductors/${pageNum}/${itemsPerPage}?search=${search}&leaveStatus=${leaveStatus}&employmentType=${employmentType}`,
+    "",
+    ""
+  );
+};
 
 // get all conductors
 export const getConductorsListApi = async () => {
@@ -301,10 +341,10 @@ export const updateDailyMaintenanceApi = async (
 };
 
 // get trip data of depot
-export const getTripOfDepotApi = async (depot) => {
+export const getTripOfDepotApi = async (depot, dateForFilter) => {
   return await commonAPI(
     "GET",
-    `${SERVERURL}/getTripinOverView/${depot}`,
+    `${SERVERURL}/getTripinOverView/${depot}?date=${dateForFilter}`,
     "",
     ""
   );
@@ -335,17 +375,22 @@ export const AddCollectionAPi = async (reqBody) => {
 };
 
 //get collection by depo
-export const getCollectionByDepoAPi = async (depo) => {
+export const getCollectionByDepoAPi = async (depo, dateForFilter) => {
   return await commonAPI(
     "GET",
-    `${SERVERURL}/getCollectionByDepot/${depo}`,
+    `${SERVERURL}/getCollectionByDepot/${depo}?date=${dateForFilter}`,
     "",
     ""
   );
 };
 
-export const getAllCollectionAPi = async () => {
-  return await commonAPI("GET", `${SERVERURL}/getAllCollection`, "", "");
+export const getAllCollectionAPi = async (dateForFilter) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getAllCollection?date=${dateForFilter}`,
+    "",
+    ""
+  );
 };
 
 // for all live trips api
@@ -356,4 +401,70 @@ export const getAllLiveTripApiForAdmin = async () => {
 // for all upcoming trips api
 export const getAllUpcomingTripApiForAdmin = async () => {
   return await commonAPI("GET", `${SERVERURL}/get-all-upcoming-trips`, "", "");
+};
+
+// for schedule trips edit search api
+export const searchCounductorDriverVehicle = async (
+  vehicleSearchValue,
+  driverSearchValue,
+  conductorSearchValue
+) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/search-driver-conductor-vehicle?vehicle=${vehicleSearchValue}&driver=${driverSearchValue}&conductor=${conductorSearchValue}`,
+    "",
+    ""
+  );
+};
+
+//get trip data of depot by corresponding name and selected date
+export const getTripOfDepotDateApi = async (depot, date) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/getTripinOverViewDate/${depot}/${date}`, // Correct URL format with query parameters
+    "",
+    ""
+  );
+};
+
+// get data for schedule trip***************************************
+
+// get filtered vehicle list for schedule trip
+export const getFilteredVehiclesForTripApi = async (search) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/filteredVehicles?search=${search}`,
+    "",
+    ""
+  );
+};
+
+// get filtered conductor list for schedule trip
+export const getFilteredConductorsForTripApi = async (search) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/filteredConductors?search=${search}`,
+    "",
+    ""
+  );
+};
+
+// get filtered dc employees for schedule trip
+export const getFilteredDCEmployeesForTripApi = async (search) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/filteredDCEmployee?search=${search}`,
+    "",
+    ""
+  );
+};
+
+// get filtered drivers for schedule trip
+export const getFilteredDriversForTripApi = async (search) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/filteredDrivers?search=${search}`,
+    "",
+    ""
+  );
 };

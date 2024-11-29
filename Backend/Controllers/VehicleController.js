@@ -571,3 +571,25 @@ export const getAllOutofServicesDetailsByDepo = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// <<<<<:::::::::Get filtered vehicle details to schedule trip :::::::::>>>>>>>>
+export const getFilteredVehiclesForTrip = async (req, res) => {
+  try {
+    const { search } = req.query;
+    const filter = {};
+    if (search) {
+      filter.BUSNO = { $regex: search, $options: "i" };
+    }
+
+    const vehiclesList = await Vehicles.find(filter)
+      .select("BUSNO CLASS _id")
+      .limit(5);
+    res.status(200).json(vehiclesList);
+  } catch (err) {
+    console.log(
+      "Error at catch in vehicleController/getFilteredVehiclesForTrip::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

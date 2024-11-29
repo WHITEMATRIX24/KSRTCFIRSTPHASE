@@ -19,6 +19,7 @@ import {
   getAllVehiclesByDepoName,
   getAllOnRouteDetailsByDepo,
   getAllOutofServicesDetailsByDepo,
+  getFilteredVehiclesForTrip,
 } from "../Controllers/VehicleController.js";
 import {
   addNewTrip,
@@ -31,6 +32,8 @@ import {
   getTripLiveBydepoName,
   getAllUpcomingTrip,
   getAllTripLive,
+  searchForDriverConductorVehicleController,
+  getAllTripByDepoNameAndDate,
 } from "../Controllers/TripController.js";
 import {
   addNewDriver,
@@ -40,6 +43,7 @@ import {
   editLeaveStatus,
   getAllDriverDetails,
   getDriverByPagination,
+  getFilteredDriversForTrip,
 } from "../Controllers/DriverController.js";
 import {
   addNewConductor,
@@ -48,6 +52,7 @@ import {
   editConductorDetails,
   editLeaveStatusConductor,
   getAllConductorDetails,
+  getFilteredConductorsForTrip,
   getFilteredConductorsList,
 } from "../Controllers/ConductorController.js";
 import {
@@ -67,6 +72,7 @@ import {
   getCollectionsOfDepot,
   getCollectionsOfDepotAndDate,
 } from "../Controllers/TrpCollectionController.js";
+import { getFilteredDCEmployeesForTrip } from "../Controllers/dcEmployeesController.js";
 // Initialize router
 const router = express.Router();
 
@@ -97,8 +103,10 @@ router.get("/getAllVehicleByDeponame/:depoName", getAllVehiclesByDepoName);
 //Get All on route services Details by depo
 router.get("/getOnRouteServicesByDepo/:depoName", getAllOnRouteDetailsByDepo);
 // GET All Out Of Service Details by depo
-router.get("/getAllOutofServicesByDepo/:depoName", getAllOutofServicesDetailsByDepo);
-
+router.get(
+  "/getAllOutofServicesByDepo/:depoName",
+  getAllOutofServicesDetailsByDepo
+);
 
 // <<<<<<<........Vehichel Maintanence Routes.........>>>>>>>
 
@@ -146,7 +154,7 @@ router.delete("/deleteDriverById/:driver_id", deleteDriverById);
 // Delete Selected Drivers
 router.delete("/deleteSelectedDrivers", deleteSelectedDriver);
 // get Driver Details By Pagination
-router.get("/getDriverByPagination", getDriverByPagination)
+router.get("/getDriverByPagination", getDriverByPagination);
 
 // <<<<<<<.......ConductorRouter.......>>>>>>>
 
@@ -163,7 +171,7 @@ router.delete("/deleteConductorById/:conductor_id", deleteConductorById);
 // Delete Selected Conductors
 router.delete("/deleteSelectedConductors", deleteSelectedConductor);
 // get filtered conductors list
-router.get('/conductors/:pageNum/:itemsPerPage', getFilteredConductorsList);
+router.get("/conductors/:pageNum/:itemsPerPage", getFilteredConductorsList);
 // <<<<<<<...........TripRouter.......>>>>>>>>
 
 // Adding new Trip info
@@ -192,6 +200,30 @@ router.get("/getLiveTripsBydepoName/:depoName", getTripLiveBydepoName);
 router.get("/get-all-upcoming-trips", getAllUpcomingTrip);
 // get all trip live
 router.get("/get-all-trip-live", getAllTripLive);
+// search driver conductor and vehicle for trip edit
+router.get(
+  "/search-driver-conductor-vehicle",
+  searchForDriverConductorVehicleController
+);
+// overview data filter by depo and date
+router.get(
+  "/getTripinOverViewDate/:depoName/:date",
+  getAllTripByDepoNameAndDate
+);
+
+// <<<<<<<........routers to get data for scheduling trips.........>>>>>>>
+
+// get filtered conductos for schedule trip
+router.get("/filteredConductors", getFilteredConductorsForTrip);
+
+// get filtered vehicles to schedule trip
+router.get("/filteredVehicles", getFilteredVehiclesForTrip);
+
+// get filtered employees to schedule trip
+router.get("/filteredDCEmployee", getFilteredDCEmployeesForTrip);
+
+// get filtered drivers to schedule Trip
+router.get("/filteredDrivers", getFilteredDriversForTrip);
 
 // <<<<<<.......Admin Router.......>>>>>
 // Reigster New Admin
@@ -227,6 +259,16 @@ router.get("/getCollectionByDate/:date", getCollectionsOfDate);
 // get collection by date and depot
 router.get("/getFilteredCollection/:date/:depot", getCollectionsOfDepotAndDate);
 
+// <<<<<<<........DC Employees Routes.........>>>>>>>
+
+// // get all employees
+// router.get('/dcEmployees',getDCEmployees)
+
+// // add employee
+// router.post('/dcEmployees',addDCEmployee)
+
+// // update employee
+// router.put('/dcEmployees/:id',updateDCEmployee)
 
 // Export the router
 export default router;

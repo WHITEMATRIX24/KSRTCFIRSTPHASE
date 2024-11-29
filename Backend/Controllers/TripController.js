@@ -2,11 +2,13 @@ import Trip from "../Models/TripSchema.js";
 import Vehicle from "../Models/VechicleSchema.js";
 import Conductor from "../Models/ConductorSchema.js";
 import Driver from "../Models/DiverSchema.js";
+import TripCollections from "../Models/TripCollectionSchema.js";
 
 // <<<<<<::::::::Adding New Trip Details::::::::>>>
 export const addNewTrip = async (req, res) => {
   const {
     waybill_Number,
+    duty_Number,
     start_date,
     end_date,
     start_time,
@@ -33,6 +35,7 @@ export const addNewTrip = async (req, res) => {
 
     const newTrip = new Trip({
       waybill_Number,
+      duty_Number,
       start_date,
       end_date,
       start_time,
@@ -61,7 +64,11 @@ export const addNewTrip = async (req, res) => {
 // <<<<<<<:::::::Getting All Trip Details From DB::::::::>>>>>>>>>
 export const getAllTripDetails = async (req, res) => {
   try {
-    const allTripDetails = await Trip.find();
+    const { date } = req.query;
+
+    const allTripDetails = await Trip.find({
+      ...(date && { start_date: date }),
+    });
     if (allTripDetails) {
       res.status(200).json(allTripDetails);
     } else {
@@ -81,6 +88,7 @@ export const editTripDetails = async (req, res) => {
   // console.log('inside')
   const {
     waybill_Number,
+    duty_Number,
     start_date,
     end_date,
     start_time,
@@ -112,6 +120,7 @@ export const editTripDetails = async (req, res) => {
       _id,
       {
         waybill_Number,
+        duty_Number,
         start_date,
         end_date,
         start_time,
@@ -147,6 +156,7 @@ export const editTripDetails = async (req, res) => {
 export const editTripDetailsNew = async (req, res) => {
   const {
     waybill_Number,
+    duty_Number,
     start_date,
     end_date,
     start_time,
@@ -173,6 +183,7 @@ export const editTripDetailsNew = async (req, res) => {
       trip_id,
       {
         waybill_Number,
+        duty_Number,
         start_date,
         end_date,
         start_time,
@@ -224,12 +235,14 @@ export const getAllCompletedTripDetails = async (req, res) => {
 
 export const getAllTripByDepoName = async (req, res) => {
   const { depoName } = req.params;
+  const { date } = req.query;
   try {
     const tripOverview = await Trip.find({
       $or: [
         { "departure_location.depo": depoName },
         { "arrival_location.depo": depoName },
       ],
+      ...(date && { start_date: date }),
     });
     if (tripOverview.length > 0) {
       res.status(200).json(tripOverview);
@@ -606,6 +619,77 @@ export const getAllUpcomingTrip = async (req, res) => {
   } catch (err) {
     console.log(
       "Error at catch in tripController/getTripLiveBydepName::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// <<<<<:::::search for driver conductor and vehicle::::>>>>>>
+export const searchForDriverConductorVehicleController = async (req, res) => {
+  try {
+    const { vehicle, driver, conductor } = req.query;
+
+    let allVehicleData;
+    let allDriverData;
+    let allConductor;
+
+    if (vehicle) {
+      allVehicleData = await Vehicle.find(
+        { BUSNO: { $regex: vehicle, $options: "i" } },
+        { _id: 1, BUSNO: 1 }
+      );
+    }
+    if (driver) {
+      allDriverData = await Driver.find(
+        { PEN: { $regex: driver, $options: "i" } },
+        { _id: 1, PEN: 1, EmployeeName: 1 }
+      );
+    }
+    if (conductor) {
+      allConductor = await Conductor.find(
+        { PEN: { $regex: conductor, $options: "i" } },
+        { _id: 1, PEN: 1, EmployeeName: 1 }
+      );
+    }
+
+    res.status(200).json({
+      message: "Success",
+      allSearchedData: { allVehicleData, allConductor, allDriverData },
+    });
+  } catch (err) {
+    console.log("Error at searching driver, conductor and vehicle", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// <<<<:::::Trip OverView filter by date:::::::>>>>
+
+export const getAllTripByDepoNameAndDate = async (req, res) => {
+  const { depoName, date } = req.params; // Ensure date and depoName come from params if using path parameters
+  // console.log("deponame",depoName);
+  console.log("date", date);
+  try {
+    // Parse the date into a proper Date object if needed (assuming the date format is YYYY-MM-DD)
+    // const parsedDate = new Date(date).toISOString(); // or use a library like moment.js or date-fns if needed
+    // console.log(parsedDate);
+
+    const tripOverviewBydate = await TripCollections.find({
+      date: date,
+      depot: depoName,
+    });
+    console.log("TripOverview", tripOverviewBydate);
+
+    if (tripOverviewBydate.length > 0) {
+      res.status(200).json(tripOverviewBydate);
+    } else {
+      res.status(404).json({
+        message: "No tripOverview details found for this depot name and date",
+      });
+    }
+  } catch (err) {
+    console.log(
+      "Error at catch in tripController/getAllTripByDepoName::::::",
       err
     );
     res.status(500).json({ error: "Internal server error" });

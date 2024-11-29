@@ -159,6 +159,7 @@ function Dashboard() {
   ]);
   const [selectedDepoForFiltering, setSelectedDepoForFiltering] =
     useState("full-data");
+  const [filterDate, setFilterDate] = useState("");
 
   // session data
   const sessionDataValue = JSON.parse(sessionStorage.getItem("user"));
@@ -188,10 +189,10 @@ function Dashboard() {
   };
 
   // get all trip details
-  const getAllTripDetails = async () => {
+  const getAllTripDetails = async (dateForFilter) => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     if (userDetails.depoName == "Admin") {
-      const result = await getAllTripApi();
+      const result = await getAllTripApi(dateForFilter);
       // console.log(result.data);
       if (result.status == 200) {
         setAllTripDetails(result.data);
@@ -264,11 +265,11 @@ function Dashboard() {
   };
 
   // get All completed Trip details
-  const getAllCompletedTripDetails = async () => {
+  const getAllCompletedTripDetails = async (dateForFilter) => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
 
     if (userDetails.depoName == "Admin") {
-      const result = await getAllCollectionAPi();
+      const result = await getAllCollectionAPi(dateForFilter);
       // Fuel Consumption total
       const ftotal = result.data.reduce((total, item) => {
         return total + item.fuelCost;
@@ -448,12 +449,12 @@ function Dashboard() {
   });
 
   // getFullData for dashboard api handler
-  const getInitialFullData = () => {
+  const getInitialFullData = (dateForFilter) => {
     getAllVehicleDetails();
-    getAllTripDetails();
+    getAllTripDetails(dateForFilter);
     getAllOnRouteDetails();
     getAllBusesInServices();
-    getAllCompletedTripDetails();
+    getAllCompletedTripDetails(dateForFilter);
     getOutOfServicesCount();
     getUpComingTripDetailsByDepo();
     getAllLiveTripByDepo();
@@ -467,11 +468,16 @@ function Dashboard() {
   }, []);
 
   ////////////////////////////////////// filter by depo data api handler
-  const getAllTripsDataFilteredByDepo = async (depoName) => {
-    const result = await getTripOfDepotApi(depoName);
+  const getAllTripsDataFilteredByDepo = async (depoName, dateForFilter) => {
+    const result = await getTripOfDepotApi(
+      depoName,
+      dateForFilter ? dateForFilter : ""
+    );
     // console.log(result);
     if (result.status == 200) {
       setAllTripDetails(result.data);
+      console.log("trip data", result.data);
+
       const count = result.data.length;
       setAllTripDataCount(count);
     } else {
@@ -499,8 +505,14 @@ function Dashboard() {
     }
   };
 
-  const getAllCompletedTripsFilteredByDepo = async (depoName) => {
-    const result = await getCollectionByDepoAPi(depoName);
+  const getAllCompletedTripsFilteredByDepo = async (
+    depoName,
+    dateForFilter
+  ) => {
+    const result = await getCollectionByDepoAPi(
+      depoName,
+      dateForFilter ? dateForFilter : ""
+    );
     if (result.status === 200) {
       // Fuel Consumption total
       const ftotal = result.data.reduce((total, item) => {
@@ -538,20 +550,26 @@ function Dashboard() {
   useEffect(() => {
     if (selectedDepoForFiltering) {
       if (selectedDepoForFiltering === "full-data") {
-        getInitialFullData();
+        getInitialFullData(filterDate);
       } else {
-        getAllTripsDataFilteredByDepo(selectedDepoForFiltering);
-        getAllVehiclesDataFilteredByDepo(selectedDepoForFiltering);
-        getAllOnRouteDetailsFilteredByDepo(selectedDepoForFiltering);
-        getAllCompletedTripsFilteredByDepo(selectedDepoForFiltering);
-        getOutServicesCountFilteredbyDepo(selectedDepoForFiltering);
+        getAllTripsDataFilteredByDepo(selectedDepoForFiltering, filterDate);
+        getAllVehiclesDataFilteredByDepo(selectedDepoForFiltering, filterDate);
+        getAllOnRouteDetailsFilteredByDepo(
+          selectedDepoForFiltering,
+          filterDate
+        );
+        getAllCompletedTripsFilteredByDepo(
+          selectedDepoForFiltering,
+          filterDate
+        );
+        getOutServicesCountFilteredbyDepo(selectedDepoForFiltering, filterDate);
         getUpComingTripDetailsByDepo();
         getAllLiveTripByDepo();
         getAllConductordetails();
         getAllDriverdetails();
       }
     }
-  }, [selectedDepoForFiltering]);
+  }, [selectedDepoForFiltering, filterDate]);
 
   return (
     <>
@@ -560,25 +578,45 @@ function Dashboard() {
         <div className="row">
           <div className="col-md-2"></div>
           <div className="col-md-10">
-            <div className="d-flex align-items-center w-full">
+            <div className="d-flex align-items-center">
               {sessionDataValue && sessionDataValue.depoName == "Admin" && (
-                <div className="d-flex gap-2 align-items-center w-50">
-                  <p className="mb-0">Filter by depo: </p>
-                  <select
-                    value={selectedDepoForFiltering}
-                    onChange={(e) =>
-                      setSelectedDepoForFiltering(e.target.value)
-                    }
-                    className="dashboard-filter-selectBox shadow-sm"
-                  >
-                    <option value="full-data" selected>
-                      Full Data
-                    </option>
-                    {depoList &&
-                      depoList.map((depo) => (
-                        <option value={depo}>{depo}</option>
-                      ))}
-                  </select>
+                <div
+                  className="d-flex align-items-center gap-3"
+                  style={{ width: "50rem" }}
+                >
+                  <div className="d-flex gap-2 align-items-center">
+                    <p className="mb-0" style={{ width: "8rem" }}>
+                      Filter by depo:{" "}
+                    </p>
+                    <select
+                      value={selectedDepoForFiltering}
+                      onChange={(e) =>
+                        setSelectedDepoForFiltering(e.target.value)
+                      }
+                      className="dashboard-filter-selectBox shadow-sm"
+                    >
+                      <option value="full-data" selected>
+                        Full Data
+                      </option>
+                      {depoList &&
+                        depoList.map((depo) => (
+                          <option value={depo}>{depo}</option>
+                        ))}
+                    </select>
+                  </div>
+                  <div className="d-flex gap-2 align-items-center w-50">
+                    <p className="mb-0" style={{ width: "12rem" }}>
+                      Filter by date:{" "}
+                    </p>
+                    <input
+                      type="date"
+                      className="form-control"
+                      onChange={(e) => {
+                        const newDate = new Date(e.target.value);
+                        setFilterDate(newDate.toISOString());
+                      }}
+                    />
+                  </div>
                 </div>
               )}
               <ExcelExport

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBus, faCircleCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import Header from '../../components/common/Header';
 import { addvehicleAPI } from '../../services/allAPI';
+import { depoList } from '../../assets/depoList';
+import { Autocomplete, TextField } from '@mui/material';
 
 const AddVehicle = () => {
   const [vehicleData, setVehicleData] = useState({
@@ -68,17 +70,7 @@ const AddVehicle = () => {
     { name: 'SWIFT SLEEPER', id: '20' }
   ];
 
-  const depots = [
-    'ADR', 'ALP', 'ALY', 'ANK', 'ARD', 'ARK', 'ATL', 'CDM', 'CGR', 'CHT', 'CHY',
-    'CLD', 'CTL', 'CTR', 'EDT', 'EKM', 'EMY', 'ETP', 'GVR', 'HPD', 'IJK', 'KDR',
-    'KGD', 'KHD', 'KKD', 'KKM', 'KLM', 'KLP', 'KMG', 'KMR', 'KMY', 'KNI', 'KNP',
-    'KNR', 'KPM', 'KPT', 'KTD', 'KTM', 'KTP', 'KTR', 'KYM', 'MKD', 'MLA', 'MLP',
-    'MLT', 'MND', 'MNR', 'MPY', 'MVK', 'MVP', 'NBR', 'NDD', 'NDM', 'NPR', 'NTA',
-    'PBR', 'PDK', 'PDM', 'PLA', 'PLD', 'PLK', 'PLR', 'PMN', 'PNI', 'PNK', 'PNR',
-    'PPD', 'PPM', 'PRK', 'PSL', 'PTA', 'PVM', 'PVR', 'RNI', 'SBY', 'TDP', 'TDY',
-    'TLY', 'TMY', 'TPM', 'TSR', 'TVL', 'TVM CL', 'TVM CTY', 'TVRA', 'VDA', 'VDY',
-    'VJD', 'VKB', 'VKM', 'VLD', 'VRD', 'VTR', 'VZM'
-  ];
+  const depots = depoList
 
 
   const handleSearchChange = (type, value) => {
@@ -140,6 +132,8 @@ const AddVehicle = () => {
           maintenance_history: [],
         });
         setSelected({ vehicleClass: '', depot: '' }); // Reset other related states
+        setSelectedClass("")
+        setSelectedDepot("")
       } else {
         alert('Unexpected response from server');
       }
@@ -166,12 +160,27 @@ const AddVehicle = () => {
     }
   };
 
-  const filteredVehicleClasses = vehicleClasses.filter(vehicleClass =>
-    vehicleClass.name.toLowerCase().includes(search.vehicleClass.toLowerCase())
-  );
-  const filteredDepots = depots.filter(depot =>
-    depot.toLowerCase().includes(search.depot.toLowerCase())
-  );
+  // const filteredVehicleClasses = vehicleClasses.filter(vehicleClass =>
+  //   vehicleClass.name.toLowerCase().includes(search.vehicleClass.toLowerCase())
+  // );
+  // const filteredDepots = depots.filter(depot =>
+  //   depot.toLowerCase().includes(search.depot?.toLowerCase())
+  // );
+
+  const[selectedClass,setSelectedClass]=useState("")
+  const[selectedDepot,setSelectedDepot]=useState("")
+  const handleChangeClass = (event, newValue) => {
+    setSelectedClass(newValue)
+    newValue?.value?setVehicleData({...vehicleData,CLASS:newValue.value}):setVehicleData({...vehicleData,CLASS:""})
+  }
+  const handleChangeDepot = (event, newValue) => {
+    setSelectedDepot(newValue)
+    newValue?.value?setVehicleData({...vehicleData,ALLOTTEDDEPOT:newValue.value}):setVehicleData({...vehicleData,ALLOTTEDDEPOT:""})
+  }
+
+  console.log(vehicleData);
+  
+  
 
   return (
     <div>
@@ -195,41 +204,38 @@ const AddVehicle = () => {
                       <Col md={6}>
                         <Form.Group controlId="vehicleClass">
                           <Form.Label>Vehicle Class</Form.Label>
-                          <Form.Control
-                            value={search.vehicleClass}
-                            onChange={(e) => handleSearchChange('vehicleClass', e.target.value)}
-                            onFocus={() => handleDropdownToggle('vehicleClass')}
-                            onBlur={() => setTimeout(()=>{handleBlur('vehicleClass')},1000)}
-                            placeholder="Search or select a vehicle class"
+                          <Autocomplete
+                            className="mt-1"
+                            value={selectedClass}
+                            onChange={handleChangeClass}
+                            options={vehicleClasses.map(item=>({ label: item.name, value: item.name}))}
+                            getOptionLabel={(option) => (option?.value ? option.value : "")}
+                            renderInput={(params) => <TextField {...params} label="Choose Vehicle Class" />}
                           />
-                          {dropdownsOpen.vehicleClass && (
-                            <div style={{ border: '1px solid #ddd', marginTop: '5px', padding: '10px' }}>
-                              {filteredVehicleClasses.length > 0 ? (
-                                filteredVehicleClasses.map((vehicleClass, index) => (
-                                  <Form.Check
-                                    type="radio"
-                                    label={vehicleClass.name}
-                                    value={vehicleClass.name}
-                                    checked={selected.vehicleClass === vehicleClass.name}
-                                    onChange={() => handleSelectionChange('vehicleClass', vehicleClass.name)}
-                                    key={index}
-                                  />
-                                ))
-                              ) : (
-                                <div>No matching vehicle classes found</div>
-                              )}
-                            </div>
-                          )}
+                          {
+                            selectedClass?
+                            <div className="mt-1"><FontAwesomeIcon icon={faCircleCheck} className="text-success me-2"/>{selectedClass?.value}</div>
+                            :<></>
+                          }
                         </Form.Group>
                       </Col>
                       <Col md={6}>
-                        <Form.Label>Registration No</Form.Label>
-                        <Form.Control
-                          value={vehicleData.REGNO}
-                          type="text"
-                          name="REGNO"
-                          onChange={handleChange}
-                        />
+                        <Form.Group controlId="depot">
+                          <Form.Label>Depot</Form.Label>
+                          <Autocomplete
+                            className="mt-1"
+                            value={selectedDepot}
+                            onChange={handleChangeDepot}
+                            options={depots.map(item=>({ label: item.code + " " + item.name, value: item.code}))}
+                            getOptionLabel={(option) => (option?.value ? option.value : "")}
+                            renderInput={(params) => <TextField {...params} label="Choose Depot" />}
+                          />
+                          {
+                            selectedDepot?
+                            <div className="mt-1"><FontAwesomeIcon icon={faCircleCheck} className="text-success me-2"/>{selectedDepot?.value}</div>
+                            :<></>
+                          }
+                        </Form.Group>
                       </Col>
                     </Row>
 
@@ -244,35 +250,15 @@ const AddVehicle = () => {
                         />
                       </Col>
                       <Col md={6}>
-                        <Form.Group controlId="depot">
-                          <Form.Label>Depot</Form.Label>
-                          <Form.Control
-                            value={search.depot}
-                            onChange={(e) => handleSearchChange('depot', e.target.value)}
-                            onFocus={() => handleDropdownToggle('depot')}
-                            onBlur={() => setTimeout(()=>{handleBlur('depot')},1000)}
-                            placeholder="Search or select a depot"
-                          />
-                          {dropdownsOpen.depot && (
-                            <div style={{ border: '1px solid #ddd', marginTop: '5px', padding: '10px' }}>
-                              {filteredDepots.length > 0 ? (
-                                filteredDepots.map((depot, index) => (
-                                  <Form.Check
-                                    type="radio"
-                                    label={depot}
-                                    value={depot}
-                                    checked={selected.depot === depot}
-                                    onChange={() => handleSelectionChange('depot', depot)}
-                                    key={index}
-                                  />
-                                ))
-                              ) : (
-                                <div>No matching depots found</div>
-                              )}
-                            </div>
-                          )}
-                        </Form.Group>
+                        <Form.Label>Registration No</Form.Label>
+                        <Form.Control
+                          value={vehicleData.REGNO}
+                          type="text"
+                          name="REGNO"
+                          onChange={handleChange}
+                        />
                       </Col>
+                      
 
                     </Row>
 
