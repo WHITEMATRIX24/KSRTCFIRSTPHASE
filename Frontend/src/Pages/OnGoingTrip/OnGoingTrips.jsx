@@ -491,8 +491,8 @@ export default function OnGoingTrips() {
             ? true
             : item.vechileDetails.BUSNO.search(vehicleFilter.toUpperCase()) ==
               -1
-              ? false
-              : true
+            ? false
+            : true
         );
       setModifiedTrips(filteredData);
     }
@@ -586,10 +586,10 @@ export default function OnGoingTrips() {
                                   <th>TRIP TYPE</th>
                                   <th>VEHICLE</th>
                                   <th>DRIVER</th>
-                                  <th>START DATE</th>
+                                  <th>START Details</th>
                                   {/*                             <th>END DATE</th>
                                    */}{" "}
-                                  <th>DEPO DETAILS</th>
+                                  <th>END DETAILS</th>
                                   <th></th>
                                   <th></th>
                                 </tr>
@@ -629,6 +629,11 @@ export default function OnGoingTrips() {
                                     </td>
 
                                     <td>
+                                      {trip.departure_location.depo && (
+                                        <p className="mb-0 fw-bold">
+                                          {trip.departure_location.depo}
+                                        </p>
+                                      )}
                                       {new Date(
                                         trip.start_date
                                       ).toLocaleDateString()}
@@ -646,23 +651,19 @@ export default function OnGoingTrips() {
                                { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}
                               </td> */}
                                     <td>
-                                      {trip.departure_location.depo ==
-                                        depoName && (
-                                          <>
-                                            {" "}
-                                            Ends in {trip.arrival_location.depo}
-                                          </>
-                                        )}
-                                      {trip.departure_location.depo !=
-                                        depoName && (
-                                          <span className="mt-0">
-                                            {" "}
-                                            Starts From{" "}
-                                            {trip.departure_location.depo}
-                                          </span>
-                                        )}
-                                      <br />
-
+                                      {trip.arrival_location.depo && (
+                                        <p className="mb-0 fw-bold">
+                                          {trip.arrival_location.depo}
+                                        </p>
+                                      )}
+                                      {trip.end_date && (
+                                        <>
+                                          {" "}
+                                          {new Date(
+                                            trip.end_date
+                                          ).toLocaleDateString()}
+                                        </>
+                                      )}
                                       {trip.end_time && (
                                         <small> {trip.end_time}</small>
                                       )}

@@ -315,10 +315,9 @@ export default function ScheduleTrip() {
                               <th>TRIP TYPE</th>
                               <th>VEHICLE</th>
                               <th>DRIVER</th>
-                              <th>START DATE</th>
-                              <th>END DATE</th>
+                              <th>START DETAILS</th>
+                              <th>END DETAILS</th>
                               <th>STATUS</th>
-                              <th></th>
                               <th></th>
                             </tr>
                           </thead>
@@ -380,6 +379,11 @@ export default function ScheduleTrip() {
                                           {item.driverDetails.EmployeeName}
                                         </td>
                                         <td>
+                                          {item.departure_location.depo && (
+                                            <p className="mb-0 fw-bold">
+                                              {item.departure_location.depo}
+                                            </p>
+                                          )}
                                           {new Date(
                                             item.start_date
                                           ).toLocaleDateString()}
@@ -389,6 +393,11 @@ export default function ScheduleTrip() {
                                           </small>
                                         </td>
                                         <td>
+                                          {item.arrival_location.depo && (
+                                            <p className="mb-0 fw-bold">
+                                              {item.arrival_location.depo}
+                                            </p>
+                                          )}
                                           {item.end_date && (
                                             <>
                                               {" "}
