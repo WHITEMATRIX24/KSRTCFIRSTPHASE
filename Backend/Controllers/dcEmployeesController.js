@@ -65,7 +65,7 @@ export const getFilteredDCEmployeesForTrip = async (req,res) => {
         ];
     }
   
-      const EmployeeList = await DCEmployees.find(filter).select("EmployeeName PEN _id").limit(5)
+      const EmployeeList = await DCEmployees.find(filter).select("EmployeeName PEN _id")
       res.status(200).json(EmployeeList)
   
     }catch(err){

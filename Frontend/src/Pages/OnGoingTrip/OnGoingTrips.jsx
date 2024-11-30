@@ -349,9 +349,9 @@ export default function OnGoingTrips() {
           cancelTrip.conductor_id,
           updatedTrip
         );
-        //console.log(result)
+        console.log(updatedVehicle);
         const result2 = await updateVehicleStatus(
-          updatedVehicle._id,
+          cancelTrip.vehicle_id,
           updatedVehicle
         );
 

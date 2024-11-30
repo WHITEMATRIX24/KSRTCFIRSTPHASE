@@ -582,8 +582,7 @@ export const getFilteredVehiclesForTrip = async (req, res) => {
     }
 
     const vehiclesList = await Vehicles.find(filter)
-      .select("BUSNO CLASS _id")
-      .limit(5);
+      .select("BUSNO CLASS _id");
     res.status(200).json(vehiclesList);
   } catch (err) {
     console.log(

@@ -8,6 +8,7 @@ import {
   faCalendarAlt,
   faClock,
   faCircleCheck,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import {
@@ -77,7 +78,7 @@ const TripParameters = () => {
 
   useEffect(()=>{
     getAllBuses();
-  },[searchBus])
+  },[])
 
 
   // get All drivers list
@@ -100,7 +101,7 @@ const TripParameters = () => {
 
   useEffect(()=>{
     getAllDriversList()
-  },[searchDriver])
+  },[])
 
   // get All Conductors list
   const getAllConductorsList = async () => {
@@ -122,7 +123,7 @@ const TripParameters = () => {
 
   useEffect(()=>{
     getAllConductorsList()
-  },[searchConductor])
+  },[])
 
   // formats date =>recieve data from date picker and returns formatted date
   function formatDate(dateInput) {
@@ -430,7 +431,15 @@ const TripParameters = () => {
         <Container fluid className="TripParameters">
           <Row>
             <Col xs={2}></Col>
-              <Col xs={6} className="mt-3">
+              {
+                (loadingCond || loadingDriv || loadingVeh)?
+                <Col xs={6} className="mt-3">
+                  <Card className="shadow-sm border-0 d-flex justify-content-center align-items-center flex-column p-5 gap-3" style={{height:"50vh"}}>
+                    <span className="fw-bold text-info fs-5">Please Hold On...</span>
+                    <span className="fs-6">Content is Loading <FontAwesomeIcon icon={faSpinner} spinPulse /></span>
+                  </Card>
+                </Col>:
+                <Col xs={6} className="mt-3">
                 <Card className="shadow-sm border-0">
                   <Card.Body>
                     <Card.Title className="d-flex align-items-center">
@@ -730,7 +739,7 @@ const TripParameters = () => {
                                 inputValue={searchDriver}
                                 onInputChange={(event, newInputValue) =>setsearchDriver(newInputValue)}
                                 onChange={handleChangeDriver}
-                                options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id })).slice(0,5)}
+                                options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
                                 getOptionLabel={(option) => (option?.value ? option.value : "")}
                                 renderInput={(params) => <TextField {...params} label="Choose Driver" />}
                               />
@@ -753,7 +762,7 @@ const TripParameters = () => {
                                 inputValue={searchConductor}
                                 onInputChange={(event, newInputValue) =>setsearchConductor(newInputValue)}
                                 onChange={handleChangeConductor}
-                                options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id })).slice(0,5)}
+                                options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
                                 getOptionLabel={(option) => (option?.value ? option.value : "")}
                                 renderInput={(params) => <TextField {...params} label="Choose Conductor" />}
                               />
@@ -799,6 +808,7 @@ const TripParameters = () => {
                   </Card.Body>
                 </Card>
               </Col>
+              }
             {/* Trip Cost Sidebar */}
             <Col xs={3} className="mt-3">
               <Card className="trip-cost-card shadow-sm border-0 p-0">

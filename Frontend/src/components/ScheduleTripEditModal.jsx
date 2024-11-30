@@ -103,13 +103,7 @@ const ScheduleTripEditModal = ({ show, handleClose, tripData, refreshApi }) => {
         endDate,
       } = tripDataToEdit;
 
-      if (
-        !vehicle_id ||
-        !driver_id ||
-        !conductor_id ||
-        !startDate ||
-        !endDate
-      ) {
+      if (!vehicle_id || !driver_id || !conductor_id || !startDate) {
         return alert("fill the form completly");
       }
       setEditIsLoading(true);

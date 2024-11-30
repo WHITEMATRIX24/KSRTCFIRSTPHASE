@@ -242,8 +242,7 @@ export const getFilteredDriversForTrip = async (req, res) => {
     }
 
     const driverList = await Driver.find(filter)
-      .select("EmployeeName PEN _id")
-      .limit(5);
+      .select("EmployeeName PEN _id");
     res.status(200).json(driverList);
   } catch (err) {
     console.log(

@@ -226,8 +226,8 @@ export const getFilteredConductorsForTrip = async (req, res) => {
 
     const ConductorList = await Conductor.find(filter)
       .select("EmployeeName PEN _id")
-      .limit(5);
-    res.status(200).json(ConductorList);
+
+      res.status(200).json(ConductorList);
   } catch (err) {
     console.log(
       "Error at catch in ConductorController/getFilteredConductorsForTrip::::::",

@@ -102,37 +102,46 @@ function Collection() {
     }
   };
 
-  const filterByDepo = () => {
-    if (!depoFilter) {
-      setAllCollections([...originalCollections]);
-    } else {
-      const filtered = originalCollections.filter((item) =>
-        item.depot?.toLowerCase().includes(depoFilter.toLowerCase())
-      );
-      setAllCollections(filtered);
-    }
-  };
-
   const filterByDate = () => {
     if (!dateFilter) {
       setAllCollections([...originalCollections]);
     } else {
       const filtered = originalCollections.filter((item) => {
-        const dbDate = new Date(item.date).toISOString().slice(0, 10); // Normalize date to YYYY-MM-DD
-        const filterDate = new Date(dateFilter).toISOString().slice(0, 10); // Same normalization
-        return dbDate === filterDate; // Direct comparison
+        const dbDate = new Date(item.date).toISOString().slice(0, 10);
+        const filterDate = new Date(dateFilter).toISOString().slice(0, 10);
+        return dbDate === filterDate;
       });
       setAllCollections(filtered);
     }
   };
 
-  useEffect(() => {
-    filterByDepo();
-  }, [depoFilter]);
+  const filterDateandDepo = () => {
+    let filtered = [...originalCollections];
+
+    if (depoFilter) {
+      filtered = filtered.filter((item) =>
+        item.depot?.toLowerCase().includes(depoFilter.toLowerCase())
+      );
+    }
+    if (dateFilter) {
+      const filterDate = new Date(dateFilter).toISOString().slice(0, 10);
+      filtered = filtered.filter((item) => {
+        const dbDate = new Date(item.date).toISOString().slice(0, 10);
+        return dbDate === filterDate;
+      });
+    }
+
+    setAllCollections(filtered);
+  };
 
   useEffect(() => {
-    filterByDate();
-  }, [dateFilter]);
+    if (role === "Admin") {
+      filterDateandDepo();
+    }
+    if (role === "Staff" || role === "Supervisor") {
+      filterByDate();
+    }
+  }, [dateFilter, depoFilter]);
 
   useEffect(() => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
