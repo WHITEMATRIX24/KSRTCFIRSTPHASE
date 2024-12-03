@@ -20,7 +20,7 @@ const driverSchema = new mongoose.Schema({
   },
   is_Permanent: {
     type: String,
-    enum: ["Badali", "Permanent"],
+    enum: ["Badli", "Permanent"],
   },
   on_leave: {
     type: String,
