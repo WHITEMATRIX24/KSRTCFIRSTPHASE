@@ -20,8 +20,6 @@ import {
 } from "../../services/allAPI";
 import { Autocomplete, TextField } from "@mui/material";
 
-
-
 const TripParameters = () => {
   //for managing depo
   const [startDepo, setStartDepo] = useState("");
@@ -29,17 +27,17 @@ const TripParameters = () => {
 
   //
   const [searchDriver, setsearchDriver] = useState("");
-  const [selectedDriver,setselectedDriver]=useState("")
+  const [selectedDriver, setselectedDriver] = useState("");
   const [searchConductor, setsearchConductor] = useState("");
   const [selectedConductor, setselectedConductor] = useState("");
   const [searchBus, setsearchBus] = useState("");
-  const [selectedBus,setSelectedBus]=useState("")
+  const [selectedBus, setSelectedBus] = useState("");
   const [loadingCond, setLoadingCond] = useState(false);
   const [loadingDriv, setLoadingDriv] = useState(false);
   const [loadingVeh, setLoadingVeh] = useState(false);
   const [outboundTrip, setOutboundTrip] = useState({
-    waybill_Number:"",
-    duty_Number:"",
+    waybill_Number: "",
+    duty_Number: "",
     vehicle_id: "",
     driver_id: "",
     conductor_id: "",
@@ -76,20 +74,19 @@ const TripParameters = () => {
     setLoadingVeh(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getAllBuses();
-  },[])
-
+  }, []);
 
   // get All drivers list
   const getAllDriversList = async () => {
     setLoadingDriv(true);
     try {
       const result = await getFilteredDriversForTripApi(searchDriver);
-      const result2 = await getFilteredDCEmployeesForTripApi(searchDriver) 
+      const result2 = await getFilteredDCEmployeesForTripApi(searchDriver);
 
-      if (result.status == 200 && result2.status==200) {
-        setDrivers([...result.data,...result2.data])      
+      if (result.status == 200 && result2.status == 200) {
+        setDrivers([...result.data, ...result2.data]);
       } else {
         console.log("Failed to load Drivers Details");
       }
@@ -99,31 +96,31 @@ const TripParameters = () => {
     setLoadingDriv(false);
   };
 
-  useEffect(()=>{
-    getAllDriversList()
-  },[])
+  useEffect(() => {
+    getAllDriversList();
+  }, []);
 
   // get All Conductors list
   const getAllConductorsList = async () => {
     setLoadingCond(true);
     try {
       const result = await getFilteredConductorsForTripApi(searchConductor);
-      const result2 = await getFilteredDCEmployeesForTripApi(searchConductor)   
+      const result2 = await getFilteredDCEmployeesForTripApi(searchConductor);
 
-      if (result.status == 200 && result2.status==200) {
-        setConductors([...result.data,...result2.data])
+      if (result.status == 200 && result2.status == 200) {
+        setConductors([...result.data, ...result2.data]);
       } else {
-        console.log("Failed to load Conductors Details")
+        console.log("Failed to load Conductors Details");
       }
     } catch (err) {
-      console.log(`Failed to load Conductors Details ${err}`)
+      console.log(`Failed to load Conductors Details ${err}`);
     }
     setLoadingCond(false);
   };
 
-  useEffect(()=>{
-    getAllConductorsList()
-  },[])
+  useEffect(() => {
+    getAllConductorsList();
+  }, []);
 
   // formats date =>recieve data from date picker and returns formatted date
   function formatDate(dateInput) {
@@ -175,8 +172,7 @@ const TripParameters = () => {
       )
     ) {
       return <span className="text-danger">Invalid Time Entry</span>;
-    }
-    else {
+    } else {
       const diffInMs = checkTimeEntries(
         outboundTrip.start_date,
         outboundTrip.start_time,
@@ -199,33 +195,31 @@ const TripParameters = () => {
 
   // add trips
   const handleSchedule = async () => {
-
-     if(!outboundTrip.vehicle_id){
-      alert("Choose Vehicle")
-      return
-    }else if(!outboundTrip.driver_id){
-      alert("Choose Driver")
-      return
-    }else if(!outboundTrip.conductor_id){
-      alert("Choose Conductor")
-      return
-    }else if(!outboundTrip.start_date){
-      alert("Select Trip Start Date")
-      return
-    }else if(!outboundTrip.departure_location.depo){
-      alert("Select Departure Depot")
-      return
-    }else if(!outboundTrip.arrival_location.depo){
-      alert("Select Arrival Depot")
-      return
-    }else if(!outboundTrip.start_time){
-      alert("Select Trip Start Time")
-      return
-    }else if(!outboundTrip.trip_type){
-      alert("Choose Trip Type Outbound/Return")
-      return
-    }
-    else if (
+    if (!outboundTrip.vehicle_id) {
+      alert("Choose Vehicle");
+      return;
+    } else if (!outboundTrip.driver_id) {
+      alert("Choose Driver");
+      return;
+    } else if (!outboundTrip.conductor_id) {
+      alert("Choose Conductor");
+      return;
+    } else if (!outboundTrip.start_date) {
+      alert("Select Trip Start Date");
+      return;
+    } else if (!outboundTrip.departure_location.depo) {
+      alert("Select Departure Depot");
+      return;
+    } else if (!outboundTrip.arrival_location.depo) {
+      alert("Select Arrival Depot");
+      return;
+    } else if (!outboundTrip.start_time) {
+      alert("Select Trip Start Time");
+      return;
+    } else if (!outboundTrip.trip_type) {
+      alert("Choose Trip Type Outbound/Return");
+      return;
+    } else if (
       !checkTimeEntries(
         outboundTrip.start_date,
         outboundTrip.start_time,
@@ -250,7 +244,6 @@ const TripParameters = () => {
     }
   };
 
-
   //////////////////////////////////////////////////////////////////
   // add Trip Api call
   const addTripApiFunction = async (trip) => {
@@ -272,11 +265,6 @@ const TripParameters = () => {
       alert(`Failed to Schedule Trip ${err}`);
     }
   };
-
-
-  
-    
-    
 
   // depo collection
   const depoList = [
@@ -380,8 +368,8 @@ const TripParameters = () => {
   // clear all fields
   const handleCancel = () => {
     setOutboundTrip({
-      waybill_Number:"",
-      duty_Number:"",
+      waybill_Number: "",
+      duty_Number: "",
       vehicle_id: "",
       driver_id: "",
       conductor_id: "",
@@ -400,28 +388,33 @@ const TripParameters = () => {
     setStartDepo("");
     setEndDepo("");
     setsearchBus("");
-    setSelectedBus("")
+    setSelectedBus("");
     setsearchConductor("");
-    setselectedConductor('')
+    setselectedConductor("");
     setsearchDriver("");
-    setselectedDriver("")
+    setselectedDriver("");
   };
 
   const handleChangeDriver = (event, newValue) => {
-    setselectedDriver(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,driver_id:newValue.id}):setOutboundTrip({...outboundTrip,driver_id:""})
-  }
+    setselectedDriver(newValue);
+    newValue?.id
+      ? setOutboundTrip({ ...outboundTrip, driver_id: newValue.id })
+      : setOutboundTrip({ ...outboundTrip, driver_id: "" });
+  };
 
   const handleChangeConductor = (event, newValue) => {
-    setselectedConductor(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,conductor_id:newValue.id}):setOutboundTrip({...outboundTrip,conductor_id:""})
-  }
+    setselectedConductor(newValue);
+    newValue?.id
+      ? setOutboundTrip({ ...outboundTrip, conductor_id: newValue.id })
+      : setOutboundTrip({ ...outboundTrip, conductor_id: "" });
+  };
 
   const handleChangeVehicle = (event, newValue) => {
-    setSelectedBus(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,vehicle_id:newValue.id}):setOutboundTrip({...outboundTrip,vehicle_id:""})
-  }
-
+    setSelectedBus(newValue);
+    newValue?.id
+      ? setOutboundTrip({ ...outboundTrip, vehicle_id: newValue.id })
+      : setOutboundTrip({ ...outboundTrip, vehicle_id: "" });
+  };
 
   return (
     <div>
@@ -431,15 +424,23 @@ const TripParameters = () => {
         <Container fluid className="TripParameters">
           <Row>
             <Col xs={2}></Col>
-              {
-                (loadingCond || loadingDriv || loadingVeh)?
-                <Col xs={6} className="mt-3">
-                  <Card className="shadow-sm border-0 d-flex justify-content-center align-items-center flex-column p-5 gap-3" style={{height:"50vh"}}>
-                    <span className="fw-bold text-info fs-5">Please Hold On...</span>
-                    <span className="fs-6">Content is Loading <FontAwesomeIcon icon={faSpinner} spinPulse /></span>
-                  </Card>
-                </Col>:
-                <Col xs={6} className="mt-3">
+            {loadingCond || loadingDriv || loadingVeh ? (
+              <Col xs={6} className="mt-3">
+                <Card
+                  className="shadow-sm border-0 d-flex justify-content-center align-items-center flex-column p-5 gap-3"
+                  style={{ height: "50vh" }}
+                >
+                  <span className="fw-bold text-info fs-5">
+                    Please Hold On...
+                  </span>
+                  <span className="fs-6">
+                    Content is Loading{" "}
+                    <FontAwesomeIcon icon={faSpinner} spinPulse />
+                  </span>
+                </Card>
+              </Col>
+            ) : (
+              <Col xs={6} className="mt-3">
                 <Card className="shadow-sm border-0">
                   <Card.Body>
                     <Card.Title className="d-flex align-items-center">
@@ -456,7 +457,13 @@ const TripParameters = () => {
                     <Form>
                       <Row>
                         <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }} > WayBill No </Form.Label>
+                          <Form.Label
+                            className="mb-1"
+                            style={{ fontSize: "14px" }}
+                          >
+                            {" "}
+                            WayBill No{" "}
+                          </Form.Label>
                           <Form.Control
                             type="text"
                             placeholder="Enter WayBill Number"
@@ -470,7 +477,13 @@ const TripParameters = () => {
                           />
                         </Col>
                         <Col>
-                          <Form.Label className="mb-1" style={{ fontSize: "14px" }} > Duty No </Form.Label>
+                          <Form.Label
+                            className="mb-1"
+                            style={{ fontSize: "14px" }}
+                          >
+                            {" "}
+                            Duty No{" "}
+                          </Form.Label>
                           <Form.Control
                             type="text"
                             placeholder="Enter Duty Number"
@@ -485,12 +498,9 @@ const TripParameters = () => {
                         </Col>
                       </Row>
 
-
-                      
                       {/* Outbound Section */}
                       <Form.Group className="mt-4">
                         <h6 className="mb-1">1. Trip Details</h6>
-
 
                         {/* location  */}
                         <Row className="mt-3">
@@ -518,11 +528,11 @@ const TripParameters = () => {
                                     !startDepo
                                       ? false
                                       : item
-                                        .toLowerCase()
-                                        .search(startDepo.toLowerCase()) ===
+                                          .toLowerCase()
+                                          .search(startDepo.toLowerCase()) ===
                                         -1
-                                        ? false
-                                        : true
+                                      ? false
+                                      : true
                                   )
                                   .slice(0, 5)
                                   .map((item, index) => (
@@ -572,10 +582,10 @@ const TripParameters = () => {
                                   !endDepo
                                     ? false
                                     : item
-                                      .toLowerCase()
-                                      .search(endDepo.toLowerCase()) === -1
-                                      ? false
-                                      : true
+                                        .toLowerCase()
+                                        .search(endDepo.toLowerCase()) === -1
+                                    ? false
+                                    : true
                                 ) // Filter based on endDepo
                                 .slice(0, 5)
                                 .map((item, index) => (
@@ -719,8 +729,6 @@ const TripParameters = () => {
                         </Row>
                       </Form.Group>
 
-                     
-
                       {/* staff Section */}
                       <Form.Group className="mt-4">
                         <h6 className="mb-1 mt-5">3. Staff</h6>
@@ -737,17 +745,39 @@ const TripParameters = () => {
                                 className="mt-1"
                                 value={selectedDriver}
                                 inputValue={searchDriver}
-                                onInputChange={(event, newInputValue) =>setsearchDriver(newInputValue)}
+                                onInputChange={(event, newInputValue) =>
+                                  setsearchDriver(newInputValue)
+                                }
                                 onChange={handleChangeDriver}
-                                options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
-                                getOptionLabel={(option) => (option?.value ? option.value : "")}
-                                renderInput={(params) => <TextField {...params} label="Choose Driver" />}
+                                // options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
+
+                                options={drivers.map((item) => ({
+                                  label: item.PEN + " " + item.EmployeeName,
+                                  value: item.PEN,
+                                  id: item._id,
+                                  type: item.driver_type,
+                                }))}
+                                getOptionLabel={(option) =>
+                                  option?.value ? option.value : ""
+                                }
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Choose Driver"
+                                  />
+                                )}
                               />
-                              {
-                                selectedDriver?
-                                <div className="mt-1 position-absolute"><FontAwesomeIcon icon={faCircleCheck} className="text-success"/>{selectedDriver?.label}</div>
-                                :<></>
-                              }
+                              {selectedDriver ? (
+                                <div className="mt-1 position-absolute">
+                                  <FontAwesomeIcon
+                                    icon={faCircleCheck}
+                                    className="text-success"
+                                  />
+                                  {selectedDriver?.label}
+                                </div>
+                              ) : (
+                                <></>
+                              )}
                             </Col>
                             <Col>
                               {/* <Form.Label
@@ -760,19 +790,40 @@ const TripParameters = () => {
                                 className="mt-1"
                                 value={selectedConductor}
                                 inputValue={searchConductor}
-                                onInputChange={(event, newInputValue) =>setsearchConductor(newInputValue)}
+                                onInputChange={(event, newInputValue) =>
+                                  setsearchConductor(newInputValue)
+                                }
                                 onChange={handleChangeConductor}
-                                options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
-                                getOptionLabel={(option) => (option?.value ? option.value : "")}
-                                renderInput={(params) => <TextField {...params} label="Choose Conductor" />}
+                                // options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
+
+                                options={conductors.map((item) => ({
+                                  label: item.PEN + " " + item.EmployeeName,
+                                  value: item.PEN,
+                                  id: item._id,
+                                  type: item.conductor_type,
+                                }))}
+                                getOptionLabel={(option) =>
+                                  option?.value ? option.value : ""
+                                }
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="Choose Conductor"
+                                  />
+                                )}
                               />
-                              {
-                                selectedConductor?
-                                <div className="mt-1 position-absolute"><FontAwesomeIcon icon={faCircleCheck} className="text-success"/>{selectedConductor?.label}</div>
-                                :<></>
-                              }
+                              {selectedConductor ? (
+                                <div className="mt-1 position-absolute">
+                                  <FontAwesomeIcon
+                                    icon={faCircleCheck}
+                                    className="text-success"
+                                  />
+                                  {selectedConductor?.label}
+                                </div>
+                              ) : (
+                                <></>
+                              )}
                             </Col>
-          
                           </Row>
                         </Row>
                       </Form.Group>
@@ -787,28 +838,42 @@ const TripParameters = () => {
                               className="mt-1"
                               value={selectedBus}
                               inputValue={searchBus}
-                              onInputChange={(event, newInputValue) =>setsearchBus(newInputValue)}
+                              onInputChange={(event, newInputValue) =>
+                                setsearchBus(newInputValue)
+                              }
                               onChange={handleChangeVehicle}
-                              options={vehicles.map(item=>({ label: item.BUSNO+" "+item.CLASS, value: item.BUSNO, id:item._id }))}
-                              getOptionLabel={(option) => (option?.value ? option.value : "")}
-                              renderInput={(params) => <TextField {...params} label="Choose Vehicle" />}
+                              options={vehicles.map((item) => ({
+                                label: item.BUSNO + " " + item.CLASS,
+                                value: item.BUSNO,
+                                id: item._id,
+                              }))}
+                              getOptionLabel={(option) =>
+                                option?.value ? option.value : ""
+                              }
+                              renderInput={(params) => (
+                                <TextField {...params} label="Choose Vehicle" />
+                              )}
                             />
-                            {
-                              selectedBus?
-                              <div className="mt-1"><FontAwesomeIcon icon={faCircleCheck} className="text-success"/>{selectedBus?.label}</div>
-                              :<></>
-                            }
+                            {selectedBus ? (
+                              <div className="mt-1">
+                                <FontAwesomeIcon
+                                  icon={faCircleCheck}
+                                  className="text-success"
+                                />
+                                {selectedBus?.label}
+                              </div>
+                            ) : (
+                              <></>
+                            )}
                           </Col>
-                          <Col>
-
-                          </Col>
+                          <Col></Col>
                         </Row>
                       </Form.Group>
                     </Form>
                   </Card.Body>
                 </Card>
               </Col>
-              }
+            )}
             {/* Trip Cost Sidebar */}
             <Col xs={3} className="mt-3">
               <Card className="trip-cost-card shadow-sm border-0 p-0">
