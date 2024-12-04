@@ -42,7 +42,9 @@ const TripParameters = () => {
     duty_Number:"",
     vehicle_id: "",
     driver_id: "",
+    driver_type:"",
     conductor_id: "",
+    conductor_type:"",
     start_date: "",
     end_date: "",
     departure_location: {
@@ -89,7 +91,7 @@ const TripParameters = () => {
       const result2 = await getFilteredDCEmployeesForTripApi(searchDriver) 
 
       if (result.status == 200 && result2.status==200) {
-        setDrivers([...result.data,...result2.data])      
+        setDrivers([...result.data.map(item=>({...item,driver_type:"drivers"})),...result2.data.map(item=>({...item,driver_type:"dcemployees"}))])      
       } else {
         console.log("Failed to load Drivers Details");
       }
@@ -111,7 +113,7 @@ const TripParameters = () => {
       const result2 = await getFilteredDCEmployeesForTripApi(searchConductor)   
 
       if (result.status == 200 && result2.status==200) {
-        setConductors([...result.data,...result2.data])
+        setConductors([...result.data.map(item=>({...item,conductor_type:"conductors"})),...result2.data.map(item=>({...item,conductor_type:"dcemployees"}))])
       } else {
         console.log("Failed to load Conductors Details")
       }
@@ -124,7 +126,11 @@ const TripParameters = () => {
   useEffect(()=>{
     getAllConductorsList()
   },[])
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> refs/remotes/origin/main
   // formats date =>recieve data from date picker and returns formatted date
   function formatDate(dateInput) {
     if (dateInput) {
@@ -262,6 +268,7 @@ const TripParameters = () => {
         trip
       );
       console.log(result);
+      
 
       if (result.status == 201) {
         alert("Trip Successfully Added");
@@ -384,7 +391,9 @@ const TripParameters = () => {
       duty_Number:"",
       vehicle_id: "",
       driver_id: "",
+      driver_type:"",
       conductor_id: "",
+      conductor_type:"",
       start_date: "",
       end_date: "",
       departure_location: {
@@ -409,19 +418,23 @@ const TripParameters = () => {
 
   const handleChangeDriver = (event, newValue) => {
     setselectedDriver(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,driver_id:newValue.id}):setOutboundTrip({...outboundTrip,driver_id:""})
+    newValue?.id?setOutboundTrip({...outboundTrip,driver_id:newValue.id,driver_type:newValue.type}):setOutboundTrip({...outboundTrip,driver_id:"",driver_type:""})
   }
 
   const handleChangeConductor = (event, newValue) => {
     setselectedConductor(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,conductor_id:newValue.id}):setOutboundTrip({...outboundTrip,conductor_id:""})
+    newValue?.id?setOutboundTrip({...outboundTrip,conductor_id:newValue.id,conductor_type:newValue.type}):setOutboundTrip({...outboundTrip,conductor_id:"",conductor_type:""})
   }
 
-  const handleChangeVehicle = (event, newValue) => {
+  const handleChangeVehicle = (event, newValue) => {    
     setSelectedBus(newValue)
     newValue?.id?setOutboundTrip({...outboundTrip,vehicle_id:newValue.id}):setOutboundTrip({...outboundTrip,vehicle_id:""})
   }
 
+  useEffect(()=>{
+    console.log(outboundTrip);
+    
+  },[outboundTrip])
 
   return (
     <div>
@@ -739,7 +752,11 @@ const TripParameters = () => {
                                 inputValue={searchDriver}
                                 onInputChange={(event, newInputValue) =>setsearchDriver(newInputValue)}
                                 onChange={handleChangeDriver}
+<<<<<<< HEAD
                                 options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
+=======
+                                options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id, type:item.driver_type }))}
+>>>>>>> refs/remotes/origin/main
                                 getOptionLabel={(option) => (option?.value ? option.value : "")}
                                 renderInput={(params) => <TextField {...params} label="Choose Driver" />}
                               />
@@ -762,7 +779,11 @@ const TripParameters = () => {
                                 inputValue={searchConductor}
                                 onInputChange={(event, newInputValue) =>setsearchConductor(newInputValue)}
                                 onChange={handleChangeConductor}
+<<<<<<< HEAD
                                 options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id }))}
+=======
+                                options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id, type:item.conductor_type }))}
+>>>>>>> refs/remotes/origin/main
                                 getOptionLabel={(option) => (option?.value ? option.value : "")}
                                 renderInput={(params) => <TextField {...params} label="Choose Conductor" />}
                               />

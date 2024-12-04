@@ -192,7 +192,7 @@ function Dashboard() {
   const getAllTripDetails = async (dateForFilter) => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     if (userDetails.depoName == "Admin") {
-      const result = await getAllTripApi(dateForFilter);
+      const result = await getAllTripApi(dateForFilter ? dateForFilter : "");
       // console.log(result.data);
       if (result.status == 200) {
         setAllTripDetails(result.data);
@@ -269,7 +269,9 @@ function Dashboard() {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
 
     if (userDetails.depoName == "Admin") {
-      const result = await getAllCollectionAPi(dateForFilter);
+      const result = await getAllCollectionAPi(
+        dateForFilter ? dateForFilter : ""
+      );
       // Fuel Consumption total
       const ftotal = result.data.reduce((total, item) => {
         return total + item.fuelCost;

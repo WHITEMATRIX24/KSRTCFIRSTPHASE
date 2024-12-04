@@ -15,12 +15,22 @@ const tripSchema = new mongoose.Schema({
   driver_id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Drivers",
+    refPath: 'driver_type',
+  },
+  driver_type:{
+    type:String,
+    required:true,
+    enum:["drivers","dcemployees"]
   },
   conductor_id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "Conductors",
+    refPath:"conductor_type"
+  },
+  conductor_type:{
+    type:String,
+    required:true,
+    enum:["conductors","dcemployees"]
   },
   start_date: {
     type: Date,

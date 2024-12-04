@@ -9,6 +9,8 @@ export const addNewTrip = async (req, res) => {
   const {
     waybill_Number,
     duty_Number,
+    driver_type,
+    conductor_type,
     start_date,
     end_date,
     start_time,
@@ -36,6 +38,8 @@ export const addNewTrip = async (req, res) => {
     const newTrip = new Trip({
       waybill_Number,
       duty_Number,
+      driver_type,
+      conductor_type,
       start_date,
       end_date,
       start_time,
@@ -89,6 +93,8 @@ export const editTripDetails = async (req, res) => {
   const {
     waybill_Number,
     duty_Number,
+    driver_type,
+    conductor_type,
     start_date,
     end_date,
     start_time,
@@ -121,6 +127,8 @@ export const editTripDetails = async (req, res) => {
       {
         waybill_Number,
         duty_Number,
+        driver_type,
+        conductor_type,
         start_date,
         end_date,
         start_time,
@@ -157,6 +165,8 @@ export const editTripDetailsNew = async (req, res) => {
   const {
     waybill_Number,
     duty_Number,
+    driver_type,
+    conductor_type,
     start_date,
     end_date,
     start_time,
@@ -184,6 +194,8 @@ export const editTripDetailsNew = async (req, res) => {
       {
         waybill_Number,
         duty_Number,
+        driver_type,
+        conductor_type,
         start_date,
         end_date,
         start_time,
@@ -297,12 +309,13 @@ export const getTripdetailsUpcomingbyDepoName = async (req, res) => {
       {
         $unwind: "$vechileDetails",
       },
+      // conductor data
       {
         $lookup: {
           from: "conductors",
           localField: "conductor_id",
           foreignField: "_id",
-          as: "conductorDetails",
+          as: "conductorSchemaData",
           pipeline: [
             {
               $project: {
@@ -315,14 +328,42 @@ export const getTripdetailsUpcomingbyDepoName = async (req, res) => {
         },
       },
       {
-        $unwind: "$conductorDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          conductorDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$conductorSchemaData" },
+            ],
+          },
+        },
+      },
+      {
+        $unset: ["dcemployeesSchemaData", "conductorSchemaData"],
+      },
+      // driver data
       {
         $lookup: {
           from: "drivers",
           localField: "driver_id",
           foreignField: "_id",
-          as: "driverDetails",
+          as: "driverSchemaData",
           pipeline: [
             {
               $project: {
@@ -335,8 +376,33 @@ export const getTripdetailsUpcomingbyDepoName = async (req, res) => {
         },
       },
       {
-        $unwind: "$driverDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          driverDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$driverSchemaData" },
+            ],
+          },
+        },
+      },
+      { $unset: ["dcemployeesSchemaData", "driverSchemaData"] },
     ]);
 
     if (tripDetails.length > 0) {
@@ -396,12 +462,13 @@ export const getTripLiveBydepoName = async (req, res) => {
       {
         $unwind: "$vechileDetails",
       },
+      // conductor Data
       {
         $lookup: {
           from: "conductors",
           localField: "conductor_id",
           foreignField: "_id",
-          as: "conductorDetails",
+          as: "conductorSchemaData",
           pipeline: [
             {
               $project: {
@@ -414,14 +481,42 @@ export const getTripLiveBydepoName = async (req, res) => {
         },
       },
       {
-        $unwind: "$conductorDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          conductorDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$conductorSchemaData" },
+            ],
+          },
+        },
+      },
+      {
+        $unset: ["dcemployeesSchemaData", "conductorSchemaData"],
+      },
+      // driver Data
       {
         $lookup: {
           from: "drivers",
           localField: "driver_id",
           foreignField: "_id",
-          as: "driverDetails",
+          as: "driverSchemaData",
           pipeline: [
             {
               $project: {
@@ -434,8 +529,33 @@ export const getTripLiveBydepoName = async (req, res) => {
         },
       },
       {
-        $unwind: "$driverDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          driverDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$driverSchemaData" },
+            ],
+          },
+        },
+      },
+      { $unset: ["dcemployeesSchemaData", "driverSchemaData"] },
     ]);
     if (tripDetails.length > 0) {
       res.status(200).json(tripDetails);
@@ -482,12 +602,13 @@ export const getAllTripLive = async (req, res) => {
       {
         $unwind: "$vechileDetails",
       },
+      // conductor data
       {
         $lookup: {
           from: "conductors",
           localField: "conductor_id",
           foreignField: "_id",
-          as: "conductorDetails",
+          as: "conductorSchemaData",
           pipeline: [
             {
               $project: {
@@ -500,14 +621,42 @@ export const getAllTripLive = async (req, res) => {
         },
       },
       {
-        $unwind: "$conductorDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          conductorDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$conductorSchemaData" },
+            ],
+          },
+        },
+      },
+      {
+        $unset: ["dcemployeesSchemaData", "conductorSchemaData"],
+      },
+      // driver data
       {
         $lookup: {
           from: "drivers",
           localField: "driver_id",
           foreignField: "_id",
-          as: "driverDetails",
+          as: "driverSchemaData",
           pipeline: [
             {
               $project: {
@@ -520,8 +669,33 @@ export const getAllTripLive = async (req, res) => {
         },
       },
       {
-        $unwind: "$driverDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          driverDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$driverSchemaData" },
+            ],
+          },
+        },
+      },
+      { $unset: ["dcemployeesSchemaData", "driverSchemaData"] },
     ]);
     if (tripDetails.length > 0) {
       res.status(200).json(tripDetails);
@@ -568,12 +742,13 @@ export const getAllUpcomingTrip = async (req, res) => {
       {
         $unwind: "$vechileDetails",
       },
+      // conductor data
       {
         $lookup: {
           from: "conductors",
           localField: "conductor_id",
           foreignField: "_id",
-          as: "conductorDetails",
+          as: "conductorSchemaData",
           pipeline: [
             {
               $project: {
@@ -586,14 +761,42 @@ export const getAllUpcomingTrip = async (req, res) => {
         },
       },
       {
-        $unwind: "$conductorDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "conductor_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          conductorDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$conductorSchemaData" },
+            ],
+          },
+        },
+      },
+      {
+        $unset: ["dcemployeesSchemaData", "conductorSchemaData"],
+      },
+      // driver data
       {
         $lookup: {
           from: "drivers",
           localField: "driver_id",
           foreignField: "_id",
-          as: "driverDetails",
+          as: "driverSchemaData",
           pipeline: [
             {
               $project: {
@@ -606,8 +809,33 @@ export const getAllUpcomingTrip = async (req, res) => {
         },
       },
       {
-        $unwind: "$driverDetails",
+        $lookup: {
+          from: "dcemployees",
+          localField: "driver_id",
+          foreignField: "_id",
+          as: "dcemployeesSchemaData",
+          pipeline: [
+            {
+              $project: {
+                _id: 1,
+                EmployeeName: 1,
+                PEN: 1,
+              },
+            },
+          ],
+        },
       },
+      {
+        $set: {
+          driverDetails: {
+            $mergeObjects: [
+              { $first: "$dcemployeesSchemaData" },
+              { $first: "$driverSchemaData" },
+            ],
+          },
+        },
+      },
+      { $unset: ["dcemployeesSchemaData", "driverSchemaData"] },
     ]);
     if (tripDetails.length > 0) {
       res.status(200).json(tripDetails);
