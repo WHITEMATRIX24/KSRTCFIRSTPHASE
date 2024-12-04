@@ -8,6 +8,7 @@ import {
   faCalendarAlt,
   faClock,
   faCircleCheck,
+  faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import {
@@ -41,7 +42,9 @@ const TripParameters = () => {
     duty_Number:"",
     vehicle_id: "",
     driver_id: "",
+    driver_type:"",
     conductor_id: "",
+    conductor_type:"",
     start_date: "",
     end_date: "",
     departure_location: {
@@ -77,7 +80,7 @@ const TripParameters = () => {
 
   useEffect(()=>{
     getAllBuses();
-  },[searchBus])
+  },[])
 
 
   // get All drivers list
@@ -88,7 +91,7 @@ const TripParameters = () => {
       const result2 = await getFilteredDCEmployeesForTripApi(searchDriver) 
 
       if (result.status == 200 && result2.status==200) {
-        setDrivers([...result.data,...result2.data])      
+        setDrivers([...result.data.map(item=>({...item,driver_type:"drivers"})),...result2.data.map(item=>({...item,driver_type:"dcemployees"}))])      
       } else {
         console.log("Failed to load Drivers Details");
       }
@@ -100,7 +103,7 @@ const TripParameters = () => {
 
   useEffect(()=>{
     getAllDriversList()
-  },[searchDriver])
+  },[])
 
   // get All Conductors list
   const getAllConductorsList = async () => {
@@ -110,7 +113,7 @@ const TripParameters = () => {
       const result2 = await getFilteredDCEmployeesForTripApi(searchConductor)   
 
       if (result.status == 200 && result2.status==200) {
-        setConductors([...result.data,...result2.data])
+        setConductors([...result.data.map(item=>({...item,conductor_type:"conductors"})),...result2.data.map(item=>({...item,conductor_type:"dcemployees"}))])
       } else {
         console.log("Failed to load Conductors Details")
       }
@@ -122,8 +125,8 @@ const TripParameters = () => {
 
   useEffect(()=>{
     getAllConductorsList()
-  },[searchConductor])
-
+  },[])
+  
   // formats date =>recieve data from date picker and returns formatted date
   function formatDate(dateInput) {
     if (dateInput) {
@@ -261,6 +264,7 @@ const TripParameters = () => {
         trip
       );
       console.log(result);
+      
 
       if (result.status == 201) {
         alert("Trip Successfully Added");
@@ -383,7 +387,9 @@ const TripParameters = () => {
       duty_Number:"",
       vehicle_id: "",
       driver_id: "",
+      driver_type:"",
       conductor_id: "",
+      conductor_type:"",
       start_date: "",
       end_date: "",
       departure_location: {
@@ -408,19 +414,23 @@ const TripParameters = () => {
 
   const handleChangeDriver = (event, newValue) => {
     setselectedDriver(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,driver_id:newValue.id}):setOutboundTrip({...outboundTrip,driver_id:""})
+    newValue?.id?setOutboundTrip({...outboundTrip,driver_id:newValue.id,driver_type:newValue.type}):setOutboundTrip({...outboundTrip,driver_id:"",driver_type:""})
   }
 
   const handleChangeConductor = (event, newValue) => {
     setselectedConductor(newValue)
-    newValue?.id?setOutboundTrip({...outboundTrip,conductor_id:newValue.id}):setOutboundTrip({...outboundTrip,conductor_id:""})
+    newValue?.id?setOutboundTrip({...outboundTrip,conductor_id:newValue.id,conductor_type:newValue.type}):setOutboundTrip({...outboundTrip,conductor_id:"",conductor_type:""})
   }
 
-  const handleChangeVehicle = (event, newValue) => {
+  const handleChangeVehicle = (event, newValue) => {    
     setSelectedBus(newValue)
     newValue?.id?setOutboundTrip({...outboundTrip,vehicle_id:newValue.id}):setOutboundTrip({...outboundTrip,vehicle_id:""})
   }
 
+  useEffect(()=>{
+    console.log(outboundTrip);
+    
+  },[outboundTrip])
 
   return (
     <div>
@@ -430,7 +440,15 @@ const TripParameters = () => {
         <Container fluid className="TripParameters">
           <Row>
             <Col xs={2}></Col>
-              <Col xs={6} className="mt-3">
+              {
+                (loadingCond || loadingDriv || loadingVeh)?
+                <Col xs={6} className="mt-3">
+                  <Card className="shadow-sm border-0 d-flex justify-content-center align-items-center flex-column p-5 gap-3" style={{height:"50vh"}}>
+                    <span className="fw-bold text-info fs-5">Please Hold On...</span>
+                    <span className="fs-6">Content is Loading <FontAwesomeIcon icon={faSpinner} spinPulse /></span>
+                  </Card>
+                </Col>:
+                <Col xs={6} className="mt-3">
                 <Card className="shadow-sm border-0">
                   <Card.Body>
                     <Card.Title className="d-flex align-items-center">
@@ -730,7 +748,7 @@ const TripParameters = () => {
                                 inputValue={searchDriver}
                                 onInputChange={(event, newInputValue) =>setsearchDriver(newInputValue)}
                                 onChange={handleChangeDriver}
-                                options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id })).slice(0,5)}
+                                options={drivers.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id, type:item.driver_type }))}
                                 getOptionLabel={(option) => (option?.value ? option.value : "")}
                                 renderInput={(params) => <TextField {...params} label="Choose Driver" />}
                               />
@@ -753,7 +771,7 @@ const TripParameters = () => {
                                 inputValue={searchConductor}
                                 onInputChange={(event, newInputValue) =>setsearchConductor(newInputValue)}
                                 onChange={handleChangeConductor}
-                                options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id })).slice(0,5)}
+                                options={conductors.map(item=>({ label: item.PEN+" "+item.EmployeeName, value: item.PEN, id:item._id, type:item.conductor_type }))}
                                 getOptionLabel={(option) => (option?.value ? option.value : "")}
                                 renderInput={(params) => <TextField {...params} label="Choose Conductor" />}
                               />
@@ -799,6 +817,7 @@ const TripParameters = () => {
                   </Card.Body>
                 </Card>
               </Col>
+              }
             {/* Trip Cost Sidebar */}
             <Col xs={3} className="mt-3">
               <Card className="trip-cost-card shadow-sm border-0 p-0">

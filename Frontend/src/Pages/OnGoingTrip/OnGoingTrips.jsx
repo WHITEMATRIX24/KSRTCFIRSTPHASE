@@ -349,9 +349,9 @@ export default function OnGoingTrips() {
           cancelTrip.conductor_id,
           updatedTrip
         );
-        //console.log(result)
+        console.log(updatedVehicle);
         const result2 = await updateVehicleStatus(
-          updatedVehicle._id,
+          cancelTrip.vehicle_id,
           updatedVehicle
         );
 
@@ -582,13 +582,14 @@ export default function OnGoingTrips() {
                               <thead>
                                 <tr className="bg-light">
                                   <th>WAYBILL NO</th>
+                                  <th>DUTY NO</th>
                                   <th>TRIP TYPE</th>
                                   <th>VEHICLE</th>
                                   <th>DRIVER</th>
-                                  <th>START DATE</th>
+                                  <th>START Details</th>
                                   {/*                             <th>END DATE</th>
                                    */}{" "}
-                                  <th>DEPO DETAILS</th>
+                                  <th>END DETAILS</th>
                                   <th></th>
                                   <th></th>
                                 </tr>
@@ -598,6 +599,7 @@ export default function OnGoingTrips() {
                                 {modifiedTrips.map((trip) => (
                                   <tr key={trip.trip_id} className="bg-white">
                                     <td>{trip.waybill_Number}</td>
+                                    <td>{trip.duty_Number}</td>
                                     <td>
                                       <span className="text-primary ms-1">
                                         {trip?.trip_type.toUpperCase()}
@@ -627,6 +629,11 @@ export default function OnGoingTrips() {
                                     </td>
 
                                     <td>
+                                      {trip.departure_location.depo && (
+                                        <p className="mb-0 fw-bold">
+                                          {trip.departure_location.depo}
+                                        </p>
+                                      )}
                                       {new Date(
                                         trip.start_date
                                       ).toLocaleDateString()}
@@ -644,23 +651,19 @@ export default function OnGoingTrips() {
                                { trip.end_time &&<small>  {formatTime(trip.end_time)}</small>}
                               </td> */}
                                     <td>
-                                      {trip.departure_location.depo ==
-                                        depoName && (
+                                      {trip.arrival_location.depo && (
+                                        <p className="mb-0 fw-bold">
+                                          {trip.arrival_location.depo}
+                                        </p>
+                                      )}
+                                      {trip.end_date && (
                                         <>
                                           {" "}
-                                          Ends in {trip.arrival_location.depo}
+                                          {new Date(
+                                            trip.end_date
+                                          ).toLocaleDateString()}
                                         </>
                                       )}
-                                      {trip.departure_location.depo !=
-                                        depoName && (
-                                        <span className="mt-0">
-                                          {" "}
-                                          Starts From{" "}
-                                          {trip.departure_location.depo}
-                                        </span>
-                                      )}
-                                      <br />
-
                                       {trip.end_time && (
                                         <small> {trip.end_time}</small>
                                       )}
