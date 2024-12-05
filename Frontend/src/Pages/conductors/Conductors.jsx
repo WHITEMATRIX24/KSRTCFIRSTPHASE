@@ -346,7 +346,7 @@ const Conductors = () => {
                           <br />
                           <span>{conductor.PEN}</span>
                         </td>
-                        <td>{conductor["Designation "]}</td>
+                        <td>{conductor["Designation "]||conductor.Designation }</td>
 
                         <td>{conductor.is_Permanent}</td>
 

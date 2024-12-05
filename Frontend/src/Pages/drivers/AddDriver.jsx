@@ -65,6 +65,8 @@ const AddDriver = () => {
         console.log(err);
       }
     }
+    console.log("Driver",driverData);
+    
   };
 
   return (
@@ -144,7 +146,7 @@ const AddDriver = () => {
                             value={driverData.is_Permanent}>
                             <option disabled value="">Select Employment Type</option>
                             <option value="Permanent">Permanent</option>
-                            <option value="Badli">Badli</option>
+                            <option value="Badali">Badali</option>
                           </Form.Control>
                         </Col>
                         <Col>
