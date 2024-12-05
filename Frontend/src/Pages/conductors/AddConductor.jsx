@@ -145,7 +145,7 @@ const AddConductor = () => {
                           >
                             <option value="" disabled>Select Employment Type</option>
                             <option value="Permanent">Permanent</option>
-                            <option value="Badli">Badli</option>
+                            <option value="Badali">Badali</option>
                           </Form.Control>
                         </Col>
                       </Col>

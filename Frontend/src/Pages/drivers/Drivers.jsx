@@ -429,7 +429,7 @@ const Drivers = () => {
                           <br />
                           <span>{driver.PEN}</span>
                         </td>
-                        <td>{driver["Designation "]}</td>
+                        <td>{driver["Designation "]||driver.Designation }</td>
 
                         <td>{driver.is_Permanent}</td>
 
