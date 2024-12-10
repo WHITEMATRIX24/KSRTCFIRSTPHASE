@@ -73,6 +73,7 @@ import {
   getCollectionsOfDepotAndDate,
 } from "../Controllers/TrpCollectionController.js";
 import { getFilteredDCEmployeesForTrip } from "../Controllers/dcEmployeesController.js";
+import { addPambaChainService, getAllPambaChainServices } from "../Controllers/PambaChainController.js";
 // Initialize router
 const router = express.Router();
 
@@ -258,6 +259,17 @@ router.get("/getCollectionByDate/:date", getCollectionsOfDate);
 
 // get collection by date and depot
 router.get("/getFilteredCollection/:date/:depot", getCollectionsOfDepotAndDate);
+
+
+
+// <<<<<<<........Pumba Chain Services Routes.........>>>>>>>
+
+// get All Services
+router.get('/pambaChainServices',getAllPambaChainServices)
+
+// add service
+router.post('/pambaChainServices',addPambaChainService)
+
 
 // <<<<<<<........DC Employees Routes.........>>>>>>>
 

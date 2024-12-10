@@ -7,6 +7,7 @@ import {
   faChartPie,
   faDriversLicense,
   faGear,
+  faLink,
   faPowerOff,
   faTruck,
 } from "@fortawesome/free-solid-svg-icons";
@@ -24,6 +25,7 @@ function NavSidebar() {
   const [isMaintenance, setIsMaintenance] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [userData,setUserData]=useState({});
+  const [showPambaChainService,setShowPambaChainService]=useState(false)
 
   const navigate = useNavigate()
 
@@ -78,6 +80,14 @@ function NavSidebar() {
         setIsAdmin(true)
       }
   },[role])
+
+
+  useEffect(()=>{
+    const user =JSON.parse(sessionStorage.getItem("user"))
+    if(user.depoName=="PBA" || user.role=="Admin"){
+      setShowPambaChainService(true)
+    }
+  },[])
   return (
     <ul className="sidebar-menu  w-100">
       {isAdmin && <li>
@@ -343,6 +353,21 @@ function NavSidebar() {
         </a>
         <Divider />
       </li> */}
+
+
+
+      {/* pamba chain services */}
+      {
+        showPambaChainService &&
+        <li className="">
+          <a href="/pambaChainServices" className='my-2' id='pumbaChainService'>
+            <FontAwesomeIcon className='me-2' icon={faLink} />Pamba Chain Services
+          </a>
+        </li>
+      }
+
+
+
        <li className="" onClick={handleLogOut}>
         <a href="#" className='my-2 text-danger' id='logout' onClick={() => toggleSubmenu('logout')}>
           <FontAwesomeIcon className='me-2' icon={faPowerOff} />LogOut

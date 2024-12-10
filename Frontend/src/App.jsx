@@ -18,6 +18,7 @@ import Maintenance from "./Pages/Maintenance/Maintenance";
 import Collection from "./Pages/Collection/Collection";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import PambaChainService from "./Pages/PambaChainService/PambaChainService";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path="/scheduled-trips" element={<ScheduleTrip />}></Route>
           <Route path="/ongoing-trips" element={<OnGoingTrips />}></Route>
           <Route path="/collection" element={<Collection />}></Route>
+          <Route path="/pambaChainServices" element={<PambaChainService />}></Route>
         </Route>
         <Route
           element={

@@ -468,3 +468,22 @@ export const getFilteredDriversForTripApi = async (search) => {
     ""
   );
 };
+
+// <<<<<<<<<<<<<<<<<<<<APIs for CHAIN SERVICE  COLLECTION>>>>>>>>>>>>>>>>>>>>>>>
+export const AddChainCollectionAPI = async (reqBody) => {
+  return await commonAPI(
+    "POST",
+    `${SERVERURL}/pambaChainServices`,
+    reqBody,
+    ""
+  );
+};
+
+export const getAllChainCollectionAPI = async (dateForFilter) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/pambaChainServices?date=${dateForFilter}`,
+    "",
+    ""
+  );
+};

@@ -21,6 +21,7 @@ import {
   faTowerBroadcast,
   faTriangleExclamation,
   faVanShuttle,
+  faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import ChartPie from "../components/ChartPie";
 import ChartBar from "../components/ChartBar";
@@ -41,6 +42,7 @@ import {
   getOnRouteServicesByDepoApi,
   getAllOutofServicesByDepoApi,
   getCollectionByDepoAPi,
+  getAllChainCollectionAPI,
 } from "../services/allAPI";
 import ExcelExport from "../components/ExcelExport ";
 
@@ -161,6 +163,9 @@ function Dashboard() {
     useState("full-data");
   const [filterDate, setFilterDate] = useState("");
 
+  // for pamba trips
+  const [totalPambaTrips, setTotalPambaTrips] = useState(0);
+
   // session data
   const sessionDataValue = JSON.parse(sessionStorage.getItem("user"));
 
@@ -192,7 +197,7 @@ function Dashboard() {
   const getAllTripDetails = async (dateForFilter) => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     if (userDetails.depoName == "Admin") {
-      const result = await getAllTripApi(dateForFilter);
+      const result = await getAllTripApi(dateForFilter ? dateForFilter : "");
       // console.log(result.data);
       if (result.status == 200) {
         setAllTripDetails(result.data);
@@ -269,7 +274,9 @@ function Dashboard() {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
 
     if (userDetails.depoName == "Admin") {
-      const result = await getAllCollectionAPi(dateForFilter);
+      const result = await getAllCollectionAPi(
+        dateForFilter ? dateForFilter : ""
+      );
       // Fuel Consumption total
       const ftotal = result.data.reduce((total, item) => {
         return total + item.fuelCost;
@@ -299,6 +306,29 @@ function Dashboard() {
     const result = await getAllDrivers();
     // console.log(result.data);
     setDriverDetails(result.data);
+  };
+
+  // get pamba chai service trips
+  const getPambaChainServiceTrips = async (dateToFilter) => {
+    try {
+      const res = await getAllChainCollectionAPI(
+        dateToFilter ? dateToFilter : ""
+      );
+
+      if (res.data.length > 0) {
+        const pambaTotalService = res.data.reduce((acc, current) => {
+          return acc + current.numberOfTrips;
+        }, 0);
+
+        setTotalPambaTrips(pambaTotalService);
+      } else {
+        setTotalPambaTrips(0);
+      }
+    } catch (error) {
+      console.log(
+        `error in fetching pamba chain service trips error: ${error}`
+      );
+    }
   };
 
   // Function to map conductorId to conductorName
@@ -448,6 +478,13 @@ function Dashboard() {
     return newObj;
   });
 
+  // function to check admin or pba depo for pamba
+  const isPambaOrAdmin = () => {
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (user.role === "Admin" || user.depoName === "PBA") return true;
+    return false;
+  };
+
   // getFullData for dashboard api handler
   const getInitialFullData = (dateForFilter) => {
     getAllVehicleDetails();
@@ -460,12 +497,13 @@ function Dashboard() {
     getAllLiveTripByDepo();
     getAllConductordetails();
     getAllDriverdetails();
+    getPambaChainServiceTrips(dateForFilter);
   };
 
   // console.log(AllvehicleDataFlatten);
-  useEffect(() => {
-    getInitialFullData();
-  }, []);
+  // useEffect(() => {
+  //   getInitialFullData();
+  // }, []);
 
   ////////////////////////////////////// filter by depo data api handler
   const getAllTripsDataFilteredByDepo = async (depoName, dateForFilter) => {
@@ -567,6 +605,7 @@ function Dashboard() {
         getAllLiveTripByDepo();
         getAllConductordetails();
         getAllDriverdetails();
+        getPambaChainServiceTrips(filterDate);
       }
     }
   }, [selectedDepoForFiltering, filterDate]);
@@ -577,7 +616,7 @@ function Dashboard() {
       <div className="container-fluid w-100 dashboard-container">
         <div className="row">
           <div className="col-md-2"></div>
-          <div className="col-md-10">
+          <div className="col-md-10 pb-5">
             <div className="d-flex align-items-center">
               {sessionDataValue && sessionDataValue.depoName == "Admin" && (
                 <div
@@ -725,7 +764,36 @@ function Dashboard() {
                 </div>
               </div>
             </div>
-
+            {/* chain service */}
+            {isPambaOrAdmin() && (
+              <div className="row mt-2">
+                <div className="col-md-12 d-flex justify-content-center">
+                  <div
+                    className="shadow px-4 py-3 text-center d-flex justify-content-center align-items-center w-100 gap-3"
+                    style={{ backgroundColor: "white" }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faLink}
+                      size="xl"
+                      style={{ color: "#f73b3b" }}
+                    />
+                    <p
+                      className="fw-bold fs-4 mb-0"
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: "normal",
+                        color: "#737373",
+                      }}
+                    >
+                      Total pamba chain services:{" "}
+                    </p>
+                    <p className="fw-bold fs-4 mb-0" style={{ color: "black" }}>
+                      {totalPambaTrips}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Section 2 */}
             <div className="row mt-2">
               <div className="col-md-6 ">
