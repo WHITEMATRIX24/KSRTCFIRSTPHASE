@@ -10,11 +10,11 @@ const pambaChainSchema = new mongoose.Schema({
   },
   numberOfStaffs: {
     type: Number,
-    required: true
+    required: false
   },
-  date:{
-    type:Date,
-    required:true
+  date: {
+    type: Date,
+    required: true
   }
 });
 

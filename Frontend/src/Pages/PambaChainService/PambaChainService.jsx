@@ -50,8 +50,7 @@ function PambaChainService() {
 
     if (
       !collectionDetails.date ||
-      !collectionDetails.numberOfBuses ||
-      !collectionDetails.numberOfStaffs
+      !collectionDetails.numberOfBuses
     ) {
       alert("Please Fill All Details");
     } else {
@@ -162,20 +161,20 @@ function PambaChainService() {
                 <span className="text-info ms-2 me-5"> {TotalTrip}</span>
               </Col>
             }
-            {
+            {/* {
               <Col md={4} className="text-end">
-                {/* Displaying the count of filtered items */}
+                
                 <span>Total No of Buses:</span>
                 <span className="text-info ms-2 me-5"> {TotalBuses}</span>
               </Col>
             }
             {
               <Col md={4} className="text-end">
-                {/* Displaying the count of filtered items */}
+              
                 <span>Total No of Staff:</span>
                 <span className="text-info ms-2 me-5"> {TotalStaff}</span>
               </Col>
-            }
+            } */}
           </Row>
           {/* Table */}
           {/*               {loading && busLoading && <div>
@@ -195,7 +194,7 @@ function PambaChainService() {
                       <th>DATE</th>
                       <th>TRIPS</th>
                       <th>BUSES</th>
-                      <th>STAFFS</th>
+                      <th>DUTIES</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -282,7 +281,7 @@ function PambaChainService() {
             </div>
             <div className="mt-2">
               <Form.Label className="mb-1" style={{ fontSize: "14px" }}>
-                Total No. of Staff
+                Total No. of Duties
               </Form.Label>
               <input
                 type="text"
