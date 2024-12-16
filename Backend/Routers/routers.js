@@ -20,6 +20,7 @@ import {
   getAllOnRouteDetailsByDepo,
   getAllOutofServicesDetailsByDepo,
   getFilteredVehiclesForTrip,
+  getAllInserviceVehicleDetailsByDepo,
 } from "../Controllers/VehicleController.js";
 import {
   addNewTrip,
@@ -73,7 +74,10 @@ import {
   getCollectionsOfDepotAndDate,
 } from "../Controllers/TrpCollectionController.js";
 import { getFilteredDCEmployeesForTrip } from "../Controllers/dcEmployeesController.js";
-import { addPambaChainService, getAllPambaChainServices } from "../Controllers/PambaChainController.js";
+import {
+  addPambaChainService,
+  getAllPambaChainServices,
+} from "../Controllers/PambaChainController.js";
 // Initialize router
 const router = express.Router();
 
@@ -107,6 +111,12 @@ router.get("/getOnRouteServicesByDepo/:depoName", getAllOnRouteDetailsByDepo);
 router.get(
   "/getAllOutofServicesByDepo/:depoName",
   getAllOutofServicesDetailsByDepo
+);
+
+// get all in service buses
+router.get(
+  "/get-all-in-servicebus-count/:depoName",
+  getAllInserviceVehicleDetailsByDepo
 );
 
 // <<<<<<<........Vehichel Maintanence Routes.........>>>>>>>
@@ -260,16 +270,13 @@ router.get("/getCollectionByDate/:date", getCollectionsOfDate);
 // get collection by date and depot
 router.get("/getFilteredCollection/:date/:depot", getCollectionsOfDepotAndDate);
 
-
-
 // <<<<<<<........Pumba Chain Services Routes.........>>>>>>>
 
 // get All Services
-router.get('/pambaChainServices',getAllPambaChainServices)
+router.get("/pambaChainServices", getAllPambaChainServices);
 
 // add service
-router.post('/pambaChainServices',addPambaChainService)
-
+router.post("/pambaChainServices", addPambaChainService);
 
 // <<<<<<<........DC Employees Routes.........>>>>>>>
 

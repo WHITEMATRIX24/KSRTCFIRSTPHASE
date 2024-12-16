@@ -487,3 +487,12 @@ export const getAllChainCollectionAPI = async (dateForFilter) => {
     ""
   );
 };
+
+export const getAllInserviceVehiclesCountApi = async (depo) => {
+  return await commonAPI(
+    "GET",
+    `${SERVERURL}/get-all-in-servicebus-count/${depo}`,
+    "",
+    ""
+  );
+};

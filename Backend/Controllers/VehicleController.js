@@ -581,12 +581,32 @@ export const getFilteredVehiclesForTrip = async (req, res) => {
       filter.BUSNO = { $regex: search, $options: "i" };
     }
 
-    const vehiclesList = await Vehicles.find(filter)
-      .select("BUSNO CLASS _id");
+    const vehiclesList = await Vehicles.find(filter).select("BUSNO CLASS _id");
     res.status(200).json(vehiclesList);
   } catch (err) {
     console.log(
       "Error at catch in vehicleController/getFilteredVehiclesForTrip::::::",
+      err
+    );
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// <<<<<:::::::::Get in_service bus count :::::::::>>>>>>>>
+export const getAllInserviceVehicleDetailsByDepo = async (req, res) => {
+  const { depoName } = req.params;
+  try {
+    const AllInservicesDetailsDepo = await Vehicles.find(
+      { status: "in_service", ALLOTEDDEPOT: depoName } // Query with both conditions
+    );
+    if (AllInservicesDetailsDepo) {
+      res.status(200).json(AllInservicesDetailsDepo);
+    } else {
+      res.status(406).json("Can't find any vehicle Details:::: ");
+    }
+  } catch (err) {
+    console.log(
+      "Error at catch in vehicleController/getAllOnRouteDetails::::::",
       err
     );
     res.status(500).json({ error: "Internal server error" });

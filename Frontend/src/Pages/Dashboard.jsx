@@ -43,6 +43,7 @@ import {
   getAllOutofServicesByDepoApi,
   getCollectionByDepoAPi,
   getAllChainCollectionAPI,
+  getAllInserviceVehiclesCountApi,
 } from "../services/allAPI";
 import ExcelExport from "../components/ExcelExport ";
 
@@ -232,10 +233,26 @@ function Dashboard() {
   // console.log(AllLiveTripdetails);
 
   //get total number of bussess in route
-  const getAllOnRouteDetails = async () => {
+  // const getAllOnRouteDetails = async () => {
+  //   const userDetails = JSON.parse(sessionStorage.getItem("user"));
+  //   if (userDetails.depoName == "Admin") {
+  //     const result = await getOnRouteServicesApi();
+  //     // console.log(result);
+  //     if (result.status == 200) {
+  //       const count = result.data.length;
+  //       setAllOnRouteBusesCount(count);
+  //     }
+  //   } else {
+  //     //get total number of bussess in route by depo
+  //     getAllOnRouteDetailsFilteredByDepo(userDetails.depoName);
+  //   }
+  // };
+
+  //get total number of bussess in service
+  const getAllInServiceDetails = async () => {
     const userDetails = JSON.parse(sessionStorage.getItem("user"));
     if (userDetails.depoName == "Admin") {
-      const result = await getOnRouteServicesApi();
+      const result = await getAvilableServicesApi();
       // console.log(result);
       if (result.status == 200) {
         const count = result.data.length;
@@ -243,7 +260,7 @@ function Dashboard() {
       }
     } else {
       //get total number of bussess in route by depo
-      getAllOnRouteDetailsFilteredByDepo(userDetails.depoName);
+      getAllInServiceVehicleCountFilteredByDepo(userDetails.depoName);
     }
   };
 
@@ -489,7 +506,8 @@ function Dashboard() {
   const getInitialFullData = (dateForFilter) => {
     getAllVehicleDetails();
     getAllTripDetails(dateForFilter);
-    getAllOnRouteDetails();
+    // getAllOnRouteDetails();
+    getAllInServiceDetails();
     getAllBusesInServices();
     getAllCompletedTripDetails(dateForFilter);
     getOutOfServicesCount();
@@ -533,8 +551,18 @@ function Dashboard() {
     }
   };
 
-  const getAllOnRouteDetailsFilteredByDepo = async (depoName) => {
-    const result = await getOnRouteServicesByDepoApi(depoName);
+  // const getAllOnRouteDetailsFilteredByDepo = async (depoName) => {
+  //   const result = await getOnRouteServicesByDepoApi(depoName);
+  //   if (result.status == 200) {
+  //     const count = result.data.length;
+  //     setAllOnRouteBusesCount(count);
+  //   } else {
+  //     setAllOnRouteBusesCount(0);
+  //   }
+  // };
+
+  const getAllInServiceVehicleCountFilteredByDepo = async (depoName) => {
+    const result = await getAllInserviceVehiclesCountApi(depoName);
     if (result.status == 200) {
       const count = result.data.length;
       setAllOnRouteBusesCount(count);
@@ -592,10 +620,11 @@ function Dashboard() {
       } else {
         getAllTripsDataFilteredByDepo(selectedDepoForFiltering, filterDate);
         getAllVehiclesDataFilteredByDepo(selectedDepoForFiltering, filterDate);
-        getAllOnRouteDetailsFilteredByDepo(
-          selectedDepoForFiltering,
-          filterDate
-        );
+        // getAllOnRouteDetailsFilteredByDepo(
+        //   selectedDepoForFiltering,
+        //   filterDate
+        // );
+        getAllInServiceVehicleCountFilteredByDepo(selectedDepoForFiltering);
         getAllCompletedTripsFilteredByDepo(
           selectedDepoForFiltering,
           filterDate
@@ -736,7 +765,7 @@ function Dashboard() {
                       className="text-secondary"
                       style={{ fontSize: "13px", fontWeight: "normal" }}
                     >
-                      Total number of buses in route
+                      Total number of buses in services
                     </h6>
                   </div>
                 </div>
