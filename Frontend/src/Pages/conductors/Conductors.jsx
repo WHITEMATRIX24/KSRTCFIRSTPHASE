@@ -69,7 +69,6 @@ const Conductors = () => {
     }
   };
 
-
   // ------------------------------------------- Delete single Conductor -------------------------------------------
   const handleShowDeleteOptions = (id) => {
     setShowDeleteId((prevId) => (prevId === id ? null : id));
@@ -127,7 +126,6 @@ const Conductors = () => {
     }
   };
 
-
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
     setCurrentPage(0);
@@ -138,30 +136,38 @@ const Conductors = () => {
     setCurrentPage(data.selected);
   };
 
-
   const navigate = useNavigate();
   const handleAddConductor = () => {
     navigate("/add-conductor");
   };
 
-  const[data,setData]=useState({conductors:[],length:0})
+  const [data, setData] = useState({ conductors: [], length: 0 });
 
-  useEffect(()=>{
-    getFilteredConductors()
-  },[currentPage,itemsPerPage,searchConductor,employmentType,status])
+  useEffect(() => {
+    getFilteredConductors();
+  }, [currentPage, itemsPerPage, searchConductor, employmentType, status]);
 
   // api call
-  const getFilteredConductors = async()=>{
-    setLoading(true)
-    try{
-      const result = await getFilteredConductorsListApi(currentPage,itemsPerPage,searchConductor,status,employmentType)
-      setData({conductors:result.data.conductors,length:result.data.length})
-    }catch(err){
-      console.log("failed to feth filtered conductors",err);
+  const getFilteredConductors = async () => {
+    setLoading(true);
+    try {
+      const result = await getFilteredConductorsListApi(
+        currentPage,
+        itemsPerPage,
+        searchConductor,
+        status,
+        employmentType
+      );
+      setData({
+        conductors: result.data.conductors,
+        length: result.data.length,
+      });
+    } catch (err) {
+      console.log("failed to feth filtered conductors", err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -186,9 +192,35 @@ const Conductors = () => {
           <hr className="vehicle-horizontal-line" />
 
           <div className="d-flex">
-            <button className="btn me-md-2" style={{borderBottom:employmentType==""?"3px solid green" : "none"}} onClick={()=>setEmploymentType("")}>ALL STATUSES</button>
-            <button className="btn me-md-2" style={{borderBottom:employmentType=="Permanent"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Permanent")}>PERMANENT</button>
-            <button className="btn me-md-2" style={{borderBottom:employmentType=="Badali"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Badali")}>BADALI</button>
+            <button
+              className="btn me-md-2"
+              style={{
+                borderBottom: employmentType == "" ? "3px solid green" : "none",
+              }}
+              onClick={() => setEmploymentType("")}
+            >
+              ALL STATUSES
+            </button>
+            <button
+              className="btn me-md-2"
+              style={{
+                borderBottom:
+                  employmentType == "Permanent" ? "3px solid green" : "none",
+              }}
+              onClick={() => setEmploymentType("Permanent")}
+            >
+              PERMANENT
+            </button>
+            <button
+              className="btn me-md-2"
+              style={{
+                borderBottom:
+                  employmentType == "Badali" ? "3px solid green" : "none",
+              }}
+              onClick={() => setEmploymentType("Badali")}
+            >
+              BADALI
+            </button>
           </div>
           <hr className="vehicle-horizontal-line" />
 
@@ -334,7 +366,7 @@ const Conductors = () => {
                         <td>{currentPage * itemsPerPage + index + 1}</td>
                         <td>
                           <img
-                            src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8"
+                            src="/user.png"
                             alt=""
                             height={"50px"}
                             width={"50px"}
@@ -346,7 +378,9 @@ const Conductors = () => {
                           <br />
                           <span>{conductor.PEN}</span>
                         </td>
-                        <td>{conductor["Designation "]||conductor.Designation }</td>
+                        <td>
+                          {conductor["Designation "] || conductor.Designation}
+                        </td>
 
                         <td>{conductor.is_Permanent}</td>
 
@@ -474,9 +508,7 @@ const Conductors = () => {
                   previousLabel={"Previous"}
                   nextLabel={"Next"}
                   breakLabel={"..."}
-                  pageCount={Math.ceil(
-                    data.length / itemsPerPage
-                  )}
+                  pageCount={Math.ceil(data.length / itemsPerPage)}
                   marginPagesDisplayed={3}
                   pageRangeDisplayed={3}
                   onPageChange={handlePageClick}

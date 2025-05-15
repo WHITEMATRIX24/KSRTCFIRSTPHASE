@@ -401,7 +401,7 @@ const Vehicles = () => {
       .filter(
         (vehicle) =>
           depotFilter === "All Depot" || vehicle.ALLOTEDDEPOT === depotFilter
-      )
+      );
     setFilteredVehicles(updatedFilteredVehicles);
     setCurrentPage(0);
   }, [
@@ -411,7 +411,7 @@ const Vehicles = () => {
     searchVehicle,
     userRole,
     depotName,
-    depotFilter
+    depotFilter,
   ]);
 
   useEffect(() => {
@@ -509,7 +509,7 @@ const Vehicles = () => {
                   <option value="AC PREMIUM SF">AC PREMIUM SF</option>
                 </Form.Control>
 
-                {userRole === "Admin" && ( 
+                {userRole === "Admin" && (
                   <Form.Control
                     as="select"
                     value={depotFilter}
@@ -531,7 +531,7 @@ const Vehicles = () => {
                     placeholder="Search Vehicle"
                     value={searchVehicle}
                     onChange={(e) => setSearchVehicle(e.target.value)}
-                    style={{ width: '200px' }}
+                    style={{ width: "200px" }}
                   />
                 </div>
               </div>
@@ -541,7 +541,7 @@ const Vehicles = () => {
                   onClick={() => {
                     setActiveStatus("ALL STATUSES");
                     setVehicleType("All Types");
-                    setDepotFilter("All Depot")
+                    setDepotFilter("All Depot");
                   }}
                 >
                   <FontAwesomeIcon className="me-2" icon={faXmark} />
@@ -635,22 +635,20 @@ const Vehicles = () => {
                         <td>{currentPage * itemsPerPage + index + 1}</td>
                         <td>
                           <img
-                            src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8"
+                            src="/ksrtc.jpeg"
                             alt=""
                             height={"50px"}
                             width={"50px"}
                           />
                         </td>
-                        
+
                         <td>
                           <strong>{vehicle.BUSNO}</strong>
                           <br />
                           <span>{vehicle.REGNO}</span>
                         </td>
                         <td>{vehicle.CLASS}</td>
-                        <td>
-                        {vehicle.ALLOTEDDEPOT}
-                        </td>
+                        <td>{vehicle.ALLOTEDDEPOT}</td>
                         <td>
                           <div
                             className="p-2 rounded"
@@ -934,7 +932,7 @@ const Vehicles = () => {
                             )}
                         </td>
                         <td>
-                          <div style={{ position:"absolute", width: "100px" }}>
+                          <div style={{ position: "absolute", width: "100px" }}>
                             <FontAwesomeIcon
                               icon={faEllipsisVertical}
                               style={{ cursor: "pointer" }}

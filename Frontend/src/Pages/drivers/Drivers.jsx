@@ -40,8 +40,8 @@ const Drivers = () => {
   const [editleave, setEditLeave] = useState({ on_leave: "" });
   const [show, setShow] = useState(false);
   const [currentId, setCurrentId] = useState(null);
-  const [driverDetails,setDriverDetails]=useState([]);
-  const [totalPages,setTotalPages]=useState({});
+  const [driverDetails, setDriverDetails] = useState([]);
+  const [totalPages, setTotalPages] = useState({});
 
   // console.log(activeStatus);
 
@@ -157,7 +157,7 @@ const Drivers = () => {
   };
 
   const handlePageClick = (data) => {
-    console.log("aer",data.selected);
+    console.log("aer", data.selected);
     setCurrentPage(data.selected);
   };
 
@@ -218,31 +218,37 @@ const Drivers = () => {
 
   // <<<:::Api call for Driver Details By Pagination::>>>
 
-  const driverByPagination=async(req,res)=>{
+  const driverByPagination = async (req, res) => {
     setLoading(true);
-    try{
-      const Details= await getDriverByPagination(currentPage,itemsPerPage,searchDriver,status,employmentType);
+    try {
+      const Details = await getDriverByPagination(
+        currentPage,
+        itemsPerPage,
+        searchDriver,
+        status,
+        employmentType
+      );
       // console.log("DATA",Details.data);
-        if(Details.status==200){
-          setTotalPages(Details.data.meta);
-          setDriverDetails(Details.data.data);
-        }else{
-          console.log(Details.status);  
-        }
-    }catch(err){
+      if (Details.status == 200) {
+        setTotalPages(Details.data.meta);
+        setDriverDetails(Details.data.data);
+      } else {
+        console.log(Details.status);
+      }
+    } catch (err) {
       console.log(err);
-    }finally {
+    } finally {
       setLoading(false);
     }
-  }
-// console.log("DA",driverDetails);
-// console.log("employ:",employmentType);
-// console.log("Status:",status);
-// console.log("Meta:",totalPages);
+  };
+  // console.log("DA",driverDetails);
+  // console.log("employ:",employmentType);
+  // console.log("Status:",status);
+  // console.log("Meta:",totalPages);
 
-  useEffect(()=>{
+  useEffect(() => {
     driverByPagination();
-  },[currentPage,itemsPerPage,searchDriver,status,employmentType])
+  }, [currentPage, itemsPerPage, searchDriver, status, employmentType]);
 
   return (
     <>
@@ -267,9 +273,35 @@ const Drivers = () => {
           {/* <hr className="vehicle-horizontal-line" /> */}
 
           <div className="d-flex">
-            <button className="btn me-md-2" style={{borderBottom:employmentType==""?"3px solid green" : "none"}} onClick={()=>setEmploymentType("")}>ALL STATUSES</button>
-            <button className="btn me-md-2" style={{borderBottom:employmentType=="Permanent"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Permanent")}>PERMANENT</button>
-            <button className="btn me-md-2" style={{borderBottom:employmentType=="Badali"?"3px solid green" : "none"}} onClick={()=>setEmploymentType("Badali")}>BADALI</button>
+            <button
+              className="btn me-md-2"
+              style={{
+                borderBottom: employmentType == "" ? "3px solid green" : "none",
+              }}
+              onClick={() => setEmploymentType("")}
+            >
+              ALL STATUSES
+            </button>
+            <button
+              className="btn me-md-2"
+              style={{
+                borderBottom:
+                  employmentType == "Permanent" ? "3px solid green" : "none",
+              }}
+              onClick={() => setEmploymentType("Permanent")}
+            >
+              PERMANENT
+            </button>
+            <button
+              className="btn me-md-2"
+              style={{
+                borderBottom:
+                  employmentType == "Badali" ? "3px solid green" : "none",
+              }}
+              onClick={() => setEmploymentType("Badali")}
+            >
+              BADALI
+            </button>
           </div>
 
           <hr className="vehicle-horizontal-line" />
@@ -417,7 +449,7 @@ const Drivers = () => {
                         <td>{currentPage * itemsPerPage + index + 1}</td>
                         <td>
                           <img
-                            src="https://english.mathrubhumi.com/image/contentid/policy:1.5293129:1644566410/image.jpg?$p=0f6e831&f=4x3&w=1080&q=0.8"
+                            src="/user.png"
                             alt=""
                             height={"50px"}
                             width={"50px"}
@@ -429,7 +461,7 @@ const Drivers = () => {
                           <br />
                           <span>{driver.PEN}</span>
                         </td>
-                        <td>{driver["Designation "]||driver.Designation }</td>
+                        <td>{driver["Designation "] || driver.Designation}</td>
 
                         <td>{driver.is_Permanent}</td>
 
@@ -556,7 +588,7 @@ const Drivers = () => {
                   previousLabel={"Previous"}
                   nextLabel={"Next"}
                   breakLabel={"..."}
-                  pageCount={totalPages?.totalPages || 0} 
+                  pageCount={totalPages?.totalPages || 0}
                   marginPagesDisplayed={3}
                   pageRangeDisplayed={3}
                   onPageChange={handlePageClick}
@@ -570,7 +602,7 @@ const Drivers = () => {
                   breakClassName={"page-item"}
                   breakLinkClassName={"page-link"}
                   activeClassName={"active"}
-                   forcePage={currentPage}
+                  forcePage={currentPage}
                 />
               </div>
             )}

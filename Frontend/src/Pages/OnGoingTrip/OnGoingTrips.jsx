@@ -10,6 +10,7 @@ import {
   faUser,
   faEllipsisV,
   faL,
+  faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../../components/common/Header";
 import Button from "react-bootstrap/Button";
@@ -25,6 +26,10 @@ import {
   getAllLiveTripApi,
   getAllLiveTripApiForAdmin,
 } from "../../services/allAPI";
+import {
+  LocationModal,
+  LocationModalLatAndLong,
+} from "../../components/modalLocation/LocationModal";
 
 export default function OnGoingTrips() {
   const depoList = [
@@ -132,6 +137,10 @@ export default function OnGoingTrips() {
   const [modifiedTrips, setModifiedTrips] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [locationModalOption, setLocationModalOption] = useState({
+    isOpen: false,
+    isOpen1: false,
+  });
 
   //state to store trip colleftion and fuel cost
   const [tripCost, setTripCost] = useState({
@@ -474,6 +483,26 @@ export default function OnGoingTrips() {
   //   getAllDriversList();
   // }, [depoName]);
 
+  // location modal open handler
+  const handleLocationModalOpen = () => {
+    setLocationModalOption({ isOpen: true });
+  };
+
+  // location modal close handler
+  const handleLocationModalClose = () => {
+    setLocationModalOption({ isOpen: false });
+  };
+
+  // location modal open handler
+  const handleLocationModalOpen1 = () => {
+    setLocationModalOption({ isOpen1: true });
+  };
+
+  // location modal close handler
+  const handleLocationModalClose1 = () => {
+    setLocationModalOption({ isOpen1: false });
+  };
+
   useEffect(() => {
     getAllTrips();
   }, [depoName]);
@@ -505,7 +534,7 @@ export default function OnGoingTrips() {
         <Container fluid className="p-4" style={{ backgroundColor: "#f8f9fa" }}>
           <Row className="">
             <Col md={2}></Col>
-            <Col md={9}>
+            <Col md={10} className="pe-5">
               <h1 className=" h5 mb-5">Live Trips</h1>
 
               {/* Filters */}
@@ -590,6 +619,7 @@ export default function OnGoingTrips() {
                                   {/*                             <th>END DATE</th>
                                    */}{" "}
                                   <th>END DETAILS</th>
+                                  <th></th>
                                   <th></th>
                                   <th></th>
                                 </tr>
@@ -692,6 +722,22 @@ export default function OnGoingTrips() {
                                   <FontAwesomeIcon className='text-danger' onClick={() => showDeleteModal(trip.id)} icon={faTrash} />
                                 </Button>
                               </td> */}
+                                    <td>
+                                      <button
+                                        className="btn btn-primary"
+                                        onClick={handleLocationModalOpen}
+                                      >
+                                        <FontAwesomeIcon icon={faLocationDot} />
+                                      </button>
+                                    </td>
+                                    <td>
+                                      <button
+                                        className="btn btn-primary"
+                                        onClick={handleLocationModalOpen1}
+                                      >
+                                        <FontAwesomeIcon icon={faLocationDot} />
+                                      </button>
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -717,7 +763,7 @@ export default function OnGoingTrips() {
               )}
             </Col>
 
-            <Col md={1}></Col>
+            {/* <Col md={1}></Col> */}
           </Row>
         </Container>
 
@@ -946,6 +992,20 @@ export default function OnGoingTrips() {
             </Button>
           </Modal.Footer>
         </Modal>
+
+        {/* location modal */}
+        {locationModalOption.isOpen && (
+          <LocationModal
+            show={locationModalOption.isOpen}
+            handleClose={handleLocationModalClose}
+          />
+        )}
+        {locationModalOption.isOpen1 && (
+          <LocationModalLatAndLong
+            show={locationModalOption.isOpen1}
+            handleClose={handleLocationModalClose1}
+          />
+        )}
       </div>
     </div>
   );
